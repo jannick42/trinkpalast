@@ -1,0 +1,2969 @@
+<!DOCTYPE html>
+<html lang="de" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🍻 TrinkPalast 3000 | by Uilderks</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="css/tailwind.css"></script>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            heading: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            party: {
+              purple: '#8B5CF6',
+              pink: '#EC4899',
+              cyan: '#06B6D4',
+              amber: '#F59E0B',
+              dark: '#090D16',
+              card: '#1E293B',
+            }
+          },
+          animation: {
+            'pulse-glow': 'pulseGlow 2s infinite alternate',
+            'float': 'float 3.5s ease-in-out infinite',
+            'bounce-subtle': 'bounceSubtle 2s infinite',
+            'spin-slow': 'spin 8s linear infinite',
+          },
+          keyframes: {
+            pulseGlow: {
+              '0%': { boxShadow: '0 0 15px rgba(236, 72, 153, 0.4), 0 0 30px rgba(139, 92, 246, 0.2)' },
+              '100%': { boxShadow: '0 0 30px rgba(236, 72, 153, 0.8), 0 0 50px rgba(6, 182, 212, 0.5)' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-8px)' },
+            },
+            bounceSubtle: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-5px)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #090D16;
+      color: #F8FAFC;
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    h1, h2, h3, .font-heading {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    #bg-canvas, #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+    }
+    #bg-canvas { z-index: 0; }
+    #confetti-canvas { z-index: 60; }
+
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .glass-card {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.96) 0%, rgba(15, 23, 42, 0.98) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .card-scene {
+      perspective: 1200px;
+      -webkit-perspective: 1200px;
+      width: 100%;
+      max-width: 380px;
+      height: 480px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    @media (max-height: 720px) {
+      .card-scene {
+        height: 420px;
+      }
+    }
+
+    .card-inner {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      -webkit-transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .card-inner.flipped {
+      transform: rotateY(180deg);
+      -webkit-transform: rotateY(180deg);
+    }
+
+    .card-front,
+    .card-back {
+      grid-area: 1 / 1;
+      width: 100%;
+      height: 100%;
+      border-radius: 1.5rem;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transform-style: preserve-3d;
+      -webkit-transform-style: preserve-3d;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    .card-front {
+      transform: rotateY(0deg);
+      -webkit-transform: rotateY(0deg);
+      z-index: 2;
+    }
+
+    .card-back {
+      transform: rotateY(180deg);
+      -webkit-transform: rotateY(180deg);
+      z-index: 1;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); }
+    ::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.5); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(236, 72, 153, 0.8); }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between relative overflow-x-hidden antialiased">
+
+  <canvas id="bg-canvas"></canvas>
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Top Header Navigation -->
+  <div class="relative z-10 w-full max-w-4xl mx-auto px-4 pt-4 pb-2">
+    <header class="glass-panel rounded-2xl px-5 py-3 flex items-center justify-between shadow-xl">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="app.showScreen('setup')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-pink-500 via-purple-600 to-cyan-400 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-pink-500/30">
+          🍻
+        </div>
+        <div>
+          <h1 class="font-heading font-black text-xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-300 to-cyan-400">
+            TRINKPALAST <span class="inline-block -translate-y-[4px] text-xs px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30 font-mono">3000</span>
+			<span id="mg-player-name" style="display: none;"></span>
+          </h1>
+          <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Don't drink & drive - Just sauf & lauf :)</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-2">
+        <button id="sound-btn" onclick="soundManager.toggleMute()" class="w-10 h-10 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700/60 flex items-center justify-center text-slate-300 hover:text-white transition-all">
+          <i class="fas fa-volume-up" id="sound-icon"></i>
+        </button>
+        <button id="nav-leaderboard-btn" onclick="app.toggleLeaderboardModal()" class="w-10 h-10 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700/60 flex items-center justify-center text-amber-400 hover:text-amber-300 transition-all relative">
+          <i class="fas fa-trophy"></i>
+          <span id="sip-badge-total" class="absolute -top-1 -right-1 bg-pink-500 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
+        </button>
+      </div>
+    </header>
+  </div>
+
+  <main class="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-4 w-full max-w-4xl mx-auto">
+
+    <!-- ==================== SCREEN 1: SETUP SCREEN ==================== -->
+    <div id="screen-setup" class="w-full max-w-xl space-y-6">
+      <div class="text-center space-y-1">
+        <h2 class="text-3xl sm:text-4xl font-heading font-extrabold text-white">Party-Setup</h2>
+        <p class="text-slate-400 text-sm">Mitspieler eintragen, Modus wählen & Decks festlegen!</p>
+      </div>
+
+      <div class="glass-panel p-5 rounded-2xl space-y-4 shadow-2xl">
+        <div class="flex justify-between items-center">
+          <h3 class="font-heading font-bold text-lg text-pink-400 flex items-center gap-2">
+            <i class="fas fa-users"></i> Mitspieler (<span id="player-count">0</span>)
+          </h3>
+          <span class="text-xs text-slate-400">Mindestens 2 Spieler</span>
+        </div>
+
+        <div class="flex gap-2">
+          <input type="text" id="player-name-input" placeholder="Name eingeben..." maxlength="15" 
+            class="flex-1 bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all text-sm"
+            onkeypress="if(event.key==='Enter') app.addPlayer()">
+          <button onclick="app.addPlayer()" class="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-5 rounded-xl font-bold shadow-lg shadow-pink-500/25 flex items-center gap-2 transition-all active:scale-95">
+            <i class="fas fa-plus"></i> <span class="hidden sm:inline">Hinzufügen</span>
+          </button>
+        </div>
+
+        <div id="player-chips" class="flex flex-wrap gap-2 pt-2 min-h-[40px]"></div>
+      </div>
+
+      <div class="glass-panel p-5 rounded-2xl space-y-3 shadow-2xl">
+        <h3 class="font-heading font-bold text-lg text-cyan-400 flex items-center gap-2">
+          <i class="fas fa-fire"></i> Intensität & Schluck-Modus
+        </h3>
+        <div class="grid grid-cols-3 gap-2.5">
+          <button onclick="app.setDifficulty('easy')" id="diff-easy" class="diff-btn glass-panel p-3 rounded-xl border-slate-700 text-center transition-all">
+            <div class="text-2xl mb-1">🍺</div>
+            <div class="font-bold text-xs sm:text-sm text-emerald-400">Warm-Up</div>
+            <div class="text-[11px] text-slate-400 mt-1">1-3 Schlücke</div>
+          </button>
+
+          <button onclick="app.setDifficulty('medium')" id="diff-medium" class="diff-btn glass-panel p-3 rounded-xl border-pink-500 bg-pink-500/10 text-center transition-all shadow-lg shadow-pink-500/20">
+            <div class="text-2xl mb-1">🍻</div>
+            <div class="font-bold text-xs sm:text-sm text-pink-400">Party-Modus</div>
+            <div class="text-[11px] text-slate-400 mt-1">2-5 Schlücke</div>
+          </button>
+
+          <button onclick="app.setDifficulty('hard')" id="diff-hard" class="diff-btn glass-panel p-3 rounded-xl border-slate-700 text-center transition-all">
+            <div class="text-2xl mb-1">🔥</div>
+            <div class="font-bold text-xs sm:text-sm text-amber-400">Abriss!</div>
+            <div class="text-[11px] text-slate-400 mt-1">3-8 Schlücke</div>
+          </button>
+        </div>
+      </div>
+
+      <div class="glass-panel p-5 rounded-2xl space-y-3 shadow-2xl">
+        <div class="flex justify-between items-center">
+          <h3 class="font-heading font-bold text-lg text-purple-400 flex items-center gap-2">
+            <i class="fas fa-layer-group"></i> Kartendecks
+          </h3>
+          <button onclick="app.toggleAllDecks()" class="text-xs text-cyan-400 hover:underline font-semibold">Alle wählen</button>
+        </div>
+
+        <div id="deck-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5"></div>
+      </div>
+
+      <button onclick="app.startGame()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-cyan-500 text-white font-heading font-black text-xl tracking-wider uppercase shadow-2xl shadow-pink-500/40 hover:shadow-pink-500/60 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 animate-pulse-glow">
+        <i class="fas fa-play text-2xl"></i> SPIEL STARTEN!
+      </button>
+    </div>
+
+    <!-- ==================== SCREEN 2: GAMEPLAY SCREEN ==================== -->
+    <div id="screen-game" class="w-full max-w-lg hidden space-y-4">
+      <div class="flex items-center justify-between text-xs font-bold text-slate-400 px-1">
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-1 rounded-lg bg-slate-800/80 border border-slate-700 text-purple-300" id="game-deck-badge">Deck</span>
+          <span class="text-slate-500">Karte <span id="current-card-num" class="text-white">1</span> / <span id="total-card-num">30</span></span>
+        </div>
+        <button onclick="app.showScreen('setup')" class="text-slate-400 hover:text-white transition-all flex items-center gap-1">
+          <i class="fas fa-sliders-h"></i> Setup
+        </button>
+      </div>
+
+      <!-- 3D CARD CONTAINER -->
+      <div class="card-scene">
+        <div id="card-element" class="card-inner cursor-pointer" onclick="app.flipCard()">
+          
+          <!-- CARD FRONT -->
+          <div class="card-front glass-card shadow-2xl p-6 border-2 border-pink-500/30 text-center relative">
+            <div class="absolute -top-20 -left-20 w-40 h-40 bg-pink-500/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-20 -right-20 w-40 h-40 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="w-full flex justify-between items-center z-10">
+              <span id="front-category-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-pink-500/20 text-pink-300 border border-pink-500/30 uppercase tracking-wider">
+                Kategorie
+              </span>
+              <span class="text-xs text-slate-400 flex items-center gap-1">
+                <i class="fas fa-sync-alt"></i> Umdrehen
+              </span>
+            </div>
+
+            <div class="space-y-4 my-auto z-10">
+              <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-pink-500 to-cyan-400 p-1 shadow-2xl animate-float">
+                <div class="w-full h-full bg-slate-900 rounded-full flex items-center justify-center text-4xl" id="front-player-icon">
+                  🎯
+                </div>
+              </div>
+              <div>
+                <p id="front-player-label" class="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1">Du bist am Zug:</p>
+                <h3 id="front-player-name" class="text-5xl font-heading font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-pink-400 to-cyan-300 pb-2 leading-tight">
+					Spieler Name
+				</h3>
+              </div>
+            </div>
+
+            <div class="text-xs text-slate-400 flex items-center justify-center gap-2 animate-bounce-subtle z-10">
+              <i class="fas fa-hand-pointer text-pink-400"></i> Karte tippen zum Umdrehen
+            </div>
+          </div>
+
+          <!-- CARD BACK -->
+          <div class="card-back glass-card shadow-2xl p-6 border-2 border-cyan-500/40 relative">
+            <div class="flex items-center justify-between z-10">
+              <span id="back-category-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 uppercase tracking-wider">
+                Kategorie
+              </span>
+              
+              <div id="sip-indicator" class="flex items-center gap-1.5 bg-amber-500/20 border border-amber-500/40 px-3 py-1 rounded-full text-amber-300 font-black text-sm shadow-lg">
+                <span id="card-sip-count">2</span> <span id="card-sip-icons">🍺🍺</span>
+              </div>
+            </div>
+
+            <div class="my-auto text-center px-1 space-y-4 z-10 overflow-y-auto max-h-[230px]">
+              <p id="card-task-text" class="text-xl sm:text-2xl leading-relaxed font-semibold text-slate-100">
+                Lade Aufgabe...
+              </p>
+            </div>
+
+            <!-- Standard resolution buttons -->
+            <div id="standard-actions" class="grid grid-cols-2 gap-3 pt-2 z-10">
+              <button onclick="event.stopPropagation(); app.resolveCard(false)" class="py-3 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-emerald-400 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-lg">
+                <i class="fas fa-check-circle text-base"></i> Geschafft! 👍
+              </button>
+              <button onclick="event.stopPropagation(); app.resolveCard(true)" class="py-3 px-3 rounded-xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-lg shadow-pink-600/30">
+                <i class="fas fa-beer text-base"></i> Trinken! 🍺
+              </button>
+            </div>
+
+            <!-- Group / Unspecific resolution buttons -->
+            <div id="group-actions" class="hidden grid grid-cols-2 gap-3 pt-2 z-10">
+              <button onclick="event.stopPropagation(); app.resolveCard(false)" class="py-3 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-emerald-400 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-lg">
+                <i class="fas fa-check-circle text-base"></i> Niemand 👍
+              </button>
+              <button onclick="event.stopPropagation(); app.openGroupDrinkModal()" class="py-3 px-3 rounded-xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-lg shadow-pink-600/30">
+                <i class="fas fa-users text-base"></i> Wer trinkt? 🍻
+              </button>
+            </div>
+
+            <!-- Minigame trigger button -->
+            <div id="minigame-action" class="hidden pt-2 z-10">
+              <button onclick="event.stopPropagation(); app.startCurrentMinigame()" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 via-purple-600 to-pink-500 hover:from-cyan-400 hover:to-pink-400 text-white font-heading font-black text-lg tracking-wider uppercase shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2 animate-pulse-glow">
+                <i class="fas fa-gamepad text-xl"></i> MINISPIEL STARTEN!
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!--<div class="flex justify-between items-center text-[11px] text-slate-400 px-2">
+        <span><i class="fas fa-keyboard text-slate-500"></i> [Leertaste] Umdrehen</span>
+        <span>[Pfeil Links] Trinken | [Pfeil Rechts] Geschafft</span>
+      </div>-->
+    </div>
+
+    <!-- ==================== SCREEN 3: END / GAME OVER SCREEN ==================== -->
+    <div id="screen-end" class="w-full max-w-xl hidden space-y-6 text-center">
+      <div class="space-y-2">
+        <div class="text-6xl mb-2 animate-bounce">🏆</div>
+        <h2 class="text-3xl sm:text-5xl font-heading font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-pink-400 to-cyan-400">
+          DECK VOLLENDET!
+        </h2>
+        <p class="text-slate-300">Was für eine Runde! Hier sind eure Ergebnisse:</p>
+      </div>
+
+      <div id="mvp-box" class="glass-panel p-6 rounded-2xl border-2 border-amber-400/50 relative overflow-hidden shadow-2xl shadow-amber-500/20">
+        <div class="absolute -right-6 -bottom-6 text-8xl opacity-10 text-amber-400 font-black">👑</div>
+        <p class="text-xs uppercase tracking-widest text-amber-400 font-bold mb-1">👑 PARTY-KAISER / QUEEN 👑</p>
+        <h3 id="mvp-name" class="text-3xl font-heading font-black text-white">Spieler</h3>
+        <p class="text-sm text-slate-300 mt-1">mit stolzen <span id="mvp-sips" class="font-black text-amber-400 text-xl">0</span> Schlücken!</p>
+      </div>
+
+      <div class="glass-panel p-5 rounded-2xl space-y-3 shadow-2xl">
+        <h3 class="font-heading font-bold text-lg text-slate-200 text-left flex items-center gap-2">
+          <i class="fas fa-list-ol text-cyan-400"></i> Gesamte Rangliste
+        </h3>
+        <div id="end-leaderboard-list" class="space-y-2"></div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <button onclick="app.restartSameGame()" class="py-3.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold transition-all border border-slate-700">
+          <i class="fas fa-redo mr-2"></i> Noch eine Runde
+        </button>
+        <button onclick="app.showScreen('setup')" class="py-3.5 px-4 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold shadow-lg shadow-pink-500/30 transition-all">
+          <i class="fas fa-sliders-h mr-2"></i> Neues Setup
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ==================== MINIGAME MODAL OVERLAY ==================== -->
+  <div id="modal-minigame" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-lg flex items-center justify-center p-3 hidden overflow-y-auto">
+    <div class="glass-panel w-full max-w-lg rounded-2xl p-5 border border-purple-500/40 shadow-2xl space-y-4 my-auto relative">
+      <div class="flex items-center justify-between border-b border-slate-700/60 pb-3">
+        <div class="flex items-center gap-2">
+          <span id="mg-icon" class="text-2xl">🎮</span>
+          <div>
+            <h3 id="mg-title" class="font-heading font-black text-lg sm:text-xl text-cyan-300">Minispiel Name</h3>
+            <p id="mg-subtitle" class="text-xs text-slate-400">Spieler: <span id="mg-player-name" class="text-amber-400 font-bold">Name</span></p>
+          </div>
+        </div>
+        <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-pink-500/20 text-pink-300 border border-pink-500/30">Minispiel</span>
+      </div>
+
+      <div id="mg-content" class="min-h-[300px] flex flex-col justify-center items-center py-2 relative"></div>
+    </div>
+  </div>
+
+  <!-- ==================== DISTRIBUTE SIPS MODAL ==================== -->
+  <div id="modal-distribute" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="glass-panel w-full max-w-md rounded-2xl p-6 space-y-4 border border-amber-500/40 shadow-2xl relative">
+      <div class="text-center space-y-1">
+        <div class="text-4xl">🍻</div>
+        <h3 class="font-heading font-black text-2xl text-amber-400">Schlucke Verteilen!</h3>
+        <p id="distribute-title" class="text-xs text-slate-300">Wähle, wer <span id="distribute-sip-count" class="text-amber-300 font-black">2</span> Schlücke trinken muss:</p>
+      </div>
+
+      <div id="distribute-players-list" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
+    </div>
+  </div>
+
+  <!-- ==================== GROUP DRINK SELECTION MODAL ==================== -->
+  <div id="modal-group-drink" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="glass-panel w-full max-w-md rounded-2xl p-6 space-y-4 border border-pink-500/40 shadow-2xl relative">
+      <div class="text-center space-y-1">
+        <div class="text-4xl">👓🍻</div>
+        <h3 class="font-heading font-black text-2xl text-pink-400">Wer hat getrunken?</h3>
+        <p class="text-xs text-slate-300">Wähle alle Spieler aus, die getrunken haben (<span id="group-sip-count" class="text-amber-300 font-black">1</span> Schluck pro Person):</p>
+      </div>
+
+      <div id="group-drink-players-list" class="grid grid-cols-2 gap-2.5 max-h-60 overflow-y-auto pr-1"></div>
+
+      <div class="pt-2 flex gap-2">
+        <button onclick="app.closeGroupDrinkModal()" class="flex-1 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs border border-slate-700 transition-all">
+          Abbrechen
+        </button>
+        <button onclick="app.confirmGroupDrink()" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white font-bold text-xs shadow-lg shadow-pink-500/30 transition-all">
+          Anrechnen 🍺
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== LEADERBOARD MODAL ==================== -->
+  <div id="modal-leaderboard" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="glass-panel w-full max-w-md rounded-2xl p-6 space-y-5 border border-slate-700/80 shadow-2xl relative">
+      <div class="flex items-center justify-between border-b border-slate-700/60 pb-3">
+        <h3 class="font-heading font-black text-xl text-amber-400 flex items-center gap-2">
+          <i class="fas fa-trophy"></i> Live Schluck-Konto
+        </h3>
+        <button onclick="app.toggleLeaderboardModal()" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div id="modal-leaderboard-list" class="space-y-2.5 max-h-72 overflow-y-auto pr-1"></div>
+
+      <p class="text-[11px] text-slate-400 text-center">Manuelle Anpassung von Schlücken möglich.</p>
+
+      <button onclick="app.toggleLeaderboardModal()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl border border-slate-700 transition-all">
+        Schließen & Weiterfeiern
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 px-5 py-3 rounded-xl glass-panel border border-pink-500/50 text-white font-bold text-sm shadow-2xl transition-all duration-300 opacity-0 pointer-events-none translate-y-4">
+    <span id="toast-msg">Nachricht</span>
+  </div>
+
+  <script>
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) this.ctx = new AudioContext();
+        }
+      }
+
+      toggleMute() {
+        this.muted = !this.muted;
+        const icon = document.getElementById('sound-icon');
+        const btn = document.getElementById('sound-btn');
+        if (this.muted) {
+          icon.className = 'fas fa-volume-mute text-slate-500';
+          btn.classList.add('opacity-60');
+          app.showToast('Sound stummgeschaltet 🔇');
+        } else {
+          icon.className = 'fas fa-volume-up text-pink-400';
+          btn.classList.remove('opacity-60');
+          this.playClick();
+          app.showToast('Sound aktiviert 🔊');
+        }
+      }
+
+      playFlip() {
+        if (this.muted) return;
+        this.init(); if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(300, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(700, this.ctx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.12);
+        osc.connect(gain); gain.connect(this.ctx.destination);
+        osc.start(); osc.stop(this.ctx.currentTime + 0.12);
+      }
+
+      playDrink() {
+        if (this.muted) return;
+        this.init(); if (!this.ctx) return;
+        for (let i = 0; i < 3; i++) {
+          setTimeout(() => {
+            if (!this.ctx) return;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(240 - i * 35, this.ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(120 - i * 25, this.ctx.currentTime + 0.12);
+            gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.12);
+            osc.connect(gain); gain.connect(this.ctx.destination);
+            osc.start(); osc.stop(this.ctx.currentTime + 0.12);
+          }, i * 130);
+        }
+      }
+
+      playSuccess() {
+        if (this.muted) return;
+        this.init(); if (!this.ctx) return;
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          setTimeout(() => {
+            if (!this.ctx) return;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.22);
+            osc.connect(gain); gain.connect(this.ctx.destination);
+            osc.start(); osc.stop(this.ctx.currentTime + 0.22);
+          }, idx * 60);
+        });
+      }
+
+      playClick() {
+        if (this.muted) return;
+        this.init(); if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+        osc.connect(gain); gain.connect(this.ctx.destination);
+        osc.start(); osc.stop(this.ctx.currentTime + 0.05);
+      }
+
+      playWheelSpin() {
+        if (this.muted) return;
+        this.init(); if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.03);
+        osc.connect(gain); gain.connect(this.ctx.destination);
+        osc.start(); osc.stop(this.ctx.currentTime + 0.03);
+      }
+
+      playGunshot() {
+        if (this.muted) return;
+        this.init(); if (!this.ctx) return;
+        const bufferSize = this.ctx.sampleRate * 0.4;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.8, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.4);
+        noise.connect(gain); gain.connect(this.ctx.destination);
+        noise.start(); noise.stop(this.ctx.currentTime + 0.4);
+      }
+
+      playClickTick() {
+        if (this.muted) return;
+        this.init(); if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1200, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.02);
+        osc.connect(gain); gain.connect(this.ctx.destination);
+        osc.start(); osc.stop(this.ctx.currentTime + 0.02);
+      }
+    }
+
+    const soundManager = new SoundEngine();
+
+    class BubbleBackground {
+      constructor() {
+        this.canvas = document.getElementById('bg-canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.bubbles = [];
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        this.initBubbles();
+        this.animate();
+      }
+
+      resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+      }
+
+      initBubbles() {
+        this.bubbles = [];
+        const count = Math.floor(window.innerWidth / 18);
+        for (let i = 0; i < count; i++) {
+          this.bubbles.push({
+            x: Math.random() * this.canvas.width,
+            y: Math.random() * this.canvas.height,
+            radius: Math.random() * 4 + 1,
+            speed: Math.random() * 1.2 + 0.3,
+            alpha: Math.random() * 0.5 + 0.1,
+            color: Math.random() > 0.5 ? '#EC4899' : (Math.random() > 0.5 ? '#06B6D4' : '#F59E0B')
+          });
+        }
+      }
+
+      animate() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.bubbles.forEach(b => {
+          b.y -= b.speed;
+          if (b.y < -10) {
+            b.y = this.canvas.height + 10;
+            b.x = Math.random() * this.canvas.width;
+          }
+          this.ctx.beginPath();
+          this.ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+          this.ctx.fillStyle = b.color;
+          this.ctx.globalAlpha = b.alpha;
+          this.ctx.shadowBlur = 8;
+          this.ctx.shadowColor = b.color;
+          this.ctx.fill();
+        });
+        requestAnimationFrame(() => this.animate());
+      }
+    }
+
+    class ConfettiEngine {
+      constructor() {
+        this.canvas = document.getElementById('confetti-canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.particles = [];
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+      }
+
+      resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+      }
+
+      explode() {
+        this.particles = [];
+        const colors = ['#EC4899', '#8B5CF6', '#06B6D4', '#F59E0B', '#10B981', '#FFFFFF'];
+        for (let i = 0; i < 110; i++) {
+          this.particles.push({
+            x: this.canvas.width / 2,
+            y: this.canvas.height / 2,
+            vx: (Math.random() - 0.5) * 16,
+            vy: (Math.random() - 0.7) * 16,
+            size: Math.random() * 8 + 4,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            rotation: Math.random() * 360,
+            rSpeed: (Math.random() - 0.5) * 10,
+            life: 1,
+            decay: Math.random() * 0.015 + 0.012
+          });
+        }
+        this.render();
+      }
+
+      render() {
+        if (this.particles.length === 0) {
+          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+          return;
+        }
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.particles.forEach((p, idx) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.28;
+          p.rotation += p.rSpeed;
+          p.life -= p.decay;
+
+          if (p.life <= 0) {
+            this.particles.splice(idx, 1);
+            return;
+          }
+
+          this.ctx.save();
+          this.ctx.translate(p.x, p.y);
+          this.ctx.rotate((p.rotation * Math.PI) / 180);
+          this.ctx.fillStyle = p.color;
+          this.ctx.globalAlpha = p.life;
+          this.ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+          this.ctx.restore();
+        });
+        requestAnimationFrame(() => this.render());
+      }
+    }
+
+    const DECKS_DATABASE = {
+classic: {
+    id: 'classic',
+    name: 'Klassisch',
+    icon: '🎲',
+    cards: [
+      { text: '{player}, mache 10 schnelle Liegestütze oder trinke {sips} Schlücke!', baseSips: 1 },
+      { text: '{player}, zeige das letzte Foto aus deiner Galerie oder trinke {sips} Schlücke!', baseSips: 2 },
+      { text: '{player} muss {player2} ein ehrliches Kompliment machen. Sonst trinken beide {sips} Schlücke!', baseSips: 1, isGroup: true },
+      { text: 'Alle Brillenträger in der Runde trinken {sips} Schluck! 👓', baseSips: 1, isGroup: true },
+      { text: '{player}, versuche 20 Sekunden lang nicht zu blinzeln. Schaffst du es nicht, trinke {sips} Schlücke!', baseSips: 1 },
+      { text: 'Alle, die ein schwarzes Oberteil tragen, trinken {sips} Schluck!', baseSips: 1, isGroup: true },
+      { text: '{player}, reime 30 Sekunden lang auf jedes Wort von {player2}. Versagst du, trinke {sips} Schlücke!', baseSips: 2 },
+      { text: 'Wer die kürzesten Haare in der Runde hat, darf {sips} Schlücke verteilen!', baseSips: 1, isGroup: true },
+      { text: '{player}, buchstabiere deinen Vornamen rückwärts. Bei Fehler: {sips} Schlücke!', baseSips: 1 },
+      { text: '{player}, balanciere deinen Drink 10 Sekunden lang auf deinem Kopf. Fällt er oder verweigerst du: {sips} Schlücke!', baseSips: 2 },
+      { text: 'Alle, die heute noch keinen Alkohol getrunken haben außer diesem Spiel, trinken {sips} Schlucke!', baseSips: 1, isGroup: true },
+      { text: '{player}, ertappe den Blick von {player2} und halte ihn 15 Sekunden ohne zu lachen. Wer lacht, trinkt {sips} Schlücke!', baseSips: 1, isGroup: true },
+      { text: 'Wer das älteste Smartphone in der Runde hat, muss {sips} Schlücke trinken!', baseSips: 1, isGroup: true },
+      { text: '{player}, mache 15 Kniebeugen. Bei jedem Abducken muss die Runde klatschen. Vergisst es jemand, trinkt die Person {sips} Schluck!', baseSips: 2 },
+      { text: 'Alle, die Socken mit Motiven tragen, verteilen {sips} Schlucke!', baseSips: 1, isGroup: true },
+      { text: '{player}, lasse dir von {player2} eine lustige Fratze mit dem Finger ins Gesicht zeichnen oder trinke {sips} Schlücke!', baseSips: 2 },
+      { text: 'Wer als Letztes den Tisch berührt, trinkt sofort {sips} Schlücke!', baseSips: 1, isGroup: true },
+      { text: '{player}, versuche 10 Sekunden auf einem Bein zu stehen und dir dabei auf den Kopf zu tippen. Wenn du umkippst: {sips} Schlücke!', baseSips: 1 },
+      { text: 'Alle, die kleiner als 1,70m sind, trinken {sips} Schlucke!', baseSips: 1, isGroup: true },
+      { text: '{player}, tausche für die nächsten 2 Runden einen Schuh mit {player2} oder trinke {sips} Schlücke!', baseSips: 2 }
+    ]
+  },
+      minigames: {
+        id: 'minigames',
+        name: 'Minispiele & Action',
+        icon: '🎮',
+        cards: [
+          { text: '🎮 MINISPIEL: {player} muss das GLÜCKSRAD drehen! Lass das Schicksal entscheiden.', baseSips: 2, minigameId: 'wheel' },
+          { text: '⚡ MINISPIEL: REAKTIONSTEST für {player}! Wie schnell sind deine Reflexe wirklich?', baseSips: 2, minigameId: 'reaction' },
+          { text: '👆 MINISPIEL: KLICK-MARATHON! {player} muss in 5 Sekunden so oft wie möglich klicken!', baseSips: 2, minigameId: 'click_sprint' },
+          { text: '⏱ MINISPIEL: EXAKT X SEKUNDEN! {player} muss ein Gefühl für die Zeit beweisen.', baseSips: 2, minigameId: 'time_guess' },
+          { text: '🃏 MINISPIEL: HÖHER ODER TIEFER! {player} zockt im Card Shark Style um Schlucke.', baseSips: 2, minigameId: 'card_shark' },
+          { text: '📦 MINISPIEL: DIE KISTE DES GRAUENS! {player} öffnet geheimnisvolle Boxen!', baseSips: 2, minigameId: 'minesweeper' },
+          { text: '🔫 MINISPIEL: RUSSISCHES ROULETTE! {player} drückt den Revolver ab. Wann hörst du auf?', baseSips: 3, minigameId: 'roulette' },
+		  { text: '🔷 MINISPIEL: FORMEN-ZÄHLER! Augen auf, {player}! Zähle alle sich bewegenden Formen – du hast genau 8 Sekunden!', baseSips: 2, minigameId: 'form' },
+		  { text: '🪄 MINISPIEL: KARTEN-TRICK! Merke dir deine Wunschkarte, {player} – verfolge sie beim Mischen und wähle die Richtige!', baseSips: 2, minigameId: 'card_ask' },
+		  { text: '⏱️ MINISPIEL: ZAHLEN-JAGD! {player}, finde und klicke alle 15 Zahlen der Reihe nach in unter 8 Sekunden!', baseSips: 2, minigameId: 'number_hunt' }
+        ]
+      },
+      truth_dare: {
+    id: 'truth_dare',
+    name: 'Wahrheit / Pflicht',
+    icon: '🔥',
+    cards: [
+      { text: 'WAHRHEIT: {player}, was ist der peinlichste Song in deiner Playlist? Sag die Wahrheit oder trinke {sips} Schlücke!', baseSips: 2 },
+      { text: 'PFLICHT: {player}, tanze 15 Sekunden ohne Musik. Wenn du verweigerst, trinke {sips} Schlücke!', baseSips: 2 },
+      { text: 'WAHRHEIT: {player}, was ist die dümmste Ausrede, die du je benutzt hast? Sag es oder trinke {sips} Schlücke.', baseSips: 1 },
+      { text: 'PFLICHT: {player}, lass {player2} ein Emoji an deinen ersten WhatsApp-Kontakt schicken oder trinke {sips} Schlücke!', baseSips: 2 },
+      { text: 'WAHRHEIT: {player}, was war deine peinlichste Jugendsünde? Erzähle es oder trinke {sips} Schlücke!', baseSips: 2 },
+      { text: 'PFLICHT: {player}, mache {player2} einen romantischen Heiratsantrag auf den Knien oder trinke {sips} Schlücke!', baseSips: 2 },
+      { text: 'WAHRHEIT: {player}, welche Person in diesem Raum würdest du auf eine einsame Insel mitnehmen und warum? Antworte ehrlich oder trinke {sips} Schlücke!', baseSips: 2 },
+      { text: 'PFLICHT: {player}, imitiere für 30 Sekunden eine berühmte Person, bis die Runde sie errät. Wenn es niemand errät: {sips} Schlücke!', baseSips: 2 },
+      { text: 'WAHRHEIT: {player}, was ist deine peinlichste Eigenschaft, die kaum jemand kennt? Sag es oder trinke {sips} Schlücke!', baseSips: 2 },
+      { text: 'PFLICHT: {player}, mache einen Handstand an der Wand oder 20 Strecksprünge. Verweigerst du: {sips} Schlücke!', baseSips: 3 },
+      { text: 'WAHRHEIT: {player}, hast du schon einmal über das Essen von jemandem in dieser Runde gelogen? Erzähle die Wahrheit oder trinke {sips} Schlücke!', baseSips: 1 },
+      { text: 'PFLICHT: {player}, sprich die nächsten 2 Runden nur noch mit verstellter, extrem hoher Stimme oder trinke {sips} Schlücke!', baseSips: 2 },
+      { text: 'WAHRHEIT: {player}, was war der schlimmste Fehlkauf deines Lebens? Antworte ehrlich oder trinke {sips} Schlücke!', baseSips: 1 },
+      { text: 'PFLICHT: {player}, trinke einen Schluck aus dem Glas von {player2} – ohne deine Hände zu benutzen! Wenn du es schaffst, verteilt ihr {sips} Schlücke!', baseSips: 2 },
+      { text: 'WAHRHEIT: {player}, was war der merkwürdigste Traum, an den du dich erinnern kannst? Sag die Wahrheit oder trinke {sips} Schlücke!', baseSips: 1 },
+      { text: 'PFLICHT: {player}, ziehe deine Socken für den Rest des Spiels über deine Hände oder trinke {sips} Schlücke!', baseSips: 2 },
+      { text: 'WAHRHEIT: {player}, hast du schon mal eine Nachricht gelesen und extra stundenlang ignoriert? Bei wem und warum? Ehrlich sein oder {sips} Schlücke!', baseSips: 2 },
+      { text: 'PFLICHT: {player}, umarme {player2} so fest und dramatisch wie in einem Hollywood-Film für 10 Sekunden oder trinke {sips} Schlücke!', baseSips: 2 },
+      { text: 'WAHRHEIT: {player}, welcher Moment in diesem Monat war dir am peinlichsten? Erzähle es oder trinke {sips} Schlücke!', baseSips: 2 },
+      { text: 'PFLICHT: {player}, spiele 20 Sekunden lang Luftgitarre zu einem Rocksong, den die Runde bestimmt, oder trinke {sips} Schlücke!', baseSips: 2 }
+    ]
+  },
+  never_have_i_ever: {
+    id: 'never_have_i_ever',
+    name: 'Ich hab noch nie...',
+    icon: '🙈',
+    cards: [
+      { text: 'Ich hab noch nie... eine Nachricht an die falsche Person geschickt! Wer doch: {sips} Schluck!', baseSips: 1, isGroup: true },
+      { text: 'Ich hab noch nie... beim Essen geschummelt oder Diät gebrochen! Alle Sünder trinken {sips} Schluck.', baseSips: 1, isGroup: true },
+      { text: 'Ich hab noch nie... auf einer Party geschlafen! Wer doch: {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: 'Ich hab noch nie... so getan, als würde ich jemanden auf der Straße nicht sehen. Alle Betroffenen: {sips} Schluck!', baseSips: 1, isGroup: true },
+      { text: 'Ich hab noch nie... mein Handy ins Klo fallen lassen! Jeder Pechvogel trinkt {sips} Schlücke!', baseSips: 1, isGroup: true },
+      { text: 'Ich hab noch nie... eine Serie an einem einzigen Tag durchgesuchtet! Alle Serien-Junkies: {sips} Schluck!', baseSips: 1, isGroup: true },
+      { text: 'Ich hab noch nie... beim Sport vorgetäuscht verletzt zu sein! Wer doch: {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: 'Ich hab noch nie... Essen vom Boden gegessen nach der 5-Sekunden-Regel! Wer ehrlich ist: {sips} Schluck!', baseSips: 1, isGroup: true },
+      { text: 'Ich hab noch nie... heimlich das Parfüm oder Deo von jemand anderem benutzt! Alle Diebe trinken {sips} Schluck!', baseSips: 1, isGroup: true },
+      { text: 'Ich hab noch nie... eine Ausrede erfunden, um nicht auf ein Date zu gehen! Wer doch: {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: 'Ich hab noch nie... etwas im Laden versehentlich beschädigt und mich davongeschlichen! Wer schuldig ist: {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: 'Ich hab noch nie... meine Haare selbst geschnitten und es sofort bereut! Wer doch: {sips} Schluck!', baseSips: 1, isGroup: true },
+      { text: 'Ich hab noch nie... so getan, als würde ich ein Fachwort verstehen, obwohl ich keine Ahnung hatte! Alle Schwindler: {sips} Schluck!', baseSips: 1, isGroup: true },
+      { text: 'Ich hab noch nie... aus Versehen die Lautstärke bei einem Video in der Öffentlichkeit voll aufgedreht! Wer doch: {sips} Schlücke!', baseSips: 1, isGroup: true },
+      { text: 'Ich hab noch nie... ein Geschenk weiterverschenkt! Alle Weiterverschenker trinken {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: 'Ich hab noch nie... in einer Prüfung geschummelt! Wer ehrlich ist, trinkt {sips} Schluck!', baseSips: 1, isGroup: true },
+      { text: 'Ich hab noch nie... mir eine Zerrung beim Tanzen geholt! Wer doch: {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: 'Ich hab noch nie... jemanden versehentlich mit falschem Namen angesprochen! Wer doch: {sips} Schluck!', baseSips: 1, isGroup: true },
+      { text: 'Ich hab noch nie... eine Pflanze vertrocknen lassen, obwohl sie pflegeleicht war! Alle Pflanzenmörder: {sips} Schluck!', baseSips: 1, isGroup: true },
+      { text: 'Ich hab noch nie... stundenlang nach meiner Brille/meinem Handy gesucht, während ich es in der Hand hielt! Alle Verplanten: {sips} Schlücke!', baseSips: 2, isGroup: true }
+    ]
+  },
+  vote: {
+    id: 'vote',
+    name: 'Wer würde eher?',
+    icon: '🗳',
+    cards: [
+      { text: 'ABSTIMMUNG: Wer würde eher aus Versehen in die falsche Bahn einsteigen? Die meistgewählte Person trinkt {sips} Schlücke!', baseSips: 1, isGroup: true },
+      { text: 'ABSTIMMUNG: Wer würde eher bei einem Reality-TV Format mitmachen? Der Gewinner verteilt {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: 'ABSTIMMUNG: Wer ist am wahrscheinlichsten als Erstes betrunken? Der Gewinner nimmt sofort {sips} Schlücke! 🍹', baseSips: 2, isGroup: true },
+      { text: 'ABSTIMMUNG: Wer gibt das meiste Geld für unnötige Dinge aus? Die meistgewählte Person trinkt {sips} Schlücke!', baseSips: 1, isGroup: true },
+      { text: 'ABSTIMMUNG: Wer würde eher eine Zombie-Apokalypse überleben? Der Gewinner darf {sips} Schlücke verteilen!', baseSips: 2, isGroup: true },
+      { text: 'ABSTIMMUNG: Wer würde eher mitten in der Nacht Snacks bestellen? Die meistgewählte Person trinkt {sips} Schlücke!', baseSips: 1, isGroup: true },
+      { text: 'ABSTIMMUNG: Wer würde eher vergessen, wo das Auto geparkt wurde? Die meistgewählte Person nimmt {sips} Schlücke!', baseSips: 1, isGroup: true },
+      { text: 'ABSTIMMUNG: Wer würde eher spontan in ein anderes Land fliegen? Der Gewinner verteilt {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: 'ABSTIMMUNG: Wer würde eher aus Versehen das eigene Haus aussperren? Die meistgewählte Person trinkt {sips} Schlücke!', baseSips: 1, isGroup: true },
+      { text: 'ABSTIMMUNG: Wer würde eher eine ganze Nacht durchzocken oder Serien schauen? Die meistgewählte Person trinkt {sips} Schluck!', baseSips: 1, isGroup: true },
+      { text: 'ABSTIMMUNG: Wer würde eher ein Haustier mit zur Party bringen? Der Gewinner darf {sips} Schlücke verteilen!', baseSips: 2, isGroup: true },
+      { text: 'ABSTIMMUNG: Wer würde eher auf der Tanzfläche einen peinlichen Move bringen? Die meistgewählte Person zeigt ihn oder trinkt {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: 'ABSTIMMUNG: Wer würde eher bei einem traurigen Werbespot weinen? Die meistgewählte Person trinkt {sips} Schlücke!', baseSips: 1, isGroup: true },
+      { text: 'ABSTIMMUNG: Wer würde eher das eigene Handy im Club verlieren? Die meistgewählte Person trinkt {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: 'ABSTIMMUNG: Wer würde eher zu spät zur eigenen Hochzeit kommen? Die meistgewählte Person trinkt {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: 'ABSTIMMUNG: Wer würde eher aus Versehen etwas Wertvolles kaputtmachen? Die meistgewählte Person nimmt {sips} Schluck!', baseSips: 1, isGroup: true },
+      { text: 'ABSTIMMUNG: Wer hat das beste Pokeraussehen und lügt am überzeugendsten? Der Gewinner verteilt {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: 'ABSTIMMUNG: Wer würde eher heimlich alle Snacks auf der Party alleine aufessen? Die meistgewählte Person trinkt {sips} Schlücke!', baseSips: 1, isGroup: true },
+      { text: 'ABSTIMMUNG: Wer würde eher ein peinliches TikTok-Video drehen und berühmt werden? Der Gewinner nimmt {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: 'ABSTIMMUNG: Wer würde eher als Erster den Raum verlassen, um schlafen zu gehen? Die meistgewählte Person trinkt {sips} Schlücke!', baseSips: 1, isGroup: true }
+    ]
+  },
+  duel: {
+    id: 'duel',
+    name: 'Duelle & Regeln',
+    icon: '⚔️',
+    cards: [
+      { text: 'DUELL: {player} gegen {player2}! Stein-Schere-Papier Best-of-3. Der Verlierer trinkt {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: 'DUELL: {player} und {player2} schauen sich tief in die Augen. Wer zuerst blinzelt oder lacht, trinkt {sips} Schlücke!', baseSips: 1, isGroup: true },
+      { text: 'KATEGORIE: {player} nennt ein Thema (z.B. Biersorten). Reihum nennt jeder einen Begriff. Wer stockt: {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: 'REGEL: Ab sofort darf niemand mehr fluchen! Wer flucht, trinkt jedes Mal {sips} Schluck. (3 Runden)', baseSips: 1, isGroup: true },
+      { text: 'DUELL: {player} und {player2} machen Daumenringen! Wer verliert, muss {sips} Schlücke trinken!', baseSips: 2, isGroup: true },
+      { text: 'REGEL: Wer ab jetzt sein Handy anfasst, muss sofort {sips} Schlücke trinken! (Gilt für 3 Runden)', baseSips: 2, isGroup: true },
+      { text: 'KATEGORIE: {player} startet mit einer Automarke. Im Uhrzeigersinn nennt jeder eine andere. Wer doppelt nennt oder stockt: {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: 'DUELL: {player} und {player2} müssen zeitgleich eine Zahl von 1 bis 5 rufen. Rufen sie dieselbe Zahl, trinken beide {sips} Schlücke!', baseSips: 1, isGroup: true },
+      { text: 'REGEL: Niemand darf ab sofort den Namen eines Mitspielers sagen. Wer es doch tut: {sips} Schluck!', baseSips: 1, isGroup: true },
+      { text: 'DUELL: {player} nennt ein Wort, {player2} muss blitzschnell ein Reimwort nennen. Wer länger als 3 Sekunden braucht, trinkt {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: 'REGEL: Alle Antworten müssen ab jetzt mit einer Gegenfrage beantwortet werden. Wer normal antwortet: {sips} Schluck! (2 Runden)', baseSips: 1, isGroup: true },
+      { text: 'KATEGORIE: {player} gibt ein Thema vor (z.B. Automodelle, Cocktails). Reihum antworten. Wer versagt, nimmt {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: 'DUELL: {player} und {player2} machen Armdrücken auf dem Tisch (vorsichtig!). Der Verlierer trinkt {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: 'REGEL: Trinken darf man ab sofort nur noch mit der nicht-dominanten Hand (Linkshänder rechts, Rechtshänder links). Fehler = {sips} Schluck!', baseSips: 1, isGroup: true },
+      { text: 'DUELL: {player} und {player2} würfeln virtuell oder schätzen eine Zahl. Wer näher an 50 liegt, verteilt {sips} Schlücke an den Verlierer!', baseSips: 2, isGroup: true },
+      { text: 'KATEGORIE: Filme mit Leonardo DiCaprio! {player} beginnt. Wer keinen mehr weiß, muss {sips} Schlücke trinken!', baseSips: 2, isGroup: true },
+      { text: 'REGEL: Vor jedem Schluck muss der Spieler laut "Zum Wohl, die Herren und Damen!" sagen. Vergisst man es: noch {sips} Schluck extra!', baseSips: 1, isGroup: true },
+      { text: 'DUELL: {player} summt einen bekannten Song. {player2} muss ihn erraten. Schafft er es nicht in 15 Sek, trinken beide {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: 'REGEL: Die gesamte Runde darf 2 Runden lang nicht mehr lachen. Wer auch nur schmunzelt, trinkt {sips} Schluck!', baseSips: 1, isGroup: true },
+      { text: 'DUELL: {player} versucht {player2} innerhalb von 20 Sekunden zum Lachen zu bringen (ohne Anfassen!). Gelingt es: {player2} trinkt {sips} Schlücke, sonst {player}!', baseSips: 2, isGroup: true }
+    ]
+  },
+  hot: {
+    id: 'hot',
+    name: 'Hot & Wild',
+    icon: '🌶️',
+    cards: [
+      { text: '{player}, flüstere {player2} ein süßes Kompliment ins Ohr, oder trinke {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, verrate der Runde deinen merkwürdigsten Moment beim Daten oder trinke {sips} Schlücke.', baseSips: 2 },
+      { text: 'Alle Singles in der Runde trinken {sips} Schluck auf die Freiheit! 🥂', baseSips: 1, isGroup: true },
+      { text: 'KÖNIGS-KARTE: Alle Spieler stoßen jetzt gemeinsam an und trinken {sips} Schlücke! CHEERS! 🍻', baseSips: 2, isGroup: true },
+      { text: '{player}, gib {player2} einen sanften Kuss auf die Wange oder die Hand. Wenn du verweigerst: {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: '{player}, zeige der Runde dein sexiestes Lächeln oder deinen besten Flirt-Blick. Versagst du laut Abstimmung: {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, flüstere {player2} etwas Schmutziges oder Anzügliches ins Ohr. Wenn {player2} rot wird, trinkt {player2} {sips} Schlücke, sonst {player}!', baseSips: 3, isGroup: true },
+      { text: '{player}, lass dir von {player2} für 15 Sekunden sanft durch die Haare streicheln oder trinke {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: '{player}, was ist deine größte optische Vorliebe beim anderen Geschlecht? Erzähle es offen oder trinke {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, mache einen kurzen, 10-sekündigen "Lapdance" vor {player2} (lustig oder sexy). Verweigerst du: {sips} Schlücke!', baseSips: 3, isGroup: true },
+      { text: '{player}, verrate der Runde deinen intimsten oder verrücktesten Ort, an dem du je jemanden geküsst hast. Sag es oder trinke {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, streiche mit deinem Finger sanft über den Nacken von {player2}. Wenn {player2} zuckt, muss {player2} {sips} Schlücke trinken!', baseSips: 2, isGroup: true },
+      { text: '{player}, vergleiche die Lippen aller Mitspieler und entscheide, wer die weichsten zu haben scheint. Die gewählte Person verteilt {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, ziehe ein Kleidungsstück deiner Wahl aus (Schuhe/Socken zählen!) oder trinke {sips} Schlücke!', baseSips: 3 },
+      { text: '{player}, bei wem aus dieser Runde würdest du am ehesten schwach werden, wenn ihr alleine auf einer Insel wärt? Antworten oder {sips} Schlücke!', baseSips: 3 },
+      { text: '{player}, beiße sanft in deine Unterlippe und schau {player2} 5 Sekunden lang intensiv an. Reagiert {player2} nervös: {sips} Schlücke für {player2}!', baseSips: 2, isGroup: true },
+      { text: 'Alle Personen in der Runde, die aktuell vergeben sind, trinken {sips} Schlücke auf die Liebe! ❤️', baseSips: 1, isGroup: true },
+      { text: '{player}, führe mit {player2} einen 10-sekündigen langsamen Walzer/Slow-Dance ohne Musik aus. Wenn ihr verweigert: beide {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: '{player}, erzähle von deinem bisher besten Kuss oder trinke {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, massiere die Schultern von {player2} für ganze 20 Sekunden oder trinke {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: '{player}, wähle eine Person aus der Runde und füttere sie mit einem Snack oder einem Schluck Getränk. Wenn ihr euch weigert: beide {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: '{player}, beschreibe deinen absoluten Traumtyp in 3 Adjektiven. Verweigerst du: {sips} Schlücke!', baseSips: 1 },
+      { text: '{player}, tippe {player2} sanft an die Hüfte und sprich dein bestes Anmach-Sprüchlein auf. Wenn {player2} lacht, trinkt {player2} {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: '{player}, wer in der Runde hat heute das heißeste Outfit an? Die gewählte Person verteilt {sips} Schlücke!', baseSips: 2 },
+      { text: 'HOT-CHALLENGE: Alle, die schon einmal ein peinliches Dating-Foto verschickt haben, trinken sofort {sips} Schlücke!', baseSips: 2, isGroup: true }
+    ]
+  },
+  brain: {
+    id: 'brain',
+    name: 'Brain-Lag',
+    icon: '🧠',
+    cards: [
+      { text: '{player}, nenne 5 Tiere mit 4 Buchstaben in 10 Sekunden, sonst trinkst du {sips} Schlücke!', baseSips: 2 },
+      { text: 'Zähle rückwärts von 20 in 3er-Schritten, {player}. Bei jedem Fehler: {sips} Schluck!', baseSips: 1 },
+      { text: '{player}, buchstabiere das Wort "Krankenwagen" rückwärts in 15 Sekunden. Schafft du es nicht: {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, was ist 7 x 8 - 12? Du hast 5 Sekunden Zeit! Falsch oder zu langsam: {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, nenne 4 Automarken, die mit einem "B" beginnen, in 8 Sekunden. Sonst: {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, sage fehlerfrei 3 Mal hintereinander rasch: "Fischers Fritze fischt frische Fische". Bei Versager: {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, nenne 5 Hauptstädte von europäischen Ländern in 10 Sekunden. Sonst trinkst du {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, zähle von 1 bis 15, aber ersetze jede Zahl, die durch 3 teilbar ist, durch das Wort "Bier". Fehler = {sips} Schlücke!', baseSips: 3 },
+      { text: '{player}, nenne 3 Eissorten ohne den Buchstaben "A" in 7 Sekunden! Schafft du es nicht: {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, nenne die Monate des Jahres in umgekehrter Reihenfolge ab Dezember bis Juli in 10 Sekunden! Fehler: {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, wie viele Buchstaben hat das Alphabet? Sag es innerhalb von 3 Sekunden! Falsch: {sips} Schlücke!', baseSips: 1 },
+      { text: '{player}, nenne 5 Dinge, die man im Supermarkt in der Tiefkühlung findet, in 6 Sekunden! Versagst du: {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, nenne 4 Gelbtöne oder gelbe Gegenstände in 6 Sekunden! Zu langsam: {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, nenne 3 deutsche Bundesländer, die mit "B" anfangen, in 5 Sekunden! Verfehlt: {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, zähle alle Finger und Zehen von {player2} zusammen und ziehe 7 ab. Sag das Ergebnis in 4 Sekunden! Falsch: {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: '{player}, sage 5 Wörter, die sich auf "Trinken" reimen, in 10 Sekunden. Schaffst du es nicht: {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, wie viel ist 100 minus 37? Du hast 5 Sekunden! Falsch: {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, nenne 3 englische Wörter, die mit "Z" beginnen, in 8 Sekunden. Sonst trinkst du {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, buchstabiere das Wort "SCHNAPS" flüssig von hinten nach vorne in 7 Sekunden. Fehler: {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, nenne 5 Musikinstrumente in 6 Sekunden. Verpasst du die Zeit: {sips} Schlücke!', baseSips: 2 }
+    ]
+  }
+};
+
+    class DrinkingApp {
+      constructor() {
+        this.players = ['Jannick', 'Florian', 'Nico', 'Elly'];
+        this.selectedDecks = ['minigames', 'classic', 'truth_dare', 'vote'];
+        this.difficulty = 'medium'; 
+        
+        this.deckQueue = [];
+        this.currentCardIndex = 0;
+        this.currentCard = null;
+        this.isFlipped = false;
+        
+        this.lastPlayerIndex = -1;
+        this.sipStats = {};
+        this.selectedGroupDrinkers = new Set();
+
+        this.confetti = new ConfettiEngine();
+        this.pendingDistributeCallback = null;
+        this.initEventListeners();
+      }
+
+      init() {
+        new BubbleBackground();
+        this.renderDecks();
+        this.renderPlayerChips();
+        this.updateStatsTotalBadge();
+      }
+
+      getMaxSipsForDifficulty() {
+        if (this.difficulty === 'easy') return 3;    // Warm-Up
+        if (this.difficulty === 'medium') return 5;  // Party-Modus
+        if (this.difficulty === 'hard') return 8;    // Abriss
+        return 3;
+      }
+
+      showToast(msg) {
+        const toast = document.getElementById('toast');
+        const msgEl = document.getElementById('toast-msg');
+        msgEl.innerText = msg;
+        toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+        setTimeout(() => {
+          toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+        }, 2200);
+      }
+
+      showScreen(screenId) {
+        soundManager.playClick();
+        ['setup', 'game', 'end'].forEach(id => {
+          const el = document.getElementById(`screen-${id}`);
+          if (el) el.classList.add('hidden');
+        });
+        document.getElementById(`screen-${screenId}`).classList.remove('hidden');
+      }
+
+      /* === SETUP LOGIC === */
+      addPlayer() {
+        const input = document.getElementById('player-name-input');
+        const name = input.value.trim();
+        if (!name) return;
+
+        if (this.players.includes(name)) {
+          this.showToast('Name existiert bereits!');
+          return;
+        }
+
+        this.players.push(name);
+        input.value = '';
+        soundManager.playClick();
+        this.renderPlayerChips();
+      }
+
+      removePlayer(idx) {
+        if (this.players.length <= 2) {
+          this.showToast('Mindestens 2 Spieler erforderlich!');
+          return;
+        }
+        this.players.splice(idx, 1);
+        soundManager.playClick();
+        this.renderPlayerChips();
+      }
+
+      renderPlayerChips() {
+        const container = document.getElementById('player-chips');
+        document.getElementById('player-count').innerText = this.players.length;
+
+        const colors = [
+          'from-pink-500/20 to-purple-500/20 border-pink-500/40 text-pink-300',
+          'from-cyan-500/20 to-blue-500/20 border-cyan-500/40 text-cyan-300',
+          'from-amber-500/20 to-orange-500/20 border-amber-500/40 text-amber-300',
+          'from-emerald-500/20 to-teal-500/20 border-emerald-500/40 text-emerald-300'
+        ];
+
+        container.innerHTML = this.players.map((p, i) => {
+          const colorClass = colors[i % colors.length];
+          return `
+            <div class="bg-gradient-to-r ${colorClass} border px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-2 shadow-sm animate-float">
+              <span>👤 ${p}</span>
+              <button onclick="app.removePlayer(${i})" class="hover:text-red-400 transition-colors">
+                <i class="fas fa-times text-xs"></i>
+              </button>
+            </div>
+          `;
+        }).join('');
+      }
+
+      setDifficulty(diff) {
+        this.difficulty = diff;
+        soundManager.playClick();
+        document.querySelectorAll('.diff-btn').forEach(btn => {
+          btn.classList.remove('border-pink-500', 'bg-pink-500/10', 'shadow-lg', 'shadow-pink-500/20');
+          btn.classList.add('border-slate-700');
+        });
+
+        const activeBtn = document.getElementById(`diff-${diff}`);
+        if (activeBtn) {
+          activeBtn.classList.remove('border-slate-700');
+          activeBtn.classList.add('border-pink-500', 'bg-pink-500/10', 'shadow-lg', 'shadow-pink-500/20');
+        }
+      }
+
+      renderDecks() {
+        const container = document.getElementById('deck-grid');
+        container.innerHTML = Object.values(DECKS_DATABASE).map(deck => {
+          const isSelected = this.selectedDecks.includes(deck.id);
+          const isSpecial = deck.id === 'minigames';
+          return `
+            <div onclick="app.toggleDeck('${deck.id}')" id="deck-card-${deck.id}" class="glass-panel p-3 rounded-xl cursor-pointer border ${isSelected ? (isSpecial ? 'border-cyan-400 bg-cyan-500/15' : 'border-purple-500 bg-purple-500/15') : 'border-slate-800'} hover:border-purple-400 transition-all text-left relative">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-xl">${deck.icon}</span>
+                <input type="checkbox" ${isSelected ? 'checked' : ''} class="pointer-events-none rounded bg-slate-900 border-slate-700 text-purple-600 focus:ring-0">
+              </div>
+              <div class="font-bold text-xs text-white">${deck.name}</div>
+              <div class="text-[11px] text-slate-400 font-mono">${deck.cards.length} Karten</div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      toggleDeck(id) {
+        soundManager.playClick();
+        if (this.selectedDecks.includes(id)) {
+          if (this.selectedDecks.length <= 1) {
+            this.showToast('Mindestens 1 Deck muss gewählt sein!');
+            return;
+          }
+          this.selectedDecks = this.selectedDecks.filter(d => d !== id);
+        } else {
+          this.selectedDecks.push(id);
+        }
+        this.renderDecks();
+      }
+
+      toggleAllDecks() {
+        soundManager.playClick();
+        if (this.selectedDecks.length === Object.keys(DECKS_DATABASE).length) {
+          this.selectedDecks = ['minigames', 'classic'];
+        } else {
+          this.selectedDecks = Object.keys(DECKS_DATABASE);
+        }
+        this.renderDecks();
+      }
+
+      /* === GAME ENGINE LOGIC === */
+      startGame() {
+        if (this.players.length < 2) {
+          this.showToast('Füge mindestens 2 Spieler hinzu!');
+          return;
+        }
+
+        this.players.forEach(p => {
+          if (this.sipStats[p] === undefined) this.sipStats[p] = 0;
+        });
+
+        let rawCards = [];
+        this.selectedDecks.forEach(deckId => {
+          const deckObj = DECKS_DATABASE[deckId];
+          if (deckObj) {
+            deckObj.cards.forEach(c => {
+              rawCards.push({ ...c, categoryName: deckObj.name, categoryIcon: deckObj.icon });
+            });
+          }
+        });
+
+        if (rawCards.length === 0) {
+          this.showToast('Keine Karten ausgewählt!');
+          return;
+        }
+
+        for (let i = rawCards.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [rawCards[i], rawCards[j]] = [rawCards[j], rawCards[i]];
+        }
+
+        this.deckQueue = rawCards;
+        this.currentCardIndex = 0;
+        this.lastPlayerIndex = -1;
+
+        document.getElementById('total-card-num').innerText = this.deckQueue.length;
+        this.showScreen('game');
+        this.loadNextCard();
+      }
+
+      calculateSips(baseSips) {
+        const base = baseSips || 1;
+        if (this.difficulty === 'easy') {
+          return Math.min(3, Math.max(1, Math.round(base * 1)));
+        }
+        if (this.difficulty === 'medium') {
+          return Math.min(5, Math.max(2, Math.round(base * 2)));
+        }
+        if (this.difficulty === 'hard') {
+          return Math.min(8, Math.max(3, Math.round(base * 3)));
+        }
+        return Math.max(1, base);
+      }
+
+      calculateMinigameSips(baseSips) {
+        const maxLimit = this.getMaxSipsForDifficulty();
+        const calculated = Math.round((baseSips || 1) * (this.difficulty === 'easy' ? 1 : this.difficulty === 'medium' ? 1.5 : 2));
+        return Math.min(maxLimit, Math.max(1, calculated));
+      }
+
+      loadNextCard() {
+        if (this.currentCardIndex >= this.deckQueue.length) {
+          this.showEndScreen();
+          return;
+        }
+
+        this.isFlipped = false;
+        const cardElem = document.getElementById('card-element');
+        cardElem.classList.remove('flipped');
+
+        const rawCard = this.deckQueue[this.currentCardIndex];
+
+        let player1Index;
+        do {
+          player1Index = Math.floor(Math.random() * this.players.length);
+        } while (this.players.length > 1 && player1Index === this.lastPlayerIndex);
+        
+        this.lastPlayerIndex = player1Index;
+        const player1 = this.players[player1Index];
+        
+        let player2 = this.players[(player1Index + 1) % this.players.length];
+        if (this.players.length > 2) {
+          let otherPlayers = this.players.filter(p => p !== player1);
+          player2 = otherPlayers[Math.floor(Math.random() * otherPlayers.length)];
+        }
+
+        const calculatedSips = rawCard.minigameId ? this.calculateMinigameSips(rawCard.baseSips) : this.calculateSips(rawCard.baseSips);
+        const isGroupTask = rawCard.isGroup || !rawCard.text.includes('{player}');
+
+        let formattedText = rawCard.text
+          .replace(/{player}/g, `<span class="text-amber-300 font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/30">${player1}</span>`)
+          .replace(/{player2}/g, `<span class="text-cyan-300 font-extrabold px-1.5 py-0.5 rounded bg-cyan-500/20 border border-cyan-500/30">${player2}</span>`)
+          .replace(/{sips}/g, `<span class="text-pink-400 font-black text-xl">${calculatedSips}</span>`);
+
+        this.currentCard = {
+          raw: rawCard,
+          player1: player1,
+          player2: player2,
+          sips: calculatedSips,
+          formattedText: formattedText,
+          minigameId: rawCard.minigameId || null,
+          isGroup: isGroupTask
+        };
+
+        // Render Front
+        document.getElementById('game-deck-badge').innerText = `${rawCard.categoryIcon} ${rawCard.categoryName}`;
+        document.getElementById('front-category-badge').innerText = rawCard.categoryName;
+        document.getElementById('front-player-label').innerText = isGroupTask ? 'Liest vor:' : 'Du bist am Zug:';
+        document.getElementById('front-player-name').innerText = player1;
+        document.getElementById('front-player-icon').innerText = rawCard.minigameId ? '🎮' : (isGroupTask ? '📣' : '🎯');
+        document.getElementById('current-card-num').innerText = this.currentCardIndex + 1;
+
+        // Render Back
+        document.getElementById('back-category-badge').innerText = rawCard.categoryName;
+        document.getElementById('card-sip-count').innerText = calculatedSips;
+        document.getElementById('card-sip-icons').innerText = '🍺'.repeat(Math.min(calculatedSips, 8));
+        document.getElementById('card-task-text').innerHTML = formattedText;
+
+        // Toggle Actions
+        const stdActions = document.getElementById('standard-actions');
+        const groupActions = document.getElementById('group-actions');
+        const mgAction = document.getElementById('minigame-action');
+
+        if (rawCard.minigameId) {
+          stdActions.classList.add('hidden');
+          groupActions.classList.add('hidden');
+          mgAction.classList.remove('hidden');
+        } else if (isGroupTask) {
+          stdActions.classList.add('hidden');
+          groupActions.classList.remove('hidden');
+          mgAction.classList.add('hidden');
+        } else {
+          stdActions.classList.remove('hidden');
+          groupActions.classList.add('hidden');
+          mgAction.classList.add('hidden');
+        }
+      }
+
+      flipCard() {
+        const cardElem = document.getElementById('card-element');
+        this.isFlipped = !this.isFlipped;
+        cardElem.classList.toggle('flipped', this.isFlipped);
+        soundManager.playFlip();
+      }
+
+      resolveCard(didDrink) {
+        if (!this.currentCard) return;
+
+        if (didDrink) {
+          soundManager.playDrink();
+          const targetPlayer = this.currentCard.player1;
+          this.addSipsToPlayer(targetPlayer, this.currentCard.sips);
+          this.showToast(`${targetPlayer} trinkt ${this.currentCard.sips} Schluck(e)! 🍺`);
+        } else {
+          soundManager.playSuccess();
+          this.confetti.explode();
+          this.showToast(`Stark geschafft! 🎉`);
+        }
+
+        this.currentCardIndex++;
+        setTimeout(() => {
+          this.loadNextCard();
+        }, 280);
+      }
+
+      /* === GROUP DRINK SELECTION MODAL === */
+      openGroupDrinkModal() {
+        if (!this.currentCard) return;
+        this.selectedGroupDrinkers = new Set();
+        const modal = document.getElementById('modal-group-drink');
+        document.getElementById('group-sip-count').innerText = this.currentCard.sips;
+        this.renderGroupDrinkPlayerList();
+        modal.classList.remove('hidden');
+      }
+
+      toggleGroupDranker(playerName) {
+        soundManager.playClick();
+        if (this.selectedGroupDrinkers.has(playerName)) {
+          this.selectedGroupDrinkers.delete(playerName);
+        } else {
+          this.selectedGroupDrinkers.add(playerName);
+        }
+        this.renderGroupDrinkPlayerList();
+      }
+
+      renderGroupDrinkPlayerList() {
+        const container = document.getElementById('group-drink-players-list');
+        container.innerHTML = this.players.map(p => {
+          const isSelected = this.selectedGroupDrinkers.has(p);
+          return `
+            <button onclick="app.toggleGroupDranker('${p}')" class="py-3 px-3 rounded-xl border font-bold text-sm transition-all flex items-center justify-between ${
+              isSelected 
+                ? 'bg-pink-500/20 border-pink-500 text-pink-300 shadow-lg shadow-pink-500/20' 
+                : 'bg-slate-800/80 border-slate-700 text-slate-300 hover:border-slate-600'
+            }">
+              <span>👤 ${p}</span>
+              <span>${isSelected ? '✅' : '⚪'}</span>
+            </button>
+          `;
+        }).join('');
+      }
+
+      confirmGroupDrink() {
+        if (this.selectedGroupDrinkers.size === 0) {
+          this.showToast('Keine Spieler ausgewählt!');
+          this.closeGroupDrinkModal();
+          this.currentCardIndex++;
+          setTimeout(() => this.loadNextCard(), 280);
+          return;
+        }
+
+        const sips = this.currentCard.sips;
+        const drinkers = Array.from(this.selectedGroupDrinkers);
+        soundManager.playDrink();
+        
+        drinkers.forEach(p => {
+          this.addSipsToPlayer(p, sips);
+        });
+
+        const namesStr = drinkers.join(', ');
+        this.showToast(`${namesStr} +${sips} Schluck(e) angerechnet! 🍺`);
+
+        this.closeGroupDrinkModal();
+        this.currentCardIndex++;
+        setTimeout(() => this.loadNextCard(), 280);
+      }
+
+      closeGroupDrinkModal() {
+        document.getElementById('modal-group-drink').classList.add('hidden');
+      }
+
+      addSipsToPlayer(playerName, sips) {
+        if (!this.sipStats[playerName]) this.sipStats[playerName] = 0;
+        this.sipStats[playerName] += sips;
+        this.updateStatsTotalBadge();
+      }
+
+      /* === SIP DISTRIBUTION POPUP === */
+      openDistributeModal(giverPlayer, sipCount, reason, callback) {
+        soundManager.playSuccess();
+        const modal = document.getElementById('modal-distribute');
+        document.getElementById('distribute-sip-count').innerText = sipCount;
+        
+        const list = document.getElementById('distribute-players-list');
+        const availableTargets = this.players.filter(p => p !== giverPlayer);
+
+        list.innerHTML = availableTargets.map(p => `
+          <button onclick="app.confirmDistribute('${giverPlayer}', '${p}', ${sipCount})" class="w-full py-3 px-4 rounded-xl bg-slate-800 hover:bg-pink-600/30 border border-slate-700 hover:border-pink-500 font-bold text-white flex justify-between items-center transition-all">
+            <span>👤 ${p}</span>
+            <span class="text-amber-400 font-black">+${sipCount} Schlucke</span>
+          </button>
+        `).join('');
+
+        this.pendingDistributeCallback = callback;
+        modal.classList.remove('hidden');
+      }
+
+      confirmDistribute(giver, target, sips) {
+        soundManager.playDrink();
+        this.addSipsToPlayer(target, sips);
+        this.showToast(`${target} bekommt ${sips} Schlucke von ${giver}! 🍻`);
+        document.getElementById('modal-distribute').classList.add('hidden');
+        if (this.pendingDistributeCallback) {
+          this.pendingDistributeCallback();
+          this.pendingDistributeCallback = null;
+        }
+      }
+
+      updateStatsTotalBadge() {
+        const total = Object.values(this.sipStats).reduce((a, b) => a + b, 0);
+        const badge = document.getElementById('sip-badge-total');
+        if (total > 0) {
+          badge.innerText = total;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+      }
+
+      toggleLeaderboardModal() {
+        soundManager.playClick();
+        const modal = document.getElementById('modal-leaderboard');
+        const isHidden = modal.classList.contains('hidden');
+        if (isHidden) {
+          this.renderLeaderboardModalList();
+          modal.classList.remove('hidden');
+        } else {
+          modal.classList.add('hidden');
+        }
+      }
+
+      renderLeaderboardModalList() {
+        const container = document.getElementById('modal-leaderboard-list');
+        const sorted = Object.entries(this.sipStats).sort((a, b) => b[1] - a[1]);
+
+        if (sorted.length === 0) {
+          container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Noch keine Schlücke getrunken!</p>`;
+          return;
+        }
+
+        const medals = ['🥇', '🥈', '🥉'];
+        container.innerHTML = sorted.map(([player, sips], idx) => `
+          <div class="glass-panel p-3 rounded-xl flex items-center justify-between border-slate-800">
+            <div class="flex items-center gap-3">
+              <span class="text-lg font-black w-6 text-center">${medals[idx] || (idx + 1) + '.'}</span>
+              <span class="font-bold text-white text-sm">${player}</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <span class="text-amber-400 font-black text-base">${sips}</span>
+                <span class="text-[10px] text-slate-400 block">Schlücke</span>
+              </div>
+              <div class="flex flex-col gap-1">
+                <button onclick="app.adjustSips('${player}', 1)" class="w-6 h-5 rounded bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center text-xs">+</button>
+                <button onclick="app.adjustSips('${player}', -1)" class="w-6 h-5 rounded bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center text-xs">-</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      adjustSips(player, amount) {
+        soundManager.playClick();
+        this.sipStats[player] = Math.max(0, (this.sipStats[player] || 0) + amount);
+        this.renderLeaderboardModalList();
+        this.updateStatsTotalBadge();
+      }
+
+      showEndScreen() {
+        soundManager.playSuccess();
+        this.confetti.explode();
+        this.showScreen('end');
+
+        const sorted = Object.entries(this.sipStats).sort((a, b) => b[1] - a[1]);
+        if (sorted.length > 0) {
+          document.getElementById('mvp-name').innerText = sorted[0][0];
+          document.getElementById('mvp-sips').innerText = sorted[0][1];
+        }
+
+        const listContainer = document.getElementById('end-leaderboard-list');
+        const medals = ['🥇', '🥈', '🥉'];
+
+        listContainer.innerHTML = sorted.map(([player, sips], idx) => `
+          <div class="glass-panel p-3.5 rounded-xl flex items-center justify-between border-slate-800">
+            <div class="flex items-center gap-3">
+              <span class="text-xl font-black w-7">${medals[idx] || (idx + 1) + '.'}</span>
+              <span class="font-bold text-white text-base">${player}</span>
+            </div>
+            <div class="text-right">
+              <span class="text-amber-400 font-black text-lg">${sips}</span>
+              <span class="text-xs text-slate-400">Schlücke</span>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      restartSameGame() {
+        this.startGame();
+      }
+
+      /* === MINIGAME LAUNCHER === */
+      startCurrentMinigame() {
+        if (!this.currentCard || !this.currentCard.minigameId) return;
+        soundManager.playClick();
+        const player = this.currentCard.player1;
+        const mgId = this.currentCard.minigameId;
+        const modal = document.getElementById('modal-minigame');
+
+        document.getElementById('mg-player-name').innerText = player;
+
+        const starters = {
+          wheel: 'initWheel',
+          reaction: 'initReaction',
+          click_sprint: 'initClickSprint',
+          time_guess: 'initTimeGuess',
+          card_shark: 'initCardShark',
+          minesweeper: 'initMinesweeper',
+          roulette: 'initRoulette',
+		  form: 'initShapeCounter',
+		  card_ask: 'initCardSharkShuffle',
+		  number_hunt: 'initNumberHunt'
+        };
+
+        const starterName = starters[String(mgId).trim()];
+        if (!starterName || typeof minigames[starterName] !== 'function') {
+          this.showToast('Minispiel konnte nicht gestartet werden.');
+          return;
+        }
+
+        modal.classList.remove('hidden');
+        minigames[starterName](player);
+      }
+
+      closeMinigame() {
+        document.getElementById('modal-minigame').classList.add('hidden');
+        this.currentCardIndex++;
+        setTimeout(() => {
+          this.loadNextCard();
+        }, 250);
+      }
+
+      initEventListeners() {
+        const cardElem = document.getElementById('card-element');
+        let startX = 0, startY = 0;
+
+        cardElem.addEventListener('touchstart', (e) => {
+          startX = e.changedTouches[0].screenX;
+          startY = e.changedTouches[0].screenY;
+        }, { passive: true });
+
+        cardElem.addEventListener('touchend', (e) => {
+          const endX = e.changedTouches[0].screenX;
+          const endY = e.changedTouches[0].screenY;
+          if (Math.abs(endX - startX) > 60 && Math.abs(endY - startY) < 100) {
+            if (!this.isFlipped) {
+              this.flipCard();
+            } else if (!this.currentCard.minigameId && !this.currentCard.isGroup) {
+              if (endX - startX > 0) this.resolveCard(false);
+              else this.resolveCard(true);
+            }
+          }
+        }, { passive: true });
+
+        window.addEventListener('keydown', (e) => {
+          const gameScreen = document.getElementById('screen-game');
+          if (gameScreen.classList.contains('hidden')) return;
+
+          if (e.code === 'Space') {
+            e.preventDefault();
+            this.flipCard();
+          } else if (e.code === 'ArrowRight' && !this.currentCard.minigameId && !this.currentCard.isGroup) {
+            e.preventDefault();
+            this.resolveCard(false);
+          } else if (e.code === 'ArrowLeft' && !this.currentCard.minigameId && !this.currentCard.isGroup) {
+            e.preventDefault();
+            this.resolveCard(true);
+          }
+        });
+      }
+    }
+
+    /* ==================== MINIGAME ENGINE ==================== */
+    class MinigameEngine {
+      showPenaltyCard(player, sips, reason, onComplete = null) {
+        app.addSipsToPlayer(player, sips);
+        soundManager.playDrink();
+
+        const container = document.getElementById('mg-content');
+        if (!container) return;
+
+        container.innerHTML = `
+          <div class="w-full flex flex-col items-center justify-center p-6 rounded-2xl bg-gradient-to-b from-rose-900 via-rose-800 to-red-950 border-4 border-rose-500 shadow-2xl animate-bounce-once text-center space-y-4 my-2">
+            <div class="text-6xl animate-pulse">🍺</div>
+            <div class="space-y-1">
+              <span class="px-3 py-1 bg-rose-500/30 text-rose-300 rounded-full text-xs font-black tracking-widest uppercase border border-rose-400/30">
+                🚨 STRAFE ERHALTEN 🚨
+              </span>
+              <h2 class="font-heading font-black text-3xl text-white mt-2 drop-shadow-md">
+                ${player}
+              </h2>
+              <p class="text-rose-200 text-sm font-semibold">${reason}</p>
+            </div>
+            
+            <div class="w-full bg-rose-950/80 border border-rose-500/40 rounded-xl py-3 px-6 shadow-inner my-2">
+              <span class="font-heading font-black text-4xl text-amber-300 drop-shadow">${sips} ${sips === 1 ? 'SCHLUCK' : 'SCHLUCKE'}</span>
+              <span class="block text-xs uppercase font-bold text-rose-300 mt-1">SOFORT TRINKEN!</span>
+            </div>
+
+            <div class="w-full bg-rose-950 rounded-full h-2 overflow-hidden border border-rose-700/50">
+              <div id="penalty-timer-bar" class="bg-gradient-to-r from-amber-400 to-rose-400 h-full w-full transition-all duration-[5000ms] ease-linear"></div>
+            </div>
+            <p class="text-[10px] text-rose-300/70 font-mono uppercase tracking-wider">Schließt in 5 Sekunden...</p>
+          </div>
+        `;
+
+        setTimeout(() => {
+          const bar = document.getElementById('penalty-timer-bar');
+          if (bar) bar.style.width = '0%';
+        }, 50);
+
+        setTimeout(() => {
+          if (typeof onComplete === 'function') {
+            onComplete();
+          } else {
+            app.closeMinigame();
+          }
+        }, 5000);
+      }
+
+      initWheel(player) {
+  document.getElementById('mg-icon').innerText = '🎡';
+  document.getElementById('mg-title').innerText = 'Glücksrad drehen';
+  document.getElementById('mg-subtitle').innerText = `${player} lässt die Scheibe entscheiden!`;
+
+  const container = document.getElementById('mg-content');
+  container.innerHTML = `
+    <div class="relative flex flex-col items-center justify-center space-y-4">
+      <div class="relative w-64 h-64 sm:w-72 sm:h-72">
+        <!-- Zeiger oben mit ID für die Klack-Animation -->
+        <div id="wheel-pointer" class="absolute -top-3 left-1/2 -translate-x-1/2 z-20 text-3xl text-pink-500 drop-shadow-md transition-transform duration-75">▼</div>
+        <canvas id="wheel-canvas" width="300" height="300" class="w-full h-full rounded-full shadow-2xl border-4 border-slate-700"></canvas>
+      </div>
+      <!--<button id="wheel-spin-btn" onclick="minigames.spinWheel('${player}')" class="py-3 px-8 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-heading font-black text-lg shadow-lg active:scale-95 transition-all">
+        DREHEN! 🚀
+      </button>-->
+	  
+	  <button id="wheel-spin-btn" onclick="minigames.spinWheel('${player}')" class="w-full py-4 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-heading font-black text-xl shadow-lg active:scale-95 transition-all">
+              DREHEN! 🚀
+      </button>
+      <p id="wheel-result" class="font-bold text-center text-amber-300 text-base min-h-[28px]"></p>
+    </div>
+  `;
+
+  const maxSips = app.getMaxSipsForDifficulty();
+  const dist1 = Math.min(maxSips, 1);
+  const dist2 = Math.min(maxSips, 2);
+  const dist4 = Math.min(maxSips, 4);
+
+  const drink1 = Math.min(maxSips, 1);
+  const drink2 = Math.min(maxSips, 2);
+  const drink3 = Math.min(maxSips, 3);
+  const drinkEx = maxSips;
+
+  this.wheelSlices = [
+    { label: `Verteile ${dist2} Schlucke`, sips: dist2, action: 'distribute' },
+    { label: `Trinke ${drink1} Schluck`, sips: drink1, action: 'drink' },
+    { label: 'Glück gehabt!', sips: 0, action: 'safe' },
+    { label: `Trinke ${drink3} Schlucke`, sips: drink3, action: 'drink' },
+    { label: `Verteile ${dist4} Schlucke`, sips: dist4, action: 'distribute' },
+    { label: `Trinke ${drink2} Schlucke`, sips: drink2, action: 'drink' },
+    { label: `Verteile ${dist1} Schluck`, sips: dist1, action: 'distribute' },
+    { label: `Trinke ${drinkEx} Schlucke`, sips: drinkEx, action: 'drink' }
+  ];
+
+  this.wheelAngle = 0;
+  this.drawWheel();
+}
+
+drawWheel() {
+  const canvas = document.getElementById('wheel-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const numSlices = this.wheelSlices.length;
+  const sliceAngle = (Math.PI * 2) / numSlices;
+  const colors = ['#EC4899', '#8B5CF6', '#06B6D4', '#10B981', '#F59E0B', '#6366F1', '#EF4444', '#3B82F6'];
+
+  ctx.clearRect(0, 0, 300, 300);
+
+  for (let i = 0; i < numSlices; i++) {
+    const angle = this.wheelAngle + i * sliceAngle;
+    ctx.beginPath();
+    ctx.moveTo(150, 150);
+    ctx.arc(150, 150, 145, angle, angle + sliceAngle);
+    ctx.fillStyle = colors[i % colors.length];
+    ctx.fill();
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.save();
+    ctx.translate(150, 150);
+    ctx.rotate(angle + sliceAngle / 2);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 11px Plus Jakarta Sans';
+    ctx.fillText(this.wheelSlices[i].label, 135, 4);
+    ctx.restore();
+  }
+
+  ctx.beginPath();
+  ctx.arc(150, 150, 22, 0, Math.PI * 2);
+  ctx.fillStyle = '#0F172A';
+  ctx.fill();
+  ctx.strokeStyle = '#334155';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+}
+
+spinWheel(player) {
+  const btn = document.getElementById('wheel-spin-btn');
+  const pointer = document.getElementById('wheel-pointer');
+  if (btn.disabled) return;
+  btn.disabled = true;
+
+  // Höhere Startgeschwindigkeit & sanftere Reibung (0.989 lässt es viel länger auslaufen)
+  let speed = Math.random() * 0.15 + 0.35;
+  let friction = 0.989;
+
+  const numSlices = this.wheelSlices.length;
+  const sliceAngle = (Math.PI * 2) / numSlices;
+
+  // Index für die Positionsberechnung am Zeiger (Oben = 1.5 * PI)
+  let lastSliceIndex = Math.floor((1.5 * Math.PI - this.wheelAngle) / sliceAngle);
+
+  const animate = () => {
+    this.wheelAngle += speed;
+    speed *= friction;
+
+    // Prüfen, ob eine Trennlinie den Zeiger oben passiert
+    const currentSliceIndex = Math.floor((1.5 * Math.PI - this.wheelAngle) / sliceAngle);
+    if (currentSliceIndex !== lastSliceIndex) {
+      // Klack-Sound abspielen
+      if (typeof soundManager !== 'undefined') {
+        if (soundManager.playClickTick) soundManager.playClickTick();
+        else if (soundManager.playWheelSpin) soundManager.playWheelSpin();
+      }
+
+      // Visueller Zeiger-Hüpfer (Klack-Effekt)
+      if (pointer) {
+        pointer.style.transform = 'translate(-50%, -4px) scale(1.15)';
+        setTimeout(() => {
+          if (pointer) pointer.style.transform = 'translate(-50%, 0) scale(1)';
+        }, 50);
+      }
+
+      lastSliceIndex = currentSliceIndex;
+    }
+
+    this.drawWheel();
+
+    if (speed > 0.0015) {
+      requestAnimationFrame(animate);
+    } else {
+      // Zeiger in Ausgangsposition
+      if (pointer) pointer.style.transform = 'translate(-50%, 0) scale(1)';
+
+      let normalizedAngle = (1.5 * Math.PI - (this.wheelAngle % (Math.PI * 2))) % (Math.PI * 2);
+      if (normalizedAngle < 0) normalizedAngle += Math.PI * 2;
+      const winningIdx = Math.floor(normalizedAngle / sliceAngle) % numSlices;
+      const res = this.wheelSlices[winningIdx];
+
+      document.getElementById('wheel-result').innerText = `🎯 Erreicht: ${res.label}!`;
+
+      setTimeout(() => {
+        if (res.action === 'drink') {
+          this.showPenaltyCard(player, res.sips, `Glücksrad-Pech (${res.label})`);
+        } else if (res.action === 'distribute') {
+          app.closeMinigame();
+          app.openDistributeModal(player, res.sips, res.label, () => {});
+        } else {
+          app.showToast(`🎉 Glück gehabt! Kein Schluck für ${player}.`);
+          app.closeMinigame();
+        }
+      }, 1000);
+    }
+  };
+
+  animate();
+}
+
+
+      initReaction(player) {
+  document.getElementById('mg-icon').innerText = '⚡';
+  document.getElementById('mg-title').innerText = 'Reaktionstest';
+  document.getElementById('mg-subtitle').innerText = `Warte auf GRÜN und tippe sofort!`;
+
+  // Alte Timer bereinigen, falls vorhanden
+  if (this.reactTimer) clearTimeout(this.reactTimer);
+  if (this.afkTimer) clearTimeout(this.afkTimer);
+
+  this.reactState = 'waiting';
+  this.startTime = 0;
+  this.canTap = false; // Klickschutz aktivieren
+
+  // Klickschutz nach 300ms aufheben (fängt Klicks vom Modal-Öffnen ab)
+  setTimeout(() => {
+    this.canTap = true;
+  }, 300);
+
+  const container = document.getElementById('mg-content');
+  container.innerHTML = `
+    <div class="w-full flex flex-col items-center space-y-4">
+      <div id="reaction-box" onclick="minigames.handleReactionTap(event, '${player}')" 
+        class="w-full h-56 rounded-2xl bg-rose-600/80 border-2 border-rose-400 flex flex-col items-center justify-center cursor-pointer transition-colors shadow-2xl p-4 text-center select-none">
+        <span id="react-icon" class="text-5xl mb-2">🛑</span>
+        <h3 id="react-msg" class="font-heading font-black text-2xl text-white">ACHTUNG...</h3>
+        <p id="react-sub" class="text-xs text-rose-100 mt-1">Nicht zu früh tippen!</p>
+      </div>
+    </div>
+  `;
+
+  const delay = Math.floor(Math.random() * 3000) + 2000;
+  this.reactTimer = setTimeout(() => {
+    const box = document.getElementById('reaction-box');
+    if (!box || this.reactState !== 'waiting') return;
+    
+    box.className = "w-full h-56 rounded-2xl bg-emerald-500 border-2 border-emerald-300 flex flex-col items-center justify-center cursor-pointer transition-colors shadow-2xl p-4 text-center animate-pulse select-none";
+    document.getElementById('react-icon').innerText = '⚡';
+    document.getElementById('react-msg').innerText = 'JETZT TIPPEN!';
+    document.getElementById('react-sub').innerText = 'SCHNELL!';
+    this.reactState = 'ready';
+    this.startTime = performance.now();
+
+    // Inaktivitäts-Schutz: Wer nach 3.5s Grün nicht tippt, verliert automatisch
+    this.afkTimer = setTimeout(() => {
+      if (this.reactState === 'ready') {
+        this.reactState = 'finished';
+        box.className = "w-full h-56 rounded-2xl bg-slate-800 border-2 border-slate-600 flex flex-col items-center justify-center p-4 text-center";
+        document.getElementById('react-icon').innerText = '😴';
+        document.getElementById('react-msg').innerText = 'EINGESCHLAFEN!';
+        document.getElementById('react-sub').innerText = 'Überhaupt nicht reagiert!';
+        
+        const maxSips = app.getMaxSipsForDifficulty();
+        setTimeout(() => {
+          this.showPenaltyCard(player, maxSips, 'Gar nicht reagiert! Volle Strafe.');
+        }, 1500);
+      }
+    }, 3500);
+
+  }, delay);
+}
+
+handleReactionTap(event, player) {
+  if (event) event.stopPropagation();
+
+  // Klicks während der Initialisierung (0-300ms) oder nach Spielende ignorieren
+  if (!this.canTap || this.reactState === 'finished') return;
+
+  const maxSips = app.getMaxSipsForDifficulty();
+
+  if (this.reactState === 'waiting') {
+    clearTimeout(this.reactTimer);
+    this.reactState = 'finished';
+
+    const box = document.getElementById('reaction-box');
+    if (box) {
+      box.className = "w-full h-56 rounded-2xl bg-rose-700 border-2 border-rose-400 flex flex-col items-center justify-center p-4 text-center";
+      document.getElementById('react-icon').innerText = '❌';
+      document.getElementById('react-msg').innerText = 'FRÜHSTART!';
+      document.getElementById('react-sub').innerText = 'Zu früh getippt!';
+    }
+
+    setTimeout(() => {
+      this.showPenaltyCard(player, maxSips, `Frühstart! Du musst die volle Strafe trinken.`);
+    }, 1800);
+
+  } else if (this.reactState === 'ready') {
+    if (this.afkTimer) clearTimeout(this.afkTimer);
+    const elapsed = Math.round(performance.now() - this.startTime);
+    this.reactState = 'finished';
+
+    const box = document.getElementById('reaction-box');
+    if (box) {
+      box.className = "w-full h-56 rounded-2xl bg-indigo-600 border-2 border-indigo-400 flex flex-col items-center justify-center p-4 text-center";
+      document.getElementById('react-icon').innerText = '⏱️';
+      document.getElementById('react-msg').innerText = `${elapsed} ms`;
+      document.getElementById('react-sub').innerText = elapsed < 230 ? 'Blitzschnell!' : elapsed <= 330 ? 'Gut reagiert!' : elapsed <= 430 ? 'Mäßige Zeit' : 'Zu langsam!';
+    }
+
+    setTimeout(() => {
+      if (elapsed < 230) {
+        soundManager.playSuccess();
+        app.closeMinigame();
+        app.openDistributeModal(player, maxSips, `Blitzschnelle Reflexe (${elapsed} ms)`, () => {});
+      } else if (elapsed <= 330) {
+        const distSips = Math.max(1, Math.floor(maxSips * 0.6));
+        soundManager.playSuccess();
+        app.closeMinigame();
+        app.openDistributeModal(player, distSips, `Gute Reaktion (${elapsed} ms)`, () => {});
+      } else if (elapsed <= 430) {
+        this.showPenaltyCard(player, 1, `Mäßige Reaktion (${elapsed} ms).`);
+      } else if (elapsed <= 550) {
+        const drinkSips = Math.min(maxSips, Math.max(2, Math.floor(maxSips * 0.6)));
+        this.showPenaltyCard(player, drinkSips, `Langsame Reaktion (${elapsed} ms)!`);
+      } else {
+        this.showPenaltyCard(player, maxSips, `Sehr langsame Reflexe (${elapsed} ms)!`);
+      }
+    }, 2200);
+  }
+}
+
+      initClickSprint(player) {
+  document.getElementById('mg-icon').innerText = '👆';
+  document.getElementById('mg-title').innerText = 'Klick-Marathon (5s)';
+  document.getElementById('mg-subtitle').innerText = `Hämmer so oft wie möglich auf den Button!`;
+
+  // Alte Timer bereinigen
+  if (this.clickTimer) clearInterval(this.clickTimer);
+
+  const container = document.getElementById('mg-content');
+  container.innerHTML = `
+    <div class="w-full flex flex-col items-center space-y-4 select-none">
+      <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden border border-slate-700">
+        <div id="click-time-bar" class="bg-gradient-to-r from-pink-500 to-cyan-400 h-full w-full transition-all duration-100"></div>
+      </div>
+      
+      <button id="click-target-btn" 
+        onpointerdown="minigames.handleClickSprintTap(event, '${player}')" 
+        class="w-48 h-48 rounded-full bg-gradient-to-tr from-pink-500 via-purple-600 to-cyan-400 p-1.5 shadow-2xl active:scale-95 transition-transform flex items-center justify-center touch-manipulation cursor-pointer select-none">
+        <div class="w-full h-full bg-slate-900 rounded-full flex flex-col items-center justify-center pointer-events-none">
+          <span id="click-count-display" class="font-heading font-black text-6xl text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-pink-400">0</span>
+          <span class="text-xs uppercase font-bold text-slate-400 mt-1">KLICKS</span>
+        </div>
+      </button>
+
+      <p id="click-status" class="font-bold text-amber-300 text-sm text-center">Tippe auf den Button zum Starten!</p>
+    </div>
+  `;
+
+  this.clickCount = 0;
+  this.clickState = 'idle';
+  this.lastClickTime = 0; // Für Zeitmessung zwischen den Klicks
+}
+
+handleClickSprintTap(event, player) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  if (this.clickState === 'ended') return;
+
+  // Entprellung: Klicks unter 30 ms Abstand ignorieren (fängt Doppelklicks/Hardwarefehler ab)
+  const now = performance.now();
+  if (now - this.lastClickTime < 30) {
+    return;
+  }
+  this.lastClickTime = now;
+
+  if (this.clickState === 'idle') {
+    this.clickState = 'running';
+    this.clickCount = 1;
+    document.getElementById('click-count-display').innerText = 1;
+    soundManager.playClickTick();
+
+    let timeLeft = 5.0;
+    this.clickTimer = setInterval(() => {
+      timeLeft -= 0.1;
+      const bar = document.getElementById('click-time-bar');
+      if (bar) bar.style.width = `${Math.max(0, (timeLeft / 5.0) * 100)}%`;
+
+      if (timeLeft <= 0) {
+        clearInterval(this.clickTimer);
+        this.clickState = 'ended';
+        this.evaluateClickSprint(player);
+      }
+    }, 100);
+  } else if (this.clickState === 'running') {
+    this.clickCount++;
+    document.getElementById('click-count-display').innerText = this.clickCount;
+    soundManager.playClickTick();
+  }
+}
+
+evaluateClickSprint(player) {
+  const count = this.clickCount;
+  const maxSips = app.getMaxSipsForDifficulty();
+  const btn = document.getElementById('click-target-btn');
+  const status = document.getElementById('click-status');
+
+  if (btn) btn.disabled = true;
+  if (status) status.innerText = `Zeit vorbei! (${count} Klicks geschafft)`;
+
+  setTimeout(() => {
+    if (count >= 40) {
+      soundManager.playSuccess();
+      app.closeMinigame();
+      app.openDistributeModal(player, maxSips, `Klick-König (${count} Klicks)`, () => {});
+    } else if (count >= 35) {
+      const distSips = Math.max(1, Math.floor(maxSips * 0.6));
+      soundManager.playSuccess();
+      app.closeMinigame();
+      app.openDistributeModal(player, distSips, `Gute Klickrate (${count} Klicks)`, () => {});
+    } else if (count >= 30) {
+      this.showPenaltyCard(player, 1, `Mäßige Klickrate (${count} Klicks).`);
+    } else if (count >= 20) {
+      const drinkSips = Math.min(maxSips, Math.max(2, Math.floor(maxSips * 0.6)));
+      this.showPenaltyCard(player, drinkSips, `Zu langsame Finger! (${count} Klicks)`);
+    } else {
+      this.showPenaltyCard(player, maxSips, `Schlechte Klick-Performance! (${count} Klicks)`);
+    }
+  }, 2000);
+}
+
+      initTimeGuess(player) {
+        document.getElementById('mg-icon').innerText = '⏱️';
+        document.getElementById('mg-title').innerText = 'Exakt X Sekunden';
+        
+        const targetSecs = (Math.floor(Math.random() * 4) + 5).toFixed(2);
+        this.timeTarget = parseFloat(targetSecs);
+
+        document.getElementById('mg-subtitle').innerText = `Stoppe die Uhr nach genau ${targetSecs}s!`;
+
+        const container = document.getElementById('mg-content');
+        container.innerHTML = `
+          <div class="w-full flex flex-col items-center space-y-5">
+            <div class="glass-panel p-6 rounded-2xl w-full text-center border-2 border-cyan-500/40">
+              <span class="text-xs uppercase tracking-widest text-slate-400 block mb-1">Zielzeit</span>
+              <span class="font-heading font-black text-4xl text-cyan-300">${targetSecs} s</span>
+            </div>
+
+            <div class="w-full h-32 glass-card rounded-2xl flex items-center justify-center border border-slate-700">
+              <span id="time-display" class="font-heading font-black text-6xl text-amber-300 font-mono">0.00s</span>
+            </div>
+
+            <button id="time-btn" onclick="minigames.handleTimeGuessBtn('${player}')" class="w-full py-4 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-heading font-black text-xl shadow-lg active:scale-95 transition-all">
+              START!
+            </button>
+          </div>
+        `;
+
+        this.timeState = 'idle';
+      }
+
+      handleTimeGuessBtn(player) {
+        const btn = document.getElementById('time-btn');
+        const display = document.getElementById('time-display');
+        const maxSips = app.getMaxSipsForDifficulty();
+
+        if (this.timeState === 'idle') {
+          this.timeState = 'running';
+          this.timeStart = performance.now();
+          btn.innerText = 'STOPP!';
+          btn.className = "w-full py-4 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 text-white font-heading font-black text-xl shadow-lg active:scale-95 transition-all animate-pulse";
+
+          this.timeAnim = requestAnimationFrame(() => this.updateTimeGuessLoop());
+        } else if (this.timeState === 'running') {
+          cancelAnimationFrame(this.timeAnim);
+          this.timeState = 'stopped';
+          
+          btn.disabled = true;
+          btn.className = "w-full py-4 rounded-xl bg-slate-800 text-slate-500 font-heading font-black text-xl cursor-not-allowed";
+
+          const elapsed = (performance.now() - this.timeStart) / 1000;
+          const diff = Math.abs(elapsed - this.timeTarget);
+          display.innerText = `${elapsed.toFixed(2)}s`;
+
+          setTimeout(() => {
+            if (diff <= 0.25) {
+              soundManager.playSuccess();
+              app.closeMinigame();
+              app.openDistributeModal(player, maxSips, 'Zeitgefühl-Gott', () => {});
+            } else if (diff <= 0.60) {
+              const distSips = Math.max(1, Math.floor(maxSips * 0.5));
+              soundManager.playSuccess();
+              app.closeMinigame();
+              app.openDistributeModal(player, distSips, 'Gutes Zeitgefühl', () => {});
+            } else {
+              const penalty = Math.min(maxSips, Math.max(2, Math.round(diff * 3)));
+              this.showPenaltyCard(player, penalty, `Zu weit daneben! (${diff.toFixed(2)}s Abweichung)`);
+            }
+          }, 2500);
+        }
+      }
+
+      updateTimeGuessLoop() {
+        if (this.timeState !== 'running') return;
+        const elapsed = (performance.now() - this.timeStart) / 1000;
+        const display = document.getElementById('time-display');
+        
+        if (elapsed > 1.8) {
+          display.innerText = '??.??s';
+        } else {
+          display.innerText = `${elapsed.toFixed(2)}s`;
+        }
+        
+        this.timeAnim = requestAnimationFrame(() => this.updateTimeGuessLoop());
+      }
+
+      initCardShark(player) {
+        document.getElementById('mg-icon').innerText = '🃏';
+        document.getElementById('mg-title').innerText = 'Höher oder Tiefer';
+        document.getElementById('mg-subtitle').innerText = `Raten & Gewinnserie ausbauen!`;
+
+        this.cardsDeck = [2,3,4,5,6,7,8,9,10,11,12,13,14];
+        this.currentCardVal = this.drawRandomCard();
+        this.cardStreak = 0;
+
+        const container = document.getElementById('mg-content');
+        container.innerHTML = `
+          <div class="w-full flex flex-col items-center space-y-4">
+            <div class="flex items-center gap-2 text-xs font-bold text-slate-400">
+              <span>Serie: <span id="card-streak-count" class="text-amber-400 font-black text-base">0</span> Erfolge</span>
+            </div>
+
+            <div id="card-display" class="w-36 h-52 glass-card rounded-2xl border-2 border-pink-500/50 flex flex-col items-center justify-between p-4 shadow-2xl transition-all transform">
+              <span class="text-xs font-bold text-slate-400 self-start" id="card-val-top">8</span>
+              <span class="text-6xl my-auto" id="card-suit-icon">♥</span>
+              <span class="text-xs font-bold text-slate-400 self-end" id="card-val-bottom">8</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 w-full">
+              <button onclick="minigames.guessCardShark('${player}', 'higher')" class="py-3 bg-slate-800 hover:bg-emerald-600/30 border border-emerald-500 text-emerald-400 font-bold rounded-xl active:scale-95 transition-all">
+                ▲ HÖHER
+              </button>
+              <button onclick="minigames.guessCardShark('${player}', 'lower')" class="py-3 bg-slate-800 hover:bg-pink-600/30 border border-pink-500 text-pink-400 font-bold rounded-xl active:scale-95 transition-all">
+                ▼ TIEFER
+              </button>
+            </div>
+
+            <button id="card-cashout-btn" onclick="minigames.cashoutCardShark('${player}')" class="hidden w-full py-2.5 bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold rounded-xl active:scale-95 transition-all text-xs">
+              💰 Serie sichern & Schlucke verteilen
+            </button>
+          </div>
+        `;
+
+        this.updateCardUI(this.currentCardVal);
+      }
+
+      drawRandomCard() {
+        return this.cardsDeck[Math.floor(Math.random() * this.cardsDeck.length)];
+      }
+
+      getCardLabel(val) {
+        if (val === 11) return 'J';
+        if (val === 12) return 'Q';
+        if (val === 13) return 'K';
+        if (val === 14) return 'A';
+        return val.toString();
+      }
+
+      updateCardUI(val) {
+        const label = this.getCardLabel(val);
+        const suits = ['♥️', '♦️', '♣️', '♠'];
+        document.getElementById('card-val-top').innerText = label;
+        document.getElementById('card-val-bottom').innerText = label;
+        document.getElementById('card-suit-icon').innerText = suits[val % 4];
+      }
+
+guessCardShark(player, choice) {
+  let nextVal = this.drawRandomCard();
+  while (nextVal === this.currentCardVal) nextVal = this.drawRandomCard();
+
+  const isHigher = nextVal > this.currentCardVal;
+  const correct = (choice === 'higher' && isHigher) || (choice === 'lower' && !isHigher);
+
+  this.currentCardVal = nextVal;
+  this.updateCardUI(nextVal);
+
+  const maxSips = app.getMaxSipsForDifficulty();
+
+  if (correct) {
+    soundManager.playSuccess();
+    this.cardStreak++;
+    document.getElementById('card-streak-count').innerText = this.cardStreak;
+    
+    const accumulated = Math.min(maxSips, this.cardStreak);
+    const cashoutBtn = document.getElementById('card-cashout-btn');
+    cashoutBtn.classList.remove('hidden');
+    cashoutBtn.innerText = `💰 Serie sichern (${accumulated} Schlucke verteilen)`;
+
+    app.showToast(`Richtig! 🎉 Serie: ${this.cardStreak}`);
+
+    // AUTOMATISCHER STOPP BEI MAXIMALER SERIE / SCHLUCKANZAHL
+    if (this.cardStreak >= maxSips) {
+      app.showToast(`🎯 Maximum von ${maxSips} Schlücken erreicht! Spiel beendet.`);
+      setTimeout(() => {
+        this.cashoutCardShark(player);
+      }, 900);
+    }
+  } else {
+    const penalty = Math.min(maxSips, Math.max(2, Math.floor(maxSips * 0.6)));
+    this.showPenaltyCard(player, penalty, 'Falsch geraten! Die Karte lag daneben.');
+  }
+}
+
+      cashoutCardShark(player) {
+        const maxSips = app.getMaxSipsForDifficulty();
+        const sips = Math.min(maxSips, Math.max(1, this.cardStreak));
+        app.closeMinigame();
+        app.openDistributeModal(player, sips, 'Card Shark Gewinnserie', () => {});
+      }
+
+      /* === BOXEN ÖFFNEN / KISTE DES GRAUENS === */
+      initMinesweeper(player) {
+        document.getElementById('mg-icon').innerText = '📦';
+        document.getElementById('mg-title').innerText = 'Kiste des Grauens';
+        
+        const mode = app.difficulty;
+        let subtitle = '';
+        let items = [];
+
+        if (mode === 'easy') {
+          // Warm-Up: Max. 3 Schluckfelder, 1 Niete, 5 "Nichts geschieht"
+          subtitle = 'Warm-Up: 3 Schluckfelder, 1 Niete ☠️, 5x Nichts!';
+          items = ['🍺', '🍺', '🍺', '☠️', '🍃', '🍃', '🍃', '🍃', '🍃'];
+        } else if (mode === 'medium') {
+          // Party-Modus: 5 Schluckfelder, 1 Niete, 3 "Nichts geschieht"
+          subtitle = 'Party-Modus: 5 Schluckfelder, 1 Niete ☠️, 3x Nichts!';
+          items = ['🍺', '🍺', '🍺', '🍺', '🍺', '☠️', '🍃', '🍃', '🍃'];
+        } else {
+          // Abriss: 8 Schluckfelder (+1 Schluck) & 1 Niete
+          subtitle = 'Abriss!: 8 Schluckfelder (+1 Schluck) & 1 Niete ☠️!';
+          items = ['🍺', '🍺', '🍺', '🍺', '🍺', '🍺', '🍺', '🍺', '☠️'];
+        }
+
+        document.getElementById('mg-subtitle').innerText = subtitle;
+
+        // Shuffle
+        for (let i = items.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [items[i], items[j]] = [items[j], items[i]];
+        }
+
+        this.boxItems = items;
+        this.boxSipsAccumulated = 0;
+        this.boxOpenedCount = 0;
+
+        const container = document.getElementById('mg-content');
+        let gridHTML = '<div class="grid grid-cols-3 gap-2.5 w-full max-w-xs mx-auto mb-4">';
+        for (let i = 0; i < 9; i++) {
+          gridHTML += `
+            <button onclick="minigames.openBox('${player}', ${i})" id="box-${i}" class="h-20 glass-panel rounded-xl border border-slate-700 hover:border-pink-500 text-2xl font-black flex items-center justify-center transition-all active:scale-90">
+              🎁
+            </button>
+          `;
+        }
+        gridHTML += '</div>';
+
+        container.innerHTML = `
+          <div class="w-full flex flex-col items-center">
+            ${gridHTML}
+            <button id="box-cashout-btn" onclick="minigames.cashoutBoxes('${player}')" class="hidden w-full py-2.5 bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold rounded-xl active:scale-95 transition-all text-xs">
+              💰 Schlucke verteilen & Aufhören
+            </button>
+          </div>
+        `;
+      }
+
+      openBox(player, idx) {
+        const btn = document.getElementById(`box-${idx}`);
+        if (!btn || btn.disabled) return;
+
+        btn.disabled = true;
+        const maxLimit = app.getMaxSipsForDifficulty();
+        const item = this.boxItems[idx];
+        this.boxOpenedCount++;
+
+        if (item === '☠️') {
+          btn.innerText = '☠️';
+          btn.classList.add('bg-rose-600/80', 'border-rose-400');
+          this.showPenaltyCard(player, maxLimit, 'NIETE GEZOGEN ☠️! Maximale Strafe!');
+        } else if (item === '🍺') {
+          if (this.boxSipsAccumulated < maxLimit) {
+            this.boxSipsAccumulated++;
+            btn.innerText = '🍺';
+            btn.classList.add('bg-emerald-600/40', 'border-emerald-400');
+            soundManager.playSuccess();
+            app.showToast(`+1 Schluck gesammelt! (${this.boxSipsAccumulated}/${maxLimit})`);
+          } else {
+            // Max limit reached -> Count as no effect
+            btn.innerText = '🍃';
+            btn.classList.add('bg-slate-800/60', 'border-slate-600');
+            soundManager.playClickTick();
+            app.showToast(`Limit von ${maxLimit} Schlücken bereits erreicht!`);
+          }
+
+          const cashoutBtn = document.getElementById('box-cashout-btn');
+          cashoutBtn.classList.remove('hidden');
+          cashoutBtn.innerText = `💰 ${this.boxSipsAccumulated} Schluck(e) verteilen & aufhören`;
+
+          if (this.boxSipsAccumulated >= maxLimit) {
+            app.showToast(`Maximum von ${maxLimit} Schlücken erreicht!`);
+          }
+        } else {
+          // "Nichts geschieht"
+          btn.innerText = '🍃';
+          btn.classList.add('bg-slate-800/60', 'border-slate-600');
+          soundManager.playClickTick();
+          app.showToast('Nichts geschieht! 🍃');
+
+          const cashoutBtn = document.getElementById('box-cashout-btn');
+          if (this.boxSipsAccumulated > 0) {
+            cashoutBtn.classList.remove('hidden');
+            cashoutBtn.innerText = `💰 ${this.boxSipsAccumulated} Schluck(e) verteilen & aufhören`;
+          }
+        }
+      }
+
+      cashoutBoxes(player) {
+        const sips = Math.max(1, this.boxSipsAccumulated);
+        app.closeMinigame();
+        app.openDistributeModal(player, sips, 'Kiste des Grauens', () => {});
+      }
+
+initRoulette(player) {
+  document.getElementById('mg-icon').innerText = '🔫';
+  document.getElementById('mg-title').innerText = 'Russisches Roulette';
+  document.getElementById('mg-subtitle').innerText = 'Klick = Gewinn-Pott wächst! Schuss = STRAFE!';
+
+  this.bulletChamber = Math.floor(Math.random() * 6);
+  this.currentChamber = 0;
+  this.survivedShots = 0;
+  this.rouletteRot = 0;
+  this.isGameOver = false; // Schutz-Flag gegen Exploits
+
+  const maxSips = app.getMaxSipsForDifficulty();
+
+  const container = document.getElementById('mg-content');
+  container.innerHTML = `
+    <div id="roulette-wrapper" class="w-full flex flex-col items-center space-y-5 transition-all">
+      <div class="glass-panel px-4 py-2 rounded-full border border-slate-700 flex items-center gap-3 text-xs font-bold text-slate-300">
+        <span>Überlebt: <span id="roulette-survived" class="text-emerald-400 font-black text-sm">0</span>/5</span>
+        <span class="text-slate-600">|</span>
+        <span>🎯 Pott: <span id="roulette-pot" class="text-amber-300 font-black text-sm">0</span> / ${maxSips} Schlucke</span>
+      </div>
+
+      <!-- Revolver-Trommel Bereich -->
+      <div class="relative flex flex-col items-center justify-center my-2">
+        <div class="z-20 -mb-2 text-rose-500 drop-shadow-[0_0_8px_rgba(244,63,94,0.6)] animate-pulse text-lg font-black">
+          ▼
+        </div>
+
+        <div class="relative w-44 h-44 rounded-full bg-gradient-to-b from-slate-700 via-slate-800 to-slate-950 p-2 border-4 border-slate-600 shadow-[0_10px_25px_rgba(0,0,0,0.8)] flex items-center justify-center">
+          
+          <div id="revolver-cylinder" class="w-full h-full rounded-full relative flex items-center justify-center transition-transform duration-700 cubic-bezier(0.15, 0.85, 0.35, 1.2)">
+            
+            ${[0, 60, 120, 180, 240, 300].map((deg, i) => `
+              <div id="chamber-${i}" 
+                   class="absolute w-8 h-8 rounded-full bg-slate-950 border-2 border-slate-600 shadow-[inset_0_3px_6px_rgba(0,0,0,0.9)] transition-all duration-300 flex items-center justify-center text-xs"
+                   style="transform: rotate(${deg}deg) translateY(-50px);">
+                <div class="w-2.5 h-2.5 rounded-full bg-slate-900 border border-slate-700/50"></div>
+              </div>
+            `).join('')}
+
+          </div>
+
+          <div class="absolute w-12 h-12 rounded-full bg-gradient-to-b from-slate-600 to-slate-900 border-2 border-slate-500 shadow-md z-10 flex items-center justify-center pointer-events-none">
+            <span id="roulette-chamber-badge" class="text-[11px] font-black tracking-tight text-amber-400 drop-shadow">1/6</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!--<button id="roulette-trigger-btn" onclick="minigames.pullTriggerRoulette('${player}')" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-rose-600 via-pink-600 to-purple-600 hover:from-rose-500 hover:to-purple-500 text-white font-heading font-black text-lg shadow-2xl active:scale-95 transition-all flex items-center justify-center gap-2">
+        💥 ABDRÜCKEN!
+      </button>-->
+	  
+	  <button id="roulette-trigger-btn" onclick="minigames.pullTriggerRoulette('${player}')" class="w-full py-4 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-heading font-black text-xl shadow-lg active:scale-95 transition-all">
+              💥 ABDRÜCKEN!
+      </button>
+
+      <button id="roulette-cashout-btn" onclick="minigames.cashoutRoulette('${player}')" class="hidden w-full py-2.5 bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold rounded-xl active:scale-95 transition-all text-xs">
+        💰 Pott sichern & Schlucke verteilen
+      </button>
+    </div>
+  `;
+}
+
+pullTriggerRoulette(player) {
+  const triggerBtn = document.getElementById('roulette-trigger-btn');
+  const cashoutBtn = document.getElementById('roulette-cashout-btn');
+
+  // Abbrechen, wenn das Spiel vorbei ist oder der Button gesperrt ist
+  if (this.isGameOver || (triggerBtn && triggerBtn.disabled)) return;
+
+  const maxSips = app.getMaxSipsForDifficulty();
+  const isBANG = this.currentChamber === this.bulletChamber;
+  const currentChamberEl = document.getElementById(`chamber-${this.currentChamber}`);
+
+  // Beide Buttons sofort während der Auswertung sperren
+  if (triggerBtn) triggerBtn.disabled = true;
+  if (cashoutBtn) cashoutBtn.classList.add('pointer-events-none', 'opacity-50');
+
+  if (isBANG) {
+    this.isGameOver = true; // Spiel sofort als beendet markieren!
+
+    // Cashout-Button SOFORT ausblenden, um Exploits zu verhindern
+    if (cashoutBtn) cashoutBtn.classList.add('hidden');
+
+    soundManager.playGunshot();
+    if (currentChamberEl) {
+      currentChamberEl.classList.remove('bg-slate-950');
+      currentChamberEl.classList.add('bg-rose-600', 'border-rose-400', 'shadow-[0_0_12px_rgba(225,29,72,0.8)]');
+      currentChamberEl.innerHTML = '💥';
+    }
+
+    setTimeout(() => {
+      this.showPenaltyCard(player, maxSips, 'PÄNG! 💥 Du hast die Patrone erwischt!');
+    }, 800);
+  } else {
+    soundManager.playClickTick();
+    if (currentChamberEl) {
+      currentChamberEl.classList.remove('bg-slate-950');
+      currentChamberEl.classList.add('bg-emerald-600/30', 'border-emerald-500', 'shadow-[0_0_8px_rgba(16,185,129,0.5)]');
+    }
+
+    this.survivedShots++;
+    this.currentChamber++;
+    
+    // Dreht die nächste Kammer flüssig unter den Schlagbolzen
+    this.rouletteRot -= 60;
+    const cylinder = document.getElementById('revolver-cylinder');
+    if (cylinder) cylinder.style.transform = `rotate(${this.rouletteRot}deg)`;
+
+    const potSips = Math.min(maxSips, this.survivedShots);
+
+    document.getElementById('roulette-survived').innerText = this.survivedShots;
+    document.getElementById('roulette-pot').innerText = potSips;
+    if (this.currentChamber < 6) {
+      document.getElementById('roulette-chamber-badge').innerText = `${this.currentChamber + 1}/6`;
+    }
+
+    if (cashoutBtn) {
+      cashoutBtn.classList.remove('hidden', 'pointer-events-none', 'opacity-50');
+      cashoutBtn.innerText = `💰 Pott sichern (${potSips} Schlucke verteilen)`;
+    }
+
+    // AUTOMATISCHER STOPP BEI MAXIMALEN SCHLÜCKEN
+    if (potSips >= maxSips) {
+      this.isGameOver = true;
+      app.showToast(`🎯 Maximum von ${maxSips} Schlücken erreicht! Automatische Auszahlung.`);
+      setTimeout(() => {
+        this.cashoutRoulette(player);
+      }, 1000);
+    } else {
+      // Trigger-Button für den nächsten Versuch wieder freigeben
+      if (triggerBtn) triggerBtn.disabled = false;
+    }
+  }
+}
+
+cashoutRoulette(player) {
+  // Wenn bereits verloren wurde oder ausgezahlt ist -> Klick ignorieren
+  if (this.isGameOver) return; 
+  this.isGameOver = true;
+
+  const potSips = Math.min(app.getMaxSipsForDifficulty(), this.survivedShots);
+  if (potSips > 0) {
+    soundManager.playSuccess();
+    app.closeMinigame();
+    app.openDistributeModal(player, potSips, `Russisches Roulette Pott (${potSips} Schlucke)`, () => {});
+  }
+}
+
+cashoutRoulette(player) {
+  const maxSips = app.getMaxSipsForDifficulty();
+  const sips = Math.min(maxSips, Math.max(1, this.survivedShots));
+  app.closeMinigame();
+  app.openDistributeModal(player, sips, 'Russisches Roulette Gewinner', () => {});
+}
+
+
+initNumberHunt(player) {
+  document.getElementById('mg-icon').innerText = '🔢';
+  document.getElementById('mg-title').innerText = 'Zahlen-Jagd';
+  document.getElementById('mg-subtitle').innerText = `${player}: Klicke 1 bis 15 der Reihe nach!`;
+
+  this.huntNext = 1;
+  this.huntStartTime = null;
+  if (this.huntInterval) clearInterval(this.huntInterval);
+
+  // Zahlen 1 bis 15 zufällig mischen
+  const numbers = Array.from({ length: 15 }, (_, i) => i + 1).sort(() => Math.random() - 0.5);
+
+  const container = document.getElementById('mg-content');
+  container.innerHTML = `
+    <div class="flex flex-col items-center space-y-4 w-full">
+      
+      <!-- Statusbar mit Ziel-Zahl und Live-Timer -->
+      <div class="flex items-center gap-4 glass-panel px-5 py-2 rounded-full border border-slate-700 text-xs font-bold text-slate-300 shadow-md">
+        <div>Nächste: <span id="hunt-target" class="text-amber-400 font-black text-lg ml-1">1</span></div>
+        <div class="text-slate-600">|</div>
+        <div>Zeit: <span id="hunt-timer" class="text-emerald-400 font-mono font-black text-lg ml-1">0.0s</span></div>
+      </div>
+
+      <!-- Grid: Nur die '1' ist klar, 2-15 sind verschwommen (blur-md) -->
+      <div class="grid grid-cols-5 gap-3 w-full max-w-sm my-2">
+        ${numbers.map(num => {
+          const isStartNumber = num === 1;
+          const initialClasses = isStartNumber
+            ? 'bg-amber-500/20 border-amber-400 text-amber-300 font-black scale-105 shadow-amber-500/20'
+            : 'bg-slate-800/90 border-slate-600 text-white blur-md opacity-30 pointer-events-none';
+
+          return `
+            <button onclick="minigames.clickNumber(${num}, '${player}')" 
+                    id="hunt-btn-${num}"
+                    class="h-16 rounded-2xl border-2 text-xl font-heading shadow-lg active:scale-90 transition-all flex items-center justify-center ${initialClasses}">
+              ${num}
+            </button>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+clickNumber(num, player) {
+  // Beim allerersten Klick (auf die 1): Timer starten & Spielfeld scharfstellen
+  if (!this.huntStartTime) {
+    this.huntStartTime = Date.now();
+    const timerEl = document.getElementById('hunt-timer');
+    
+    this.huntInterval = setInterval(() => {
+      if (timerEl && this.huntStartTime) {
+        const currentElapsed = ((Date.now() - this.huntStartTime) / 1000).toFixed(1);
+        timerEl.innerText = `${currentElapsed}s`;
+      }
+    }, 100);
+
+    // Alle verbliebenen Zahlen (2-15) aufdecken & freischalten
+    for (let i = 2; i <= 15; i++) {
+      const btn = document.getElementById(`hunt-btn-${i}`);
+      if (btn) {
+        btn.classList.remove('blur-md', 'opacity-30', 'pointer-events-none');
+        btn.classList.add('hover:border-slate-400');
+      }
+    }
+  }
+
+  if (num === this.huntNext) {
+    soundManager.playClickTick();
+    const btn = document.getElementById(`hunt-btn-${num}`);
+    if (btn) {
+      btn.classList.remove('bg-slate-800/90', 'bg-amber-500/20', 'border-slate-600', 'border-amber-400', 'text-amber-300', 'hover:border-slate-400', 'scale-105');
+      btn.classList.add('bg-emerald-600/30', 'border-emerald-500', 'text-emerald-400', 'pointer-events-none', 'opacity-30');
+    }
+
+    this.huntNext++;
+    const targetEl = document.getElementById('hunt-target');
+    if (targetEl) targetEl.innerText = this.huntNext <= 15 ? this.huntNext : '✓';
+
+    // Wenn alle 15 Zahlen angeklickt wurden
+    if (this.huntNext > 15) {
+      clearInterval(this.huntInterval);
+      const elapsedSeconds = parseFloat(((Date.now() - this.huntStartTime) / 1000).toFixed(1));
+      const maxSips = app.getMaxSipsForDifficulty();
+
+      const timerEl = document.getElementById('hunt-timer');
+      if (timerEl) timerEl.innerText = `${elapsedSeconds}s`;
+
+      // Zielzeit unterschritten: GEWONNEN!
+      if (elapsedSeconds <= 8.0) {
+        soundManager.playSuccess();
+        app.showToast(`🔥 Rekord! In nur ${elapsedSeconds}s geschafft!`);
+        setTimeout(() => {
+          app.closeMinigame();
+          app.openDistributeModal(player, maxSips, `Zahlen-Jagd Rekordzeit (${elapsedSeconds}s)`, () => {});
+        }, 800);
+      } else {
+        // DYNAMISCHE STRAFBERECHNUNG JE NACH ZEITÜBERSCHREITUNG:
+        const extraTime = elapsedSeconds - 8.0;
+        const penaltySips = Math.min(maxSips, Math.max(1, Math.ceil(extraTime / 1)));
+
+        setTimeout(() => {
+          this.showPenaltyCard(
+            player, 
+            penaltySips, 
+            `Zu langsam! (${elapsedSeconds}s gebraucht – Limit war 8.0s)`
+          );
+        }, 800);
+      }
+    }
+  } else {
+    // Falsche Zahl angeklickt -> Visuelles Feedback
+    const btn = document.getElementById(`hunt-btn-${num}`);
+    if (btn) {
+      btn.classList.add('border-rose-500', 'bg-rose-500/30');
+      setTimeout(() => btn.classList.remove('border-rose-500', 'bg-rose-500/30'), 300);
+    }
+  }
+}
+
+initShapeCounter(player) {
+  document.getElementById('mg-icon').innerText = '🔺';
+  document.getElementById('mg-title').innerText = 'Formen-Zähler';
+  document.getElementById('mg-subtitle').innerText = `Aufmerksam mitzählen!`;
+
+  // Vorherige Animationsschleife stoppen, falls noch aktiv
+  if (this.shapeAnimFrame) cancelAnimationFrame(this.shapeAnimFrame);
+
+  const shapeTypes = ['triangle', 'circle', 'square'];
+  const targetShapeType = shapeTypes[Math.floor(Math.random() * shapeTypes.length)];
+  const shapeNames = { triangle: 'Dreiecke', circle: 'Kreise', square: 'Quadrate' };
+
+  // Dynamischer Bereich pro Durchgang (3 bis 11 Formen pro Typ)
+  const minRange = Math.floor(Math.random() * 3) + 3;
+  const maxRange = minRange + Math.floor(Math.random() * 4) + 3;
+  const getRandomCount = () => Math.floor(Math.random() * (maxRange - minRange + 1)) + minRange;
+
+  const counts = {
+    triangle: getRandomCount(),
+    circle: getRandomCount(),
+    square: getRandomCount()
+  };
+
+  const targetCount = counts[targetShapeType];
+
+  const shapeSVGMap = {
+    triangle: `<svg class="w-8 h-8 filter drop-shadow-[0_0_10px_rgba(244,63,94,0.8)]" viewBox="0 0 24 24"><path d="M12 2L22 20H2L12 2Z" fill="#f43f5e" stroke="#fda4af" stroke-width="1.5"/></svg>`,
+    circle: `<svg class="w-8 h-8 filter drop-shadow-[0_0_10px_rgba(251,191,36,0.8)]" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#fbbf24" stroke="#fde047" stroke-width="1.5"/></svg>`,
+    square: `<svg class="w-8 h-8 filter drop-shadow-[0_0_10px_rgba(56,189,248,0.8)]" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4" fill="#38bdf8" stroke="#7dd3fc" stroke-width="1.5"/></svg>`
+  };
+
+  const totalShapes = [];
+  Object.keys(counts).forEach(type => {
+    for (let i = 0; i < counts[type]; i++) {
+      totalShapes.push({ type, svg: shapeSVGMap[type] });
+    }
+  });
+
+  totalShapes.sort(() => Math.random() - 0.5);
+
+  const container = document.getElementById('mg-content');
+  container.innerHTML = `
+    <div class="flex flex-col items-center justify-center space-y-4 w-full">
+      <div class="text-xs font-bold text-amber-400 animate-pulse">⏰ 8 Sekunden Zeit... Genau mitzählen!</div>
+
+      <div id="shape-box" class="relative w-full h-56 glass-panel rounded-2xl border border-slate-700 overflow-hidden shadow-inner bg-slate-950/60">
+        ${totalShapes.map((s, idx) => `
+          <div id="shape-item-${idx}" class="absolute top-0 left-0 will-change-transform">
+            ${s.svg}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  // Start der Physik-Engine nach Rendern des DOM
+  setTimeout(() => {
+    const box = document.getElementById('shape-box');
+    if (!box) return;
+
+    const shapeSize = 32; // Größe der w-8 h-8 SVGs (32px)
+    const maxX = box.clientWidth - shapeSize;
+    const maxY = box.clientHeight - shapeSize;
+
+    // Physikalische Daten für jedes Objekt erzeugen
+    const physicsNodes = totalShapes.map((_, idx) => {
+      const el = document.getElementById(`shape-item-${idx}`);
+      // Geschwindigkeiten in Pixel pro Frame (dynamisch positiv oder negativ)
+		const vx = (Math.random() * 0.2 + 0.1) * (Math.random() > 0.5 ? 1 : -1); // 0.6 bis 1.6 px/frame
+		const vy = (Math.random() * 0.2 + 0.1) * (Math.random() > 0.5 ? 1 : -1);
+
+      return {
+        el,
+        x: Math.random() * Math.max(10, maxX),
+        y: Math.random() * Math.max(10, maxY),
+        vx,
+        vy
+      };
+    });
+
+    const updatePhysics = () => {
+      physicsNodes.forEach(node => {
+        if (!node.el) return;
+
+        node.x += node.vx;
+        node.y += node.vy;
+
+        // Abprallen an den x-Rändern
+        if (node.x <= 0) {
+          node.x = 0;
+          node.vx *= -1;
+        } else if (node.x >= maxX) {
+          node.x = maxX;
+          node.vx *= -1;
+        }
+
+        // Abprallen an den y-Rändern
+        if (node.y <= 0) {
+          node.y = 0;
+          node.vy *= -1;
+        } else if (node.y >= maxY) {
+          node.y = maxY;
+          node.vy *= -1;
+        }
+
+        node.el.style.transform = `translate3d(${node.x}px, ${node.y}px, 0)`;
+      });
+
+      this.shapeAnimFrame = requestAnimationFrame(updatePhysics);
+    };
+
+    this.shapeAnimFrame = requestAnimationFrame(updatePhysics);
+  }, 50);
+
+  // Nach 5 Sekunden: Animation stoppen & Frage einblenden
+  setTimeout(() => {
+    if (this.shapeAnimFrame) {
+      cancelAnimationFrame(this.shapeAnimFrame);
+      this.shapeAnimFrame = null;
+    }
+
+    const optionsSet = new Set([targetCount]);
+    while (optionsSet.size < 4) {
+      const offset = [-2, -1, 1, 2, 3][Math.floor(Math.random() * 5)];
+      const val = targetCount + offset;
+      if (val > 0) optionsSet.add(val);
+    }
+    const options = Array.from(optionsSet).sort(() => Math.random() - 0.5);
+
+    container.innerHTML = `
+      <div class="flex flex-col items-center space-y-4 w-full">
+        <div class="text-base font-bold text-slate-200 text-center">
+          Wie viele <span class="text-amber-400 font-black underline">${shapeNames[targetShapeType]}</span> hast du gesehen?
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 w-full max-w-xs">
+          ${options.map(opt => `
+            <button onclick="minigames.answerShapeCounter('${player}', ${opt},${targetCount})"
+                    class="py-3.5 bg-slate-800 hover:bg-slate-700 border-2 border-slate-600 rounded-xl font-heading font-black text-xl text-white shadow-md active:scale-95 transition-all">
+              ${opt}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }, 8000);
+}
+
+answerShapeCounter(player, chosen, correct) {
+  const maxSips = app.getMaxSipsForDifficulty();
+  if (chosen === correct) {
+    soundManager.playSuccess();
+    app.showToast(`Richtig! Es waren genau ${correct}! 🎉`);
+    setTimeout(() => {
+      app.closeMinigame();
+      app.openDistributeModal(player, maxSips, 'Formen-Zähler Meister', () => {});
+    }, 600);
+  } else {
+    const penalty = Math.min(maxSips, 3);
+    this.showPenaltyCard(player, penalty, `Falsch! Es waren ${correct} (du tipptest ${chosen}).`);
+  }
+}
+
+
+initCardSharkShuffle(player) {
+  document.getElementById('mg-icon').innerText = '🃏';
+  document.getElementById('mg-title').innerText = 'Karten-Hai';
+  document.getElementById('mg-subtitle').innerText = 'Merk dir die Karte und verfolge sie!';
+
+  const maxSips = app.getMaxSipsForDifficulty();
+
+  this.cards = [
+    { id: 0, type: 'win', label: `Verteile ${maxSips} Schlucke`, icon: '🏆' },
+    { id: 1, type: 'safe', label: 'Glück gehabt! Nichts.', icon: '🛡️' },
+    { id: 2, type: 'lose', label: `Trinke ${maxSips} Schlucke`, icon: '💀' }
+  ].sort(() => Math.random() - 0.5);
+
+  // Initialen Slot festlegen (0, 1, 2)
+  this.cards.forEach((c, i) => {
+    c.initialSlot = i;
+    c.slot = i;
+  });
+
+  const container = document.getElementById('mg-content');
+  container.innerHTML = `
+    <div class="flex flex-col items-center space-y-5">
+      <p id="card-status-text" class="text-xs font-bold text-amber-300 animate-pulse">Merk dir die Verteilung!</p>
+
+      <!-- Vergrößerter Container (min-h-[190px]) -->
+      <div id="card-deck" class="flex justify-center items-center gap-2 sm:gap-3 w-full my-2 relative min-h-[190px]">
+        ${this.cards.map((c, i) => `
+          <!-- Vergrößerte Karte: w-28 h-42 -->
+          <div id="shuffle-card-${i}" class="w-28 h-42 rounded-2xl border-2 border-slate-600 glass-panel flex flex-col items-center justify-center p-2 text-center transition-all duration-300 shadow-xl">
+            <span class="text-3xl mb-1.5">${c.icon}</span>
+            <span class="text-xs font-bold text-slate-200 leading-tight">${c.label}</span>
+          </div>
+        `).join('')}
+      </div>
+
+      <button id="start-shuffle-btn" onclick="minigames.startCardShuffle('${player}')" class="w-full py-3 bg-gradient-to-r from-amber-500 to-purple-600 hover:from-amber-600 hover:to-purple-700 text-white font-heading font-black text-base rounded-xl shadow-lg active:scale-95 transition-all">
+        🔀 Karten verdecken & mischen!
+      </button>
+    </div>
+  `;
+}
+
+initCardSharkShuffle(player) {
+  document.getElementById('mg-icon').innerText = '🃏';
+  document.getElementById('mg-title').innerText = 'Karten-Hai';
+  document.getElementById('mg-subtitle').innerText = 'Merk dir die Karte und verfolge sie!';
+
+  const maxSips = app.getMaxSipsForDifficulty();
+
+  this.cards = [
+    { id: 0, type: 'win', label: `Verteile ${maxSips} Schlucke`, icon: '🏆' },
+    { id: 1, type: 'safe', label: 'Glück gehabt! Nichts.', icon: '🛡️' },
+    { id: 2, type: 'lose', label: `Trinke ${maxSips} Schlucke`, icon: '💀' }
+  ].sort(() => Math.random() - 0.5);
+
+  // Initialen Slot festlegen (0, 1, 2)
+  this.cards.forEach((c, i) => {
+    c.initialSlot = i;
+    c.slot = i;
+  });
+
+  const container = document.getElementById('mg-content');
+  container.innerHTML = `
+    <div class="flex flex-col items-center space-y-5">
+      <p id="card-status-text" class="text-xs font-bold text-amber-300 animate-pulse">Merk dir die Verteilung!</p>
+
+      <!-- Container mit ausreichend Platz für die Bogen-Animationen -->
+      <div id="card-deck" class="flex justify-center items-center gap-2 sm:gap-3 w-full my-2 relative min-h-[200px]">
+        ${this.cards.map((c, i) => `
+          <!-- Echte Pokerkarten-Proportionen: w-28 (112px) x h-[160px] -->
+          <div id="shuffle-card-${i}" class="w-28 h-[160px] rounded-xl border-2 border-slate-600 glass-panel flex flex-col items-center justify-between p-3 text-center transition-all duration-300 shadow-xl select-none">
+            <span class="text-3xl mt-4">${c.icon}</span>
+            <span class="text-xs font-bold text-slate-200 leading-tight mb-1">${c.label}</span>
+          </div>
+        `).join('')}
+      </div>
+
+      <!--<button id="start-shuffle-btn" onclick="minigames.startCardShuffle('${player}')" class="w-full py-3 bg-gradient-to-r from-amber-500 to-purple-600 hover:from-amber-600 hover:to-purple-700 text-white font-heading font-black text-base rounded-xl shadow-lg active:scale-95 transition-all">
+        🔀 Karten verdecken & mischen!
+      </button>-->
+	  
+	  <button id="start-shuffle-btn" onclick="minigames.startCardShuffle('${player}')" class="w-full py-4 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-heading font-black text-xl shadow-lg active:scale-95 transition-all">
+              🔀 Karten verdecken & mischen!
+      </button>
+    </div>
+  `;
+}
+
+startCardShuffle(player) {
+  const btn = document.getElementById('start-shuffle-btn');
+  if (btn) btn.style.display = 'none';
+
+  const statusText = document.getElementById('card-status-text');
+  statusText.innerText = 'Karten werden verdeckt & gemischt...';
+
+  // 1. Karten umdrehen & Transition aktivieren
+  this.cards.forEach((card) => {
+    const cardEl = document.getElementById(`shuffle-card-${card.initialSlot}`);
+    if (cardEl) {
+      cardEl.classList.add('bg-slate-900');
+      cardEl.innerHTML = '<span class="text-4xl my-auto">❓</span>';
+      cardEl.style.transition = 'transform 0.28s cubic-bezier(0.4, 0, 0.2, 1)';
+    }
+  });
+
+  // 2. Exakten Pixel-Abstand zwischen den Slot-Mitten berechnen
+  const c0 = document.getElementById('shuffle-card-0');
+  const c1 = document.getElementById('shuffle-card-1');
+  const slotDistance = (c0 && c1) ? Math.abs(c1.offsetLeft - c0.offsetLeft) : 120;
+
+  let swapsCount = 0;
+  const maxSwaps = 16; // Längeres Mischen
+  let lastS1 = -1;
+
+  setTimeout(() => {
+    const interval = setInterval(() => {
+      swapsCount++;
+      soundManager.playClickTick();
+
+      // Zwei unterschiedliche Slots für den Tausch wählen
+      let s1 = Math.floor(Math.random() * 3);
+      while (s1 === lastS1) s1 = Math.floor(Math.random() * 3);
+      let s2 = Math.floor(Math.random() * 3);
+      while (s2 === s1) s2 = Math.floor(Math.random() * 3);
+      lastS1 = s1;
+
+      const cardA = this.cards.find(c => c.slot === s1);
+      const cardB = this.cards.find(c => c.slot === s2);
+
+      // Logischen Slot tauschen
+      cardA.slot = s2;
+      cardB.slot = s1;
+
+      // Visuelle Transformation anwenden (mit Bogenbewegung nach oben/unten)
+      this.cards.forEach(card => {
+        const cardEl = document.getElementById(`shuffle-card-${card.initialSlot}`);
+        if (cardEl) {
+          const x = (card.slot - card.initialSlot) * slotDistance;
+          let y = 0;
+          if (card === cardA) y = -30; // Bogen nach oben
+          if (card === cardB) y = 30;  // Bogen nach unten
+          cardEl.style.transform = `translate(${x}px, ${y}px)`;
+        }
+      });
+
+      // Nach der Hälfte der Bewegung Karten wieder auf einer Linie ausrichten
+      setTimeout(() => {
+        this.cards.forEach(card => {
+          const cardEl = document.getElementById(`shuffle-card-${card.initialSlot}`);
+          if (cardEl) {
+            const x = (card.slot - card.initialSlot) * slotDistance;
+            cardEl.style.transform = `translate(${x}px, 0px)`;
+          }
+        });
+      }, 180);
+
+      // Ende des Mischens
+      if (swapsCount >= maxSwaps) {
+        clearInterval(interval);
+
+        setTimeout(() => {
+          this.cards.sort((a, b) => a.slot - b.slot);
+
+          statusText.innerText = 'Wähle eine Karte!';
+          statusText.classList.remove('animate-pulse');
+
+          [0, 1, 2].forEach(slotIdx => {
+            const cardInSlot = this.cards[slotIdx];
+            const cardEl = document.getElementById(`shuffle-card-${cardInSlot.initialSlot}`);
+            if (cardEl) {
+              cardEl.classList.add('cursor-pointer', 'hover:border-amber-400', 'hover:scale-105');
+              cardEl.onclick = () => this.pickShuffleCard(player, slotIdx);
+            }
+          });
+        }, 170);
+      }
+    }, 350);
+  }, 500);
+}
+
+pickShuffleCard(player, pickedSlotIndex) {
+  this.cards.forEach(card => {
+    const cardEl = document.getElementById(`shuffle-card-${card.initialSlot}`);
+    if (cardEl) cardEl.onclick = null;
+  });
+
+  const maxSips = app.getMaxSipsForDifficulty();
+
+  // Alle Karten an ihren aktuellen Positionen aufdecken
+  this.cards.forEach((card, slotIdx) => {
+    const cardEl = document.getElementById(`shuffle-card-${card.initialSlot}`);
+    if (cardEl) {
+      cardEl.innerHTML = `
+        <span class="text-3xl mt-4">${card.icon}</span>
+        <span class="text-xs font-bold text-slate-200 leading-tight mb-1">${card.label}</span>
+      `;
+      if (slotIdx === pickedSlotIndex) {
+        cardEl.classList.add('border-amber-400', 'ring-2', 'ring-amber-400/50');
+      }
+    }
+  });
+
+  const pickedCard = this.cards[pickedSlotIndex];
+
+  setTimeout(() => {
+    if (pickedCard.type === 'win') {
+      soundManager.playSuccess();
+      app.closeMinigame();
+      app.openDistributeModal(player, maxSips, 'Hauptgewinn beim Karten-Hai', () => {});
+    } else if (pickedCard.type === 'lose') {
+      this.showPenaltyCard(player, maxSips, 'Niete gezogen! Der Hai hat zugebissen.');
+    } else {
+      soundManager.playClickTick();
+      app.showToast(`🛡️ Glück gehabt! Keine Strafe für ${player}.`);
+      app.closeMinigame();
+    }
+  }, 1200);
+}
+
+
+
+    }
+
+    const minigames = new MinigameEngine();
+    const app = new DrinkingApp();
+
+    window.addEventListener('DOMContentLoaded', () => {
+      app.init();
+    });
+  </script>
+</body>
+</html>
