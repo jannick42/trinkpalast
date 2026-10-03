@@ -647,35 +647,70 @@
       }
     }
 	
-// Variable außerhalb der Funktion anlegen:
+// 1. Ein globaler AudioContext für die gesamte App
+let globalAudioCtx = null;
+
+function getAudioContext() {
+  if (!globalAudioCtx) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (AudioContextClass) {
+      globalAudioCtx = new AudioContextClass();
+    }
+  }
+  return globalAudioCtx;
+}
+
+// 2. iOS-Unlock: Beim ersten Touch/Klick den AudioContext aktivieren
+function unlockAudioContext() {
+  const ctx = getAudioContext();
+  if (ctx && ctx.state === 'suspended') {
+    ctx.resume();
+  }
+}
+
+// Einmalig globale Event-Listener für den Unlock registrieren
+if (typeof window !== 'undefined') {
+  ['touchstart', 'touchend', 'mousedown', 'keydown'].forEach(eventType => {
+    document.addEventListener(eventType, unlockAudioContext, { once: true });
+  });
+}
+
+// 3. Überarbeitete Sound-Funktion
 let isTickHigh = true;
 
 function playTickSound() {
   try {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) return;
-    const audioCtx = new AudioContext();
+    const audioCtx = getAudioContext();
+    if (!audioCtx) return;
+
+    // Falls iOS den Kontext wieder suspended hat, Resume versuchen
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
 
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
 
     osc.type = 'sine';
-    
-    // Wechselt die Frequenz: 1200Hz für Tick, 800Hz für Tock
+
     const freq = isTickHigh ? 1200 : 800;
-    isTickHigh = !isTickHigh; // Zustand umkehren
+    isTickHigh = !isTickHigh;
 
-    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    const now = audioCtx.currentTime;
 
-    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.025);
+    osc.frequency.setValueAtTime(freq, now);
+
+    gain.gain.setValueAtTime(0.12, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
 
     osc.connect(gain);
     gain.connect(audioCtx.destination);
 
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.025);
-  } catch (e) {}
+    osc.start(now);
+    osc.stop(now + 0.025);
+  } catch (e) {
+    console.warn("Tick sound failed:", e);
+  }
 }
 
 function playTimeoutSound() {
@@ -971,7 +1006,7 @@ classic: {
       { text: 'DUELL: {player} und {player2} würfeln virtuell oder schätzen eine Zahl. Wer näher an 50 liegt, verteilt {sips} Schlücke an den Verlierer!', baseSips: 2, isGroup: true },
       { text: 'KATEGORIE: Filme mit Leonardo DiCaprio! {player} beginnt. Wer keinen mehr weiß, muss {sips} Schlücke trinken!', baseSips: 2, isGroup: true },
       { text: 'REGEL: Vor jedem Schluck muss der Spieler laut "Zum Wohl, die Herren und Damen!" sagen. Vergisst man es: noch {sips} Schluck extra!', baseSips: 1, isGroup: true },
-      { text: 'DUELL: {player} summt einen bekannten Song. {player2} muss ihn erraten. Schafft er es nicht in 15 Sek, trinken beide {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: 'DUELL: {player} summt einen bekannten Song. {player2} muss ihn erraten. Schafft er es nicht in 15 Sek, trinken beide {sips} Schlücke!', baseSips: 2, isBoth: true },
       { text: 'REGEL: Die gesamte Runde darf 2 Runden lang nicht mehr lachen. Wer auch nur schmunzelt, trinkt {sips} Schluck!', baseSips: 1, isGroup: true },
       { text: 'DUELL: {player} versucht {player2} innerhalb von 20 Sekunden zum Lachen zu bringen (ohne Anfassen!). Gelingt es: {player2} trinkt {sips} Schlücke, sonst {player}!', baseSips: 2, isGroup: true }
     ]
@@ -998,10 +1033,10 @@ classic: {
       { text: '{player}, bei wem aus dieser Runde würdest du am ehesten schwach werden, wenn ihr alleine auf einer Insel wärt? Antworten oder {sips} Schlücke!', baseSips: 3 },
       { text: '{player}, beiße sanft in deine Unterlippe und schau {player2} 5 Sekunden lang intensiv an. Reagiert {player2} nervös: {sips} Schlücke für {player2}!', baseSips: 2, isGroup: true },
       { text: 'Alle Personen in der Runde, die aktuell vergeben sind, trinken {sips} Schlücke auf die Liebe! ❤️', baseSips: 1, isGroup: true },
-      { text: '{player}, führe mit {player2} einen 10-sekündigen langsamen Walzer/Slow-Dance ohne Musik aus. Wenn ihr verweigert: beide {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: '{player}, führe mit {player2} einen 10-sekündigen langsamen Walzer/Slow-Dance ohne Musik aus. Wenn ihr verweigert: beide {sips} Schlücke!', baseSips: 2, isBoth: true },
       { text: '{player}, erzähle von deinem bisher besten Kuss oder trinke {sips} Schlücke!', baseSips: 2 },
       { text: '{player}, massiere die Schultern von {player2} für ganze 20 Sekunden oder trinke {sips} Schlücke!', baseSips: 2, isGroup: true },
-      { text: '{player}, wähle eine Person aus der Runde und füttere sie mit einem Snack oder einem Schluck Getränk. Wenn ihr euch weigert: beide {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: '{player}, wähle eine Person aus der Runde und füttere sie mit einem Snack oder einem Schluck Getränk. Wenn ihr euch weigert: beide {sips} Schlücke!', baseSips: 2, isBoth: true },
       { text: '{player}, beschreibe deinen absoluten Traumtyp in 3 Adjektiven. Verweigerst du: {sips} Schlücke!', baseSips: 1 },
       { text: '{player}, tippe {player2} sanft an die Hüfte und sprich dein bestes Anmach-Sprüchlein auf. Wenn {player2} lacht, trinkt {player2} {sips} Schlücke!', baseSips: 2, isGroup: true },
       { text: '{player}, wer in der Runde hat heute das heißeste Outfit an? Die gewählte Person verteilt {sips} Schlücke!', baseSips: 2 },
@@ -1348,10 +1383,23 @@ calculateMinigameSips(baseSips) {
         document.getElementById('current-card-num').innerText = this.currentCardIndex + 1;
 
         // Render Back
-        document.getElementById('back-category-badge').innerText = rawCard.categoryName;
-        document.getElementById('card-sip-count').innerText = calculatedSips;
-        document.getElementById('card-sip-icons').innerText = '🍺'.repeat(Math.min(calculatedSips, 8));
-        document.getElementById('card-task-text').innerHTML = formattedText;
+        //document.getElementById('back-category-badge').innerText = rawCard.categoryName;
+        //document.getElementById('card-sip-count').innerText = calculatedSips;
+        //document.getElementById('card-sip-icons').innerText = '🍺'.repeat(Math.min(calculatedSips, 8));
+        //document.getElementById('card-task-text').innerHTML = formattedText;
+		
+		// Render Back
+document.getElementById('back-category-badge').innerText = rawCard.categoryName;
+
+if (rawCard.minigameId) {
+  document.getElementById('card-sip-count').innerText = 'Überraschung!';
+  document.getElementById('card-sip-icons').innerText = '';
+} else {
+  document.getElementById('card-sip-count').innerText = calculatedSips;
+  document.getElementById('card-sip-icons').innerText = '🍺'.repeat(Math.min(calculatedSips, 8));
+}
+
+document.getElementById('card-task-text').innerHTML = formattedText;
 
         // Timer Detection for standard non-minigame cards
         const timerContainer = document.getElementById('card-timer-container');
