@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>🍻 TrinkPalast 3000 | by Uilderks</title>
+  <title>🍻 TrinkPalast 3000 | by Jannick</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="css/tailwind.css"></script>
@@ -179,7 +179,7 @@
         </div>
         <div>
           <h1 class="font-heading font-black text-xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-300 to-cyan-400">
-            TRINKPALAST <span class="inline-block -translate-y-[4px] text-xs px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30 font-mono">3000</span>
+            TRINKPALAST <span class="inline-block -translate-y-[4px] text-xs px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30 font-mono">by Jannick</span>
 			<span id="mg-player-name" style="display: none;"></span>
           </h1>
           <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Don't drink & drive - Just sauf & lauf :)</p>
@@ -247,7 +247,7 @@
           <button onclick="app.setDifficulty('hard')" id="diff-hard" class="diff-btn glass-panel p-3 rounded-xl border-slate-700 text-center transition-all">
             <div class="text-2xl mb-1">🔥</div>
             <div class="font-bold text-xs sm:text-sm text-amber-400">Abriss!</div>
-            <div class="text-[11px] text-slate-400 mt-1">3-8 Schlücke</div>
+            <div class="text-[11px] text-slate-400 mt-1">4-8 Schlücke</div>
           </button>
         </div>
       </div>
@@ -318,7 +318,7 @@
           </div>
 
           <!-- CARD BACK -->
-          <div class="card-back glass-card shadow-2xl p-6 border-2 border-cyan-500/40 relative">
+          <div class="card-back glass-card shadow-2xl p-5 border-2 border-cyan-500/40 relative">
             <div class="flex items-center justify-between z-10">
               <span id="back-category-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 uppercase tracking-wider">
                 Kategorie
@@ -329,10 +329,31 @@
               </div>
             </div>
 
-            <div class="my-auto text-center px-1 space-y-4 z-10 overflow-y-auto max-h-[230px]">
-              <p id="card-task-text" class="text-xl sm:text-2xl leading-relaxed font-semibold text-slate-100">
-                Lade Aufgabe...
-              </p>
+            <div class="my-auto text-center px-1 space-y-2 z-10 overflow-hidden flex flex-col justify-center items-center">
+              <div class="overflow-y-auto max-h-[180px] w-full">
+                <p id="card-task-text" class="text-lg sm:text-xl leading-relaxed font-semibold text-slate-100">
+                  Lade Aufgabe...
+                </p>
+              </div>
+
+              <!-- CARD TIMER CONTAINER -->
+<div id="card-timer-container" class="hidden w-full max-w-xs mt-6 z-10">
+  <div class="relative overflow-hidden bg-slate-950/80 backdrop-blur-md border border-cyan-500/30 rounded-2xl p-2.5 shadow-lg shadow-cyan-950/40">
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 pl-1">
+        <span class="text-cyan-400 text-base">⏱️</span>
+        <span id="card-timer-display" class="font-mono font-black text-2xl text-cyan-300 tracking-widest drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]">07s</span>
+      </div>
+      <button id="card-timer-btn" onclick="event.stopPropagation(); app.toggleCardTimer()" class="py-1.5 px-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all active:scale-95 shadow-md shadow-cyan-500/20 flex items-center gap-1.5">
+        <i class="fas fa-play text-[10px]" id="card-timer-icon"></i>
+        <span id="card-timer-btn-text">START</span>
+      </button>
+    </div>
+    <div class="w-full bg-slate-800/60 rounded-full h-1.5 mt-2.5 overflow-hidden">
+      <div id="card-timer-bar" class="bg-gradient-to-r from-cyan-500 to-emerald-400 h-full w-full transition-all duration-75 shadow-[0_0_10px_rgba(6,182,212,0.8)]"></div>
+    </div>
+  </div>
+</div>
             </div>
 
             <!-- Standard resolution buttons -->
@@ -350,8 +371,8 @@
               <button onclick="event.stopPropagation(); app.resolveCard(false)" class="py-3 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-emerald-400 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-lg">
                 <i class="fas fa-check-circle text-base"></i> Niemand 👍
               </button>
-              <button onclick="event.stopPropagation(); app.openGroupDrinkModal()" class="py-3 px-3 rounded-xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-lg shadow-pink-600/30">
-                <i class="fas fa-users text-base"></i> Wer trinkt? 🍻
+              <button id="group-drink-btn" onclick="event.stopPropagation(); app.handleGroupDrinkClick()" class="py-3 px-3 rounded-xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-lg shadow-pink-600/30">
+                <i class="fas fa-users text-base" id="group-drink-btn-icon"></i> <span id="group-drink-btn-text">Wer trinkt? 🍻</span>
               </button>
             </div>
 
@@ -625,6 +646,64 @@
         osc.start(); osc.stop(this.ctx.currentTime + 0.02);
       }
     }
+	
+// Variable außerhalb der Funktion anlegen:
+let isTickHigh = true;
+
+function playTickSound() {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const audioCtx = new AudioContext();
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = 'sine';
+    
+    // Wechselt die Frequenz: 1200Hz für Tick, 800Hz für Tock
+    const freq = isTickHigh ? 1200 : 800;
+    isTickHigh = !isTickHigh; // Zustand umkehren
+
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.025);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.025);
+  } catch (e) {}
+}
+
+function playTimeoutSound() {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const audioCtx = new AudioContext();
+
+    // 3 kurze, präzise Pieptöne hintereinander (beep-beep-beep)
+    [0, 0.1, 0.2].forEach(delay => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1800, audioCtx.currentTime + delay);
+
+      gain.gain.setValueAtTime(0, audioCtx.currentTime + delay);
+      gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + delay + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + 0.07);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(audioCtx.currentTime + delay);
+      osc.stop(audioCtx.currentTime + delay + 0.07);
+    });
+  } catch (e) {}
+}
 
     const soundManager = new SoundEngine();
 
@@ -751,7 +830,7 @@ classic: {
     cards: [
       { text: '{player}, mache 10 schnelle Liegestütze oder trinke {sips} Schlücke!', baseSips: 1 },
       { text: '{player}, zeige das letzte Foto aus deiner Galerie oder trinke {sips} Schlücke!', baseSips: 2 },
-      { text: '{player} muss {player2} ein ehrliches Kompliment machen. Sonst trinken beide {sips} Schlücke!', baseSips: 1, isGroup: true },
+      { text: '{player} muss {player2} ein ehrliches Kompliment machen. Sonst trinken beide {sips} Schlücke!', baseSips: 1, isBoth: true},
       { text: 'Alle Brillenträger in der Runde trinken {sips} Schluck! 👓', baseSips: 1, isGroup: true },
       { text: '{player}, versuche 20 Sekunden lang nicht zu blinzeln. Schaffst du es nicht, trinke {sips} Schlücke!', baseSips: 1 },
       { text: 'Alle, die ein schwarzes Oberteil tragen, trinken {sips} Schluck!', baseSips: 1, isGroup: true },
@@ -762,7 +841,7 @@ classic: {
       { text: 'Alle, die heute noch keinen Alkohol getrunken haben außer diesem Spiel, trinken {sips} Schlucke!', baseSips: 1, isGroup: true },
       { text: '{player}, ertappe den Blick von {player2} und halte ihn 15 Sekunden ohne zu lachen. Wer lacht, trinkt {sips} Schlücke!', baseSips: 1, isGroup: true },
       { text: 'Wer das älteste Smartphone in der Runde hat, muss {sips} Schlücke trinken!', baseSips: 1, isGroup: true },
-      { text: '{player}, mache 15 Kniebeugen. Bei jedem Abducken muss die Runde klatschen. Vergisst es jemand, trinkt die Person {sips} Schluck!', baseSips: 2 },
+      { text: '{player}, mache 15 Kniebeugen. Bei jedem Abducken muss die Runde klatschen. Vergisst es jemand, trinkt die Person {sips} Schluck!', baseSips: 2, isGroup: true},
       { text: 'Alle, die Socken mit Motiven tragen, verteilen {sips} Schlucke!', baseSips: 1, isGroup: true },
       { text: '{player}, lasse dir von {player2} eine lustige Fratze mit dem Finger ins Gesicht zeichnen oder trinke {sips} Schlücke!', baseSips: 2 },
       { text: 'Wer als Letztes den Tisch berührt, trinkt sofort {sips} Schlücke!', baseSips: 1, isGroup: true },
@@ -785,7 +864,8 @@ classic: {
           { text: '🔫 MINISPIEL: RUSSISCHES ROULETTE! {player} drückt den Revolver ab. Wann hörst du auf?', baseSips: 3, minigameId: 'roulette' },
 		  { text: '🔷 MINISPIEL: FORMEN-ZÄHLER! Augen auf, {player}! Zähle alle sich bewegenden Formen – du hast genau 8 Sekunden!', baseSips: 2, minigameId: 'form' },
 		  { text: '🪄 MINISPIEL: KARTEN-TRICK! Merke dir deine Wunschkarte, {player} – verfolge sie beim Mischen und wähle die Richtige!', baseSips: 2, minigameId: 'card_ask' },
-		  { text: '⏱️ MINISPIEL: ZAHLEN-JAGD! {player}, finde und klicke alle 15 Zahlen der Reihe nach in unter 8 Sekunden!', baseSips: 2, minigameId: 'number_hunt' }
+		  { text: '⏱️ MINISPIEL: ZAHLEN-JAGD! {player}, finde und klicke alle 15 Zahlen der Reihe nach in unter 8 Sekunden!', baseSips: 2, minigameId: 'number_hunt' },
+		  { text: '🎴 MINISPIEL: HÖCHSTE KARTE! {player}, wähle dein Schicksal! Nur Platz 1 verteilt Schlucke – der Rest trinkt!', baseSips: 2, minigameId: 'five_card' }
         ]
       },
       truth_dare: {
@@ -904,7 +984,7 @@ classic: {
       { text: '{player}, flüstere {player2} ein süßes Kompliment ins Ohr, oder trinke {sips} Schlücke!', baseSips: 2 },
       { text: '{player}, verrate der Runde deinen merkwürdigsten Moment beim Daten oder trinke {sips} Schlücke.', baseSips: 2 },
       { text: 'Alle Singles in der Runde trinken {sips} Schluck auf die Freiheit! 🥂', baseSips: 1, isGroup: true },
-      { text: 'KÖNIGS-KARTE: Alle Spieler stoßen jetzt gemeinsam an und trinken {sips} Schlücke! CHEERS! 🍻', baseSips: 2, isGroup: true },
+      { text: 'KÖNIGS-KARTE: Alle Spieler stoßen jetzt gemeinsam an und trinken {sips} Schlücke! CHEERS! 🍻', baseSips: 2, isGroup: true, isAll: true },
       { text: '{player}, gib {player2} einen sanften Kuss auf die Wange oder die Hand. Wenn du verweigerst: {sips} Schlücke!', baseSips: 2, isGroup: true },
       { text: '{player}, zeige der Runde dein sexiestes Lächeln oder deinen besten Flirt-Blick. Versagst du laut Abstimmung: {sips} Schlücke!', baseSips: 2 },
       { text: '{player}, flüstere {player2} etwas Schmutziges oder Anzügliches ins Ohr. Wenn {player2} rot wird, trinkt {player2} {sips} Schlücke, sonst {player}!', baseSips: 3, isGroup: true },
@@ -971,6 +1051,9 @@ classic: {
         this.lastPlayerIndex = -1;
         this.sipStats = {};
         this.selectedGroupDrinkers = new Set();
+
+        this.currentCardTimerSec = null;
+        this.cardTimerInterval = null;
 
         this.confetti = new ConfettiEngine();
         this.pendingDistributeCallback = null;
@@ -1158,7 +1241,7 @@ classic: {
         this.loadNextCard();
       }
 
-      calculateSips(baseSips) {
+      /*calculateSips(baseSips) {
         const base = baseSips || 1;
         if (this.difficulty === 'easy') {
           return Math.min(3, Math.max(1, Math.round(base * 1)));
@@ -1170,18 +1253,45 @@ classic: {
           return Math.min(8, Math.max(3, Math.round(base * 3)));
         }
         return Math.max(1, base);
-      }
+      }*/
+	  
+	  calculateSips(baseSips) {
+		// Generiert Zufallswerte exakt im Bereich des gewählten Modus
+		if (this.difficulty === 'easy') {
+		// Warm-Up: 1 bis 3 Schlücke zufällig
+		return Math.floor(Math.random() * 3) + 1;
+		}
+		if (this.difficulty === 'medium') {
+		// Party-Modus: 2 bis 5 Schlücke zufällig
+		return Math.floor(Math.random() * 4) + 2;
+		}
+		if (this.difficulty === 'hard') {
+		// Abriss: 4 bis 8 Schlücke zufällig
+		return Math.floor(Math.random() * 5) + 4;
+		}
+	return 1;
+	}
 
-      calculateMinigameSips(baseSips) {
+calculateMinigameSips(baseSips) {
+  // Verwendet dieselbe Zufallslogik auch für Minispiele
+  return this.calculateSips(baseSips);
+}
+
+      /*calculateMinigameSips(baseSips) {
         const maxLimit = this.getMaxSipsForDifficulty();
         const calculated = Math.round((baseSips || 1) * (this.difficulty === 'easy' ? 1 : this.difficulty === 'medium' ? 1.5 : 2));
         return Math.min(maxLimit, Math.max(1, calculated));
-      }
+      }*/
 
       loadNextCard() {
         if (this.currentCardIndex >= this.deckQueue.length) {
           this.showEndScreen();
           return;
+        }
+
+        if (this.cardTimerInterval) {
+          clearInterval(this.cardTimerInterval);
+          this.cardTimerInterval = null;
         }
 
         this.isFlipped = false;
@@ -1205,7 +1315,11 @@ classic: {
         }
 
         const calculatedSips = rawCard.minigameId ? this.calculateMinigameSips(rawCard.baseSips) : this.calculateSips(rawCard.baseSips);
-        const isGroupTask = rawCard.isGroup || !rawCard.text.includes('{player}');
+        // Bei den Variablendefinitionen am Anfang von loadNextCard():
+		const isBothTask = rawCard.isBoth;
+		const isGroupTask = rawCard.isGroup || isBothTask || !rawCard.text.includes('{player}');
+        const isTwoPlayers = rawCard.text.includes('{player2}');
+        const isAllTask = rawCard.isAll;
 
         let formattedText = rawCard.text
           .replace(/{player}/g, `<span class="text-amber-300 font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/30">${player1}</span>`)
@@ -1219,7 +1333,10 @@ classic: {
           sips: calculatedSips,
           formattedText: formattedText,
           minigameId: rawCard.minigameId || null,
-          isGroup: isGroupTask
+          isGroup: isGroupTask,
+          isTwoPlayers: isTwoPlayers,
+          isAll: isAllTask,
+		  isBoth: isBothTask
         };
 
         // Render Front
@@ -1236,10 +1353,25 @@ classic: {
         document.getElementById('card-sip-icons').innerText = '🍺'.repeat(Math.min(calculatedSips, 8));
         document.getElementById('card-task-text').innerHTML = formattedText;
 
+        // Timer Detection for standard non-minigame cards
+        const timerContainer = document.getElementById('card-timer-container');
+        const timeMatch = !rawCard.minigameId ? rawCard.text.match(/(\d+)\s*(?:Sekunden|Sek\b)/i) : null;
+
+        if (timeMatch) {
+          this.currentCardTimerSec = parseInt(timeMatch[1], 10);
+          if (timerContainer) timerContainer.classList.remove('hidden');
+          this.resetCardTimerUI();
+        } else {
+          this.currentCardTimerSec = null;
+          if (timerContainer) timerContainer.classList.add('hidden');
+        }
+
         // Toggle Actions
         const stdActions = document.getElementById('standard-actions');
         const groupActions = document.getElementById('group-actions');
         const mgAction = document.getElementById('minigame-action');
+        const groupBtnText = document.getElementById('group-drink-btn-text');
+        const groupBtnIcon = document.getElementById('group-drink-btn-icon');
 
         if (rawCard.minigameId) {
           stdActions.classList.add('hidden');
@@ -1249,11 +1381,95 @@ classic: {
           stdActions.classList.add('hidden');
           groupActions.classList.remove('hidden');
           mgAction.classList.add('hidden');
+
+if (isAllTask) {
+  if (groupBtnText) groupBtnText.innerText = 'Alle trinken! 🍻';
+  if (groupBtnIcon) groupBtnIcon.className = 'fas fa-beer text-base';
+} else if (isBothTask) {
+  if (groupBtnText) groupBtnText.innerText = 'Beide trinken! 🍻';
+  if (groupBtnIcon) groupBtnIcon.className = 'fas fa-users text-base';
+} else {
+  if (groupBtnText) groupBtnText.innerText = 'Wer trinkt? 🍻';
+  if (groupBtnIcon) groupBtnIcon.className = 'fas fa-users text-base';
+}
         } else {
           stdActions.classList.remove('hidden');
           groupActions.classList.add('hidden');
           mgAction.classList.add('hidden');
         }
+      }
+
+      /* === CARD TIMER LOGIC === */
+/* === CARD TIMER LOGIC === */
+toggleCardTimer() {
+  if (this.cardTimerInterval) {
+    clearInterval(this.cardTimerInterval);
+    this.cardTimerInterval = null;
+    this.resetCardTimerUI();
+    return;
+  }
+
+  soundManager.playClick();
+  const display = document.getElementById('card-timer-display');
+  const bar = document.getElementById('card-timer-bar');
+  const btnText = document.getElementById('card-timer-btn-text');
+  const icon = document.getElementById('card-timer-icon');
+
+  if (btnText) btnText.innerText = 'STOPP';
+  if (icon) icon.className = 'fas fa-stop text-[10px]';
+
+  const totalSec = this.currentCardTimerSec || 10;
+  let remainingMs = totalSec * 1000;
+  const startTime = Date.now();
+  
+  // MERKER: Speichert die Sekunde, für die bereits getickt wurde
+  let lastSec = Math.ceil(remainingMs / 1000);
+
+  this.cardTimerInterval = setInterval(() => {
+    const elapsed = Date.now() - startTime;
+    remainingMs = Math.max(0, totalSec * 1000 - elapsed);
+    const secDisplay = Math.ceil(remainingMs / 1000);
+
+    // TICKEN-LOGIK: Prüft, ob eine neue Sekunde angebrochen ist
+    if (secDisplay < lastSec && secDisplay > 0) {
+      if (typeof soundManager !== 'undefined' && typeof soundManager.playTick === 'function') {
+        soundManager.playTick();
+      } else {
+        playTickSound(); // Fallback über Web Audio API
+      }
+      lastSec = secDisplay;
+    }
+
+    if (display) display.innerText = `${secDisplay < 10 ? '0' + secDisplay : secDisplay}s`;
+    if (bar) bar.style.width = `${(remainingMs / (totalSec * 1000)) * 100}%`;
+
+    if (remainingMs <= 0) {
+      clearInterval(this.cardTimerInterval);
+      this.cardTimerInterval = null;
+      if (display) display.innerText = '00s';
+      if (bar) bar.style.width = '0%';
+      if (btnText) btnText.innerText = 'NEUSTART';
+      if (icon) icon.className = 'fas fa-redo text-[10px]';
+      <!--soundManager.playGunshot();-->
+	  playTimeoutSound();
+      this.showToast('⏱️️ Zeit abgelaufen!');
+    }
+  }, 50);
+}
+
+
+
+      resetCardTimerUI() {
+        const totalSec = this.currentCardTimerSec || 10;
+        const display = document.getElementById('card-timer-display');
+        const bar = document.getElementById('card-timer-bar');
+        const btnText = document.getElementById('card-timer-btn-text');
+        const icon = document.getElementById('card-timer-icon');
+
+        if (display) display.innerText = `${totalSec < 10 ? '0' + totalSec : totalSec}s`;
+        if (bar) bar.style.width = '100%';
+        if (btnText) btnText.innerText = 'START';
+        if (icon) icon.className = 'fas fa-play text-[10px]';
       }
 
       flipCard() {
@@ -1284,6 +1500,42 @@ classic: {
       }
 
       /* === GROUP DRINK SELECTION MODAL === */
+handleGroupDrinkClick() {
+  if (!this.currentCard) return;
+  if (this.currentCard.isAll) {
+    this.confirmAllDrink();
+  } else if (this.currentCard.isBoth) {
+    this.confirmBothDrink();
+  } else {
+    this.openGroupDrinkModal();
+  }
+}
+
+confirmBothDrink() {
+  const sips = this.currentCard.sips;
+  const p1 = this.currentCard.player1;
+  const p2 = this.currentCard.player2;
+
+  soundManager.playDrink();
+  this.addSipsToPlayer(p1, sips);
+  this.addSipsToPlayer(p2, sips);
+
+  this.showToast(`${p1} & ${p2} trinken jeweils ${sips} Schluck(e)! 🍻`);
+  this.currentCardIndex++;
+  setTimeout(() => this.loadNextCard(), 280);
+}
+
+      confirmAllDrink() {
+        const sips = this.currentCard.sips;
+        soundManager.playDrink();
+        this.players.forEach(p => {
+          this.addSipsToPlayer(p, sips);
+        });
+        this.showToast(`Alle trinken ${sips} Schluck(e)! 🍻`);
+        this.currentCardIndex++;
+        setTimeout(() => this.loadNextCard(), 280);
+      }
+
       openGroupDrinkModal() {
         if (!this.currentCard) return;
         this.selectedGroupDrinkers = new Set();
@@ -1305,7 +1557,11 @@ classic: {
 
       renderGroupDrinkPlayerList() {
         const container = document.getElementById('group-drink-players-list');
-        container.innerHTML = this.players.map(p => {
+        const targetPlayers = (this.currentCard && this.currentCard.isTwoPlayers)
+          ? [this.currentCard.player1, this.currentCard.player2]
+          : this.players;
+
+        container.innerHTML = targetPlayers.map(p => {
           const isSelected = this.selectedGroupDrinkers.has(p);
           return `
             <button onclick="app.toggleGroupDranker('${p}')" class="py-3 px-3 rounded-xl border font-bold text-sm transition-all flex items-center justify-between ${
@@ -1498,7 +1754,8 @@ classic: {
           roulette: 'initRoulette',
 		  form: 'initShapeCounter',
 		  card_ask: 'initCardSharkShuffle',
-		  number_hunt: 'initNumberHunt'
+		  number_hunt: 'initNumberHunt',
+		  five_card: 'initFiveCards'
         };
 
         const starterName = starters[String(mgId).trim()];
@@ -1607,7 +1864,7 @@ classic: {
         }, 5000);
       }
 
-      initWheel(player) {
+initWheel(player) {
   document.getElementById('mg-icon').innerText = '🎡';
   document.getElementById('mg-title').innerText = 'Glücksrad drehen';
   document.getElementById('mg-subtitle').innerText = `${player} lässt die Scheibe entscheiden!`;
@@ -1616,30 +1873,27 @@ classic: {
   container.innerHTML = `
     <div class="relative flex flex-col items-center justify-center space-y-4">
       <div class="relative w-64 h-64 sm:w-72 sm:h-72">
-        <!-- Zeiger oben mit ID für die Klack-Animation -->
         <div id="wheel-pointer" class="absolute -top-3 left-1/2 -translate-x-1/2 z-20 text-3xl text-pink-500 drop-shadow-md transition-transform duration-75">▼</div>
         <canvas id="wheel-canvas" width="300" height="300" class="w-full h-full rounded-full shadow-2xl border-4 border-slate-700"></canvas>
       </div>
-      <!--<button id="wheel-spin-btn" onclick="minigames.spinWheel('${player}')" class="py-3 px-8 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-heading font-black text-lg shadow-lg active:scale-95 transition-all">
+      <button id="wheel-spin-btn" onclick="minigames.spinWheel('${player}')" class="w-full py-4 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-heading font-black text-xl shadow-lg active:scale-95 transition-all">
         DREHEN! 🚀
-      </button>-->
-	  
-	  <button id="wheel-spin-btn" onclick="minigames.spinWheel('${player}')" class="w-full py-4 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-heading font-black text-xl shadow-lg active:scale-95 transition-all">
-              DREHEN! 🚀
       </button>
       <p id="wheel-result" class="font-bold text-center text-amber-300 text-base min-h-[28px]"></p>
     </div>
   `;
 
   const maxSips = app.getMaxSipsForDifficulty();
-  const dist1 = Math.min(maxSips, 1);
-  const dist2 = Math.min(maxSips, 2);
-  const dist4 = Math.min(maxSips, 4);
 
-  const drink1 = Math.min(maxSips, 1);
-  const drink2 = Math.min(maxSips, 2);
-  const drink3 = Math.min(maxSips, 3);
-  const drinkEx = maxSips;
+  // Dynamische Schluckanzahl für Teilergebnisse; Höchststrafe (drinkEx) bleibt maxSips
+  const dist1 = app.calculateMinigameSips(1);
+  const dist2 = app.calculateMinigameSips(2);
+  const dist4 = app.calculateMinigameSips(3);
+
+  const drink1 = app.calculateMinigameSips(1);
+  const drink2 = app.calculateMinigameSips(2);
+  const drink3 = app.calculateMinigameSips(3);
+  const drinkEx = maxSips; // Höchststrafe bleibt unverändert
 
   this.wheelSlices = [
     { label: `Verteile ${dist2} Schlucke`, sips: dist2, action: 'distribute' },
@@ -1702,30 +1956,25 @@ spinWheel(player) {
   if (btn.disabled) return;
   btn.disabled = true;
 
-  // Höhere Startgeschwindigkeit & sanftere Reibung (0.989 lässt es viel länger auslaufen)
   let speed = Math.random() * 0.15 + 0.35;
   let friction = 0.989;
 
   const numSlices = this.wheelSlices.length;
   const sliceAngle = (Math.PI * 2) / numSlices;
 
-  // Index für die Positionsberechnung am Zeiger (Oben = 1.5 * PI)
   let lastSliceIndex = Math.floor((1.5 * Math.PI - this.wheelAngle) / sliceAngle);
 
   const animate = () => {
     this.wheelAngle += speed;
     speed *= friction;
 
-    // Prüfen, ob eine Trennlinie den Zeiger oben passiert
     const currentSliceIndex = Math.floor((1.5 * Math.PI - this.wheelAngle) / sliceAngle);
     if (currentSliceIndex !== lastSliceIndex) {
-      // Klack-Sound abspielen
       if (typeof soundManager !== 'undefined') {
         if (soundManager.playClickTick) soundManager.playClickTick();
         else if (soundManager.playWheelSpin) soundManager.playWheelSpin();
       }
 
-      // Visueller Zeiger-Hüpfer (Klack-Effekt)
       if (pointer) {
         pointer.style.transform = 'translate(-50%, -4px) scale(1.15)';
         setTimeout(() => {
@@ -1741,7 +1990,6 @@ spinWheel(player) {
     if (speed > 0.0015) {
       requestAnimationFrame(animate);
     } else {
-      // Zeiger in Ausgangsposition
       if (pointer) pointer.style.transform = 'translate(-50%, 0) scale(1)';
 
       let normalizedAngle = (1.5 * Math.PI - (this.wheelAngle % (Math.PI * 2))) % (Math.PI * 2);
@@ -1767,7 +2015,6 @@ spinWheel(player) {
 
   animate();
 }
-
 
       initReaction(player) {
   document.getElementById('mg-icon').innerText = '⚡';
@@ -1832,8 +2079,6 @@ spinWheel(player) {
 
 handleReactionTap(event, player) {
   if (event) event.stopPropagation();
-
-  // Klicks während der Initialisierung (0-300ms) oder nach Spielende ignorieren
   if (!this.canTap || this.reactState === 'finished') return;
 
   const maxSips = app.getMaxSipsForDifficulty();
@@ -1851,7 +2096,7 @@ handleReactionTap(event, player) {
     }
 
     setTimeout(() => {
-      this.showPenaltyCard(player, maxSips, `Frühstart! Du musst die volle Strafe trinken.`);
+      this.showPenaltyCard(player, maxSips, `Frühstart! Du musst die volle Strafe trinken.`); // Höchststrafe
     }, 1800);
 
   } else if (this.reactState === 'ready') {
@@ -1871,19 +2116,20 @@ handleReactionTap(event, player) {
       if (elapsed < 230) {
         soundManager.playSuccess();
         app.closeMinigame();
-        app.openDistributeModal(player, maxSips, `Blitzschnelle Reflexe (${elapsed} ms)`, () => {});
+        app.openDistributeModal(player, maxSips, `Blitzschnelle Reflexe (${elapsed} ms)`, () => {}); // Höchstgewinn
       } else if (elapsed <= 330) {
-        const distSips = Math.max(1, Math.floor(maxSips * 0.6));
+        const distSips = app.calculateMinigameSips(2);
         soundManager.playSuccess();
         app.closeMinigame();
         app.openDistributeModal(player, distSips, `Gute Reaktion (${elapsed} ms)`, () => {});
       } else if (elapsed <= 430) {
-        this.showPenaltyCard(player, 1, `Mäßige Reaktion (${elapsed} ms).`);
+        const drinkSips = app.calculateMinigameSips(1);
+        this.showPenaltyCard(player, drinkSips, `Mäßige Reaktion (${elapsed} ms).`);
       } else if (elapsed <= 550) {
-        const drinkSips = Math.min(maxSips, Math.max(2, Math.floor(maxSips * 0.6)));
+        const drinkSips = app.calculateMinigameSips(2);
         this.showPenaltyCard(player, drinkSips, `Langsame Reaktion (${elapsed} ms)!`);
       } else {
-        this.showPenaltyCard(player, maxSips, `Sehr langsame Reflexe (${elapsed} ms)!`);
+        this.showPenaltyCard(player, maxSips, `Sehr langsame Reflexe (${elapsed} ms)!`); // Höchststrafe
       }
     }, 2200);
   }
@@ -1975,19 +2221,20 @@ evaluateClickSprint(player) {
     if (count >= 40) {
       soundManager.playSuccess();
       app.closeMinigame();
-      app.openDistributeModal(player, maxSips, `Klick-König (${count} Klicks)`, () => {});
+      app.openDistributeModal(player, maxSips, `Klick-König (${count} Klicks)`, () => {}); // Höchstgewinn
     } else if (count >= 35) {
-      const distSips = Math.max(1, Math.floor(maxSips * 0.6));
+      const distSips = app.calculateMinigameSips(2);
       soundManager.playSuccess();
       app.closeMinigame();
       app.openDistributeModal(player, distSips, `Gute Klickrate (${count} Klicks)`, () => {});
     } else if (count >= 30) {
-      this.showPenaltyCard(player, 1, `Mäßige Klickrate (${count} Klicks).`);
+      const drinkSips = app.calculateMinigameSips(1);
+      this.showPenaltyCard(player, drinkSips, `Mäßige Klickrate (${count} Klicks).`);
     } else if (count >= 20) {
-      const drinkSips = Math.min(maxSips, Math.max(2, Math.floor(maxSips * 0.6)));
+      const drinkSips = app.calculateMinigameSips(2);
       this.showPenaltyCard(player, drinkSips, `Zu langsame Finger! (${count} Klicks)`);
     } else {
-      this.showPenaltyCard(player, maxSips, `Schlechte Klick-Performance! (${count} Klicks)`);
+      this.showPenaltyCard(player, maxSips, `Schlechte Klick-Performance! (${count} Klicks)`); // Höchststrafe
     }
   }, 2000);
 }
@@ -2022,46 +2269,45 @@ evaluateClickSprint(player) {
         this.timeState = 'idle';
       }
 
-      handleTimeGuessBtn(player) {
-        const btn = document.getElementById('time-btn');
-        const display = document.getElementById('time-display');
-        const maxSips = app.getMaxSipsForDifficulty();
+handleTimeGuessBtn(player) {
+  const btn = document.getElementById('time-btn');
+  const display = document.getElementById('time-display');
+  const maxSips = app.getMaxSipsForDifficulty();
 
-        if (this.timeState === 'idle') {
-          this.timeState = 'running';
-          this.timeStart = performance.now();
-          btn.innerText = 'STOPP!';
-          btn.className = "w-full py-4 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 text-white font-heading font-black text-xl shadow-lg active:scale-95 transition-all animate-pulse";
+  if (this.timeState === 'idle') {
+    this.timeState = 'running';
+    this.timeStart = performance.now();
+    btn.innerText = 'STOPP!';
+    btn.className = "w-full py-4 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 text-white font-heading font-black text-xl shadow-lg active:scale-95 transition-all animate-pulse";
+    this.timeAnim = requestAnimationFrame(() => this.updateTimeGuessLoop());
+  } else if (this.timeState === 'running') {
+    cancelAnimationFrame(this.timeAnim);
+    this.timeState = 'stopped';
+    
+    btn.disabled = true;
+    btn.className = "w-full py-4 rounded-xl bg-slate-800 text-slate-500 font-heading font-black text-xl cursor-not-allowed";
 
-          this.timeAnim = requestAnimationFrame(() => this.updateTimeGuessLoop());
-        } else if (this.timeState === 'running') {
-          cancelAnimationFrame(this.timeAnim);
-          this.timeState = 'stopped';
-          
-          btn.disabled = true;
-          btn.className = "w-full py-4 rounded-xl bg-slate-800 text-slate-500 font-heading font-black text-xl cursor-not-allowed";
+    const elapsed = (performance.now() - this.timeStart) / 1000;
+    const diff = Math.abs(elapsed - this.timeTarget);
+    display.innerText = `${elapsed.toFixed(2)}s`;
 
-          const elapsed = (performance.now() - this.timeStart) / 1000;
-          const diff = Math.abs(elapsed - this.timeTarget);
-          display.innerText = `${elapsed.toFixed(2)}s`;
-
-          setTimeout(() => {
-            if (diff <= 0.25) {
-              soundManager.playSuccess();
-              app.closeMinigame();
-              app.openDistributeModal(player, maxSips, 'Zeitgefühl-Gott', () => {});
-            } else if (diff <= 0.60) {
-              const distSips = Math.max(1, Math.floor(maxSips * 0.5));
-              soundManager.playSuccess();
-              app.closeMinigame();
-              app.openDistributeModal(player, distSips, 'Gutes Zeitgefühl', () => {});
-            } else {
-              const penalty = Math.min(maxSips, Math.max(2, Math.round(diff * 3)));
-              this.showPenaltyCard(player, penalty, `Zu weit daneben! (${diff.toFixed(2)}s Abweichung)`);
-            }
-          }, 2500);
-        }
+    setTimeout(() => {
+      if (diff <= 0.25) {
+        soundManager.playSuccess();
+        app.closeMinigame();
+        app.openDistributeModal(player, maxSips, 'Zeitgefühl-Gott', () => {}); // Höchstgewinn
+      } else if (diff <= 0.60) {
+        const distSips = app.calculateMinigameSips(2);
+        soundManager.playSuccess();
+        app.closeMinigame();
+        app.openDistributeModal(player, distSips, 'Gutes Zeitgefühl', () => {});
+      } else {
+        const penalty = app.calculateMinigameSips(Math.round(diff * 2));
+        this.showPenaltyCard(player, penalty, `Zu weit daneben! (${diff.toFixed(2)}s Abweichung)`);
       }
+    }, 2500);
+  }
+}
 
       updateTimeGuessLoop() {
         if (this.timeState !== 'running') return;
@@ -2161,7 +2407,6 @@ guessCardShark(player, choice) {
 
     app.showToast(`Richtig! 🎉 Serie: ${this.cardStreak}`);
 
-    // AUTOMATISCHER STOPP BEI MAXIMALER SERIE / SCHLUCKANZAHL
     if (this.cardStreak >= maxSips) {
       app.showToast(`🎯 Maximum von ${maxSips} Schlücken erreicht! Spiel beendet.`);
       setTimeout(() => {
@@ -2169,7 +2414,7 @@ guessCardShark(player, choice) {
       }, 900);
     }
   } else {
-    const penalty = Math.min(maxSips, Math.max(2, Math.floor(maxSips * 0.6)));
+    const penalty = app.calculateMinigameSips(2);
     this.showPenaltyCard(player, penalty, 'Falsch geraten! Die Karte lag daneben.');
   }
 }
@@ -2293,6 +2538,13 @@ guessCardShark(player, choice) {
         app.openDistributeModal(player, sips, 'Kiste des Grauens', () => {});
       }
 
+getRoulettePot(survivedShots, maxSips) {
+  if (survivedShots <= 0) return 0;
+  // Skaliert die 5 überlebten Schüsse proportional zur maximalen Schluckanzahl
+  return Math.min(maxSips, Math.ceil((survivedShots / 5) * maxSips));
+}
+
+/* === 1. INITIALISIERUNG (initRoulette) === */
 initRoulette(player) {
   document.getElementById('mg-icon').innerText = '🔫';
   document.getElementById('mg-title').innerText = 'Russisches Roulette';
@@ -2302,7 +2554,7 @@ initRoulette(player) {
   this.currentChamber = 0;
   this.survivedShots = 0;
   this.rouletteRot = 0;
-  this.isGameOver = false; // Schutz-Flag gegen Exploits
+  this.isGameOver = false;
 
   const maxSips = app.getMaxSipsForDifficulty();
 
@@ -2342,12 +2594,8 @@ initRoulette(player) {
         </div>
       </div>
 
-      <!--<button id="roulette-trigger-btn" onclick="minigames.pullTriggerRoulette('${player}')" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-rose-600 via-pink-600 to-purple-600 hover:from-rose-500 hover:to-purple-500 text-white font-heading font-black text-lg shadow-2xl active:scale-95 transition-all flex items-center justify-center gap-2">
+      <button id="roulette-trigger-btn" onclick="minigames.pullTriggerRoulette('${player}')" class="w-full py-4 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-heading font-black text-xl shadow-lg active:scale-95 transition-all">
         💥 ABDRÜCKEN!
-      </button>-->
-	  
-	  <button id="roulette-trigger-btn" onclick="minigames.pullTriggerRoulette('${player}')" class="w-full py-4 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-heading font-black text-xl shadow-lg active:scale-95 transition-all">
-              💥 ABDRÜCKEN!
       </button>
 
       <button id="roulette-cashout-btn" onclick="minigames.cashoutRoulette('${player}')" class="hidden w-full py-2.5 bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold rounded-xl active:scale-95 transition-all text-xs">
@@ -2361,21 +2609,18 @@ pullTriggerRoulette(player) {
   const triggerBtn = document.getElementById('roulette-trigger-btn');
   const cashoutBtn = document.getElementById('roulette-cashout-btn');
 
-  // Abbrechen, wenn das Spiel vorbei ist oder der Button gesperrt ist
   if (this.isGameOver || (triggerBtn && triggerBtn.disabled)) return;
 
   const maxSips = app.getMaxSipsForDifficulty();
   const isBANG = this.currentChamber === this.bulletChamber;
   const currentChamberEl = document.getElementById(`chamber-${this.currentChamber}`);
 
-  // Beide Buttons sofort während der Auswertung sperren
   if (triggerBtn) triggerBtn.disabled = true;
   if (cashoutBtn) cashoutBtn.classList.add('pointer-events-none', 'opacity-50');
 
   if (isBANG) {
-    this.isGameOver = true; // Spiel sofort als beendet markieren!
+    this.isGameOver = true;
 
-    // Cashout-Button SOFORT ausblenden, um Exploits zu verhindern
     if (cashoutBtn) cashoutBtn.classList.add('hidden');
 
     soundManager.playGunshot();
@@ -2398,12 +2643,12 @@ pullTriggerRoulette(player) {
     this.survivedShots++;
     this.currentChamber++;
     
-    // Dreht die nächste Kammer flüssig unter den Schlagbolzen
     this.rouletteRot -= 60;
     const cylinder = document.getElementById('revolver-cylinder');
     if (cylinder) cylinder.style.transform = `rotate(${this.rouletteRot}deg)`;
 
-    const potSips = Math.min(maxSips, this.survivedShots);
+    // Dynamischer Pott basierend auf der bisherigen Anzahl überlebter Schüsse
+    const potSips = this.getRoulettePot(this.survivedShots, maxSips);
 
     document.getElementById('roulette-survived').innerText = this.survivedShots;
     document.getElementById('roulette-pot').innerText = potSips;
@@ -2416,7 +2661,7 @@ pullTriggerRoulette(player) {
       cashoutBtn.innerText = `💰 Pott sichern (${potSips} Schlucke verteilen)`;
     }
 
-    // AUTOMATISCHER STOPP BEI MAXIMALEN SCHLÜCKEN
+    // AUTOMATISCHER STOPP BEI ERREICHEN DER MAXIMALEN SCHLÜCKE
     if (potSips >= maxSips) {
       this.isGameOver = true;
       app.showToast(`🎯 Maximum von ${maxSips} Schlücken erreicht! Automatische Auszahlung.`);
@@ -2424,30 +2669,23 @@ pullTriggerRoulette(player) {
         this.cashoutRoulette(player);
       }, 1000);
     } else {
-      // Trigger-Button für den nächsten Versuch wieder freigeben
       if (triggerBtn) triggerBtn.disabled = false;
     }
   }
 }
 
 cashoutRoulette(player) {
-  // Wenn bereits verloren wurde oder ausgezahlt ist -> Klick ignorieren
   if (this.isGameOver) return; 
   this.isGameOver = true;
 
-  const potSips = Math.min(app.getMaxSipsForDifficulty(), this.survivedShots);
+  const maxSips = app.getMaxSipsForDifficulty();
+  const potSips = this.getRoulettePot(this.survivedShots, maxSips);
+
   if (potSips > 0) {
     soundManager.playSuccess();
     app.closeMinigame();
     app.openDistributeModal(player, potSips, `Russisches Roulette Pott (${potSips} Schlucke)`, () => {});
   }
-}
-
-cashoutRoulette(player) {
-  const maxSips = app.getMaxSipsForDifficulty();
-  const sips = Math.min(maxSips, Math.max(1, this.survivedShots));
-  app.closeMinigame();
-  app.openDistributeModal(player, sips, 'Russisches Roulette Gewinner', () => {});
 }
 
 
@@ -2496,7 +2734,6 @@ initNumberHunt(player) {
 }
 
 clickNumber(num, player) {
-  // Beim allerersten Klick (auf die 1): Timer starten & Spielfeld scharfstellen
   if (!this.huntStartTime) {
     this.huntStartTime = Date.now();
     const timerEl = document.getElementById('hunt-timer');
@@ -2508,7 +2745,6 @@ clickNumber(num, player) {
       }
     }, 100);
 
-    // Alle verbliebenen Zahlen (2-15) aufdecken & freischalten
     for (let i = 2; i <= 15; i++) {
       const btn = document.getElementById(`hunt-btn-${i}`);
       if (btn) {
@@ -2530,7 +2766,6 @@ clickNumber(num, player) {
     const targetEl = document.getElementById('hunt-target');
     if (targetEl) targetEl.innerText = this.huntNext <= 15 ? this.huntNext : '✓';
 
-    // Wenn alle 15 Zahlen angeklickt wurden
     if (this.huntNext > 15) {
       clearInterval(this.huntInterval);
       const elapsedSeconds = parseFloat(((Date.now() - this.huntStartTime) / 1000).toFixed(1));
@@ -2539,18 +2774,16 @@ clickNumber(num, player) {
       const timerEl = document.getElementById('hunt-timer');
       if (timerEl) timerEl.innerText = `${elapsedSeconds}s`;
 
-      // Zielzeit unterschritten: GEWONNEN!
       if (elapsedSeconds <= 8.0) {
         soundManager.playSuccess();
         app.showToast(`🔥 Rekord! In nur ${elapsedSeconds}s geschafft!`);
         setTimeout(() => {
           app.closeMinigame();
-          app.openDistributeModal(player, maxSips, `Zahlen-Jagd Rekordzeit (${elapsedSeconds}s)`, () => {});
+          app.openDistributeModal(player, maxSips, `Zahlen-Jagd Rekordzeit (${elapsedSeconds}s)`, () => {}); // Höchstgewinn
         }, 800);
       } else {
-        // DYNAMISCHE STRAFBERECHNUNG JE NACH ZEITÜBERSCHREITUNG:
         const extraTime = elapsedSeconds - 8.0;
-        const penaltySips = Math.min(maxSips, Math.max(1, Math.ceil(extraTime / 1)));
+        const penaltySips = app.calculateMinigameSips(Math.ceil(extraTime / 2));
 
         setTimeout(() => {
           this.showPenaltyCard(
@@ -2562,7 +2795,6 @@ clickNumber(num, player) {
       }
     }
   } else {
-    // Falsche Zahl angeklickt -> Visuelles Feedback
     const btn = document.getElementById(`hunt-btn-${num}`);
     if (btn) {
       btn.classList.add('border-rose-500', 'bg-rose-500/30');
@@ -2726,10 +2958,10 @@ answerShapeCounter(player, chosen, correct) {
     app.showToast(`Richtig! Es waren genau ${correct}! 🎉`);
     setTimeout(() => {
       app.closeMinigame();
-      app.openDistributeModal(player, maxSips, 'Formen-Zähler Meister', () => {});
+      app.openDistributeModal(player, maxSips, 'Formen-Zähler Meister', () => {}); // Höchstgewinn
     }, 600);
   } else {
-    const penalty = Math.min(maxSips, 3);
+    const penalty = app.calculateMinigameSips(2);
     this.showPenaltyCard(player, penalty, `Falsch! Es waren ${correct} (du tipptest ${chosen}).`);
   }
 }
@@ -2955,9 +3187,202 @@ pickShuffleCard(player, pickedSlotIndex) {
 }
 
 
+/* === 8. HÖCHSTE KARTE (NUR Platz 1 verteilt, Platz 2-5 trinken steigend) === */
+initFiveCards(player) {
+  document.getElementById('mg-icon').innerText = '🎴';
+  document.getElementById('mg-title').innerText = 'Höchste Karte';
+  document.getElementById('mg-subtitle').innerText = `${player}, wähle dein Schicksal!`;
+
+  this.fiveCardsState = {
+    isRevealing: false
+  };
+
+  const maxSips = app.getMaxSipsForDifficulty();
+
+  const container = document.getElementById('mg-content');
+  container.innerHTML = `
+    <div class="w-full flex flex-col items-center space-y-4">
+      <div class="glass-panel px-4 py-1.5 rounded-full border border-slate-700 flex items-center gap-2 text-xs font-bold text-slate-300">
+        <span>🏆 Max. Gewinn / Strafe: <span class="text-amber-300 font-black">${maxSips} Schlucke</span></span>
+      </div>
+
+      <!-- 3D Perspective Container -->
+      <div id="five-cards-container" class="grid grid-cols-5 gap-1.5 sm:gap-2.5 w-full max-w-lg my-2 [perspective:1000px]">
+        ${[0, 1, 2, 3, 4].map(i => `
+          <div id="five-card-wrapper-${i}" onclick="minigames.pickFiveCard('${player}',${i})" 
+               class="group relative h-32 sm:h-40 w-full cursor-pointer transition-transform duration-300 hover:-translate-y-1">
+            
+            <!-- 3D Card Inner -->
+            <div id="five-card-inner-${i}" class="relative w-full h-full rounded-xl transition-transform duration-700 [transform-style:preserve-3d]">
+              
+              <!-- Vorderseite (Verdeckte Karte) -->
+              <div id="five-card-front-${i}" class="absolute inset-0 w-full h-full rounded-xl bg-gradient-to-br from-indigo-900 via-slate-900 to-purple-950 border-2 border-indigo-500/40 shadow-xl flex flex-col items-center justify-center [backface-visibility:hidden] group-hover:border-pink-400 group-hover:shadow-pink-500/20">
+                <div class="w-8 h-8 rounded-full bg-indigo-500/10 border border-indigo-400/30 flex items-center justify-center text-indigo-300 text-sm font-black">
+                  ?
+                </div>
+                <span class="text-[10px] uppercase font-bold text-indigo-400/60 mt-2 tracking-widest">Karte ${i + 1}</span>
+              </div>
+
+              <!-- Rückseite (Aufgedeckte Karte) -->
+              <div id="five-card-back-${i}" class="absolute inset-0 w-full h-full rounded-xl bg-slate-900 border-2 border-slate-700 shadow-2xl flex flex-col justify-between p-2 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+              </div>
+
+            </div>
+
+            <!-- Rang-Badge -->
+            <div id="five-card-rank-${i}" class="absolute -bottom-3 left-1/2 -translate-x-1/2 opacity-0 transition-all duration-500 z-20 pointer-events-none">
+            </div>
+
+          </div>
+        `).join('')}
+      </div>
+
+      <div id="five-cards-status" class="min-h-[28px] text-center font-bold text-amber-300 text-sm animate-pulse">
+        Wähle eine der 5 verdeckten Karten!
+      </div>
+    </div>
+  `;
+}
+
+pickFiveCard(player, chosenIdx) {
+  if (this.fiveCardsState.isRevealing) return;
+  this.fiveCardsState.isRevealing = true;
+
+  for (let i = 0; i < 5; i++) {
+    const wrapper = document.getElementById(`five-card-wrapper-${i}`);
+    if (wrapper) {
+      wrapper.classList.remove('cursor-pointer', 'hover:-translate-y-1');
+      wrapper.removeAttribute('onclick');
+    }
+  }
+
+  const chosenWrapper = document.getElementById(`five-card-wrapper-${chosenIdx}`);
+  if (chosenWrapper) {
+    chosenWrapper.classList.add('-translate-y-2');
+    const frontEl = document.getElementById(`five-card-front-${chosenIdx}`);
+    if (frontEl) {
+      frontEl.className = "absolute inset-0 w-full h-full rounded-xl bg-gradient-to-br from-amber-900/40 via-slate-900 to-purple-950 border-2 border-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.4)] flex flex-col items-center justify-center [backface-visibility:hidden]";
+    }
+  }
+
+  const cardValues = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+  const cardLabels = { 11: 'J', 12: 'Q', 13: 'K', 14: 'A' };
+  const cardSuits = ['♠️', '♥️', '♦️', '♣️'];
+
+  const shuffledValues = [...cardValues].sort(() => Math.random() - 0.5).slice(0, 5);
+  const generatedCards = shuffledValues.map(val => ({
+    value: val,
+    label: cardLabels[val] || val.toString(),
+    suit: cardSuits[Math.floor(Math.random() * cardSuits.length)]
+  }));
+
+  const statusEl = document.getElementById('five-cards-status');
+  if (statusEl) {
+    statusEl.classList.remove('animate-pulse');
+    statusEl.innerText = 'Spannung steigt... Karten werden aufgedeckt! 🥁';
+  }
+
+  const revealOrder = [0, 1, 2, 3, 4].filter(idx => idx !== chosenIdx);
+  revealOrder.push(chosenIdx);
+
+  let currentStep = 0;
+
+  const interval = setInterval(() => {
+    if (currentStep < revealOrder.length) {
+      const idx = revealOrder[currentStep];
+      const card = generatedCards[idx];
+      const isRed = (card.suit === '♥️' || card.suit === '♦️');
+      const isPlayerCard = (idx === chosenIdx);
+
+      soundManager.playClickTick();
+
+      const backEl = document.getElementById(`five-card-back-${idx}`);
+      if (backEl) {
+        backEl.className = `absolute inset-0 w-full h-full rounded-xl bg-gradient-to-b from-slate-800 to-slate-950 border-2 ${
+          isPlayerCard 
+            ? 'border-amber-400 shadow-[0_0_25px_rgba(251,191,36,0.6)] ring-2 ring-amber-400/50' 
+            : 'border-slate-700 shadow-xl'
+        } flex flex-col justify-between p-2 [backface-visibility:hidden] [transform:rotateY(180deg)]`;
+
+        backEl.innerHTML = `
+          <div class="flex justify-between items-center w-full">
+            <span class="text-xs font-black ${isRed ? 'text-rose-400' : 'text-slate-300'}">${card.label}</span>
+            <span class="text-xs">${card.suit}</span>
+          </div>
+          <div class="text-2xl sm:text-3xl font-black text-center ${isRed ? 'text-rose-400' : 'text-white'} drop-shadow-md">
+            ${card.label}
+          </div>
+          <div class="flex justify-between items-center w-full rotate-180">
+            <span class="text-xs font-black ${isRed ? 'text-rose-400' : 'text-slate-300'}">${card.label}</span>
+            <span class="text-xs">${card.suit}</span>
+          </div>
+        `;
+      }
+
+      const innerEl = document.getElementById(`five-card-inner-${idx}`);
+      if (innerEl) {
+        innerEl.style.transform = 'rotateY(180deg)';
+      }
+
+      currentStep++;
+    } else {
+      clearInterval(interval);
+
+      const sorted = [...generatedCards].sort((a, b) => b.value - a.value);
+      const playerValue = generatedCards[chosenIdx].value;
+      const rank = sorted.findIndex(c => c.value === playerValue) + 1;
+
+      setTimeout(() => {
+        generatedCards.forEach((c, idx) => {
+          const cRank = sorted.findIndex(sc => sc.value === c.value) + 1;
+          const badgeEl = document.getElementById(`five-card-rank-${idx}`);
+          if (badgeEl) {
+            let badgeClass = "bg-slate-800 text-slate-300 border-slate-600";
+            if (cRank === 1) badgeClass = "bg-amber-500 text-slate-950 font-black border-amber-300 shadow-[0_0_10px_rgba(251,191,36,0.8)]";
+            else if (cRank === 2) badgeClass = "bg-slate-300 text-slate-950 font-black border-white";
+            else if (cRank === 3) badgeClass = "bg-amber-700 text-amber-100 font-black border-amber-500";
+            else if (cRank === 5) badgeClass = "bg-rose-600 text-white font-black border-rose-400";
+
+            badgeEl.className = `absolute -bottom-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[10px] border shadow-lg whitespace-nowrap z-20 transition-all duration-500 scale-100 opacity-100 ${badgeClass}`;
+            badgeEl.innerText = `#${cRank}`;
+          }
+        });
+
+        const maxSips = app.getMaxSipsForDifficulty();
+
+        setTimeout(() => {
+          if (rank === 1) {
+            // Platz 1: Höchste Karte -> EINZIGER GEWINNER (verteilt maxSips)
+            soundManager.playSuccess();
+            app.closeMinigame();
+            app.openDistributeModal(player, maxSips, `🥇 Platz 1! Höchste Karte (${generatedCards[chosenIdx].label}) gezogen!`, () => {});
+          } else if (rank === 2) {
+            // Platz 2: Knappe Niederlage -> Trinkt wenige Schlucke
+            const drinkSips = app.calculateMinigameSips(1);
+            this.showPenaltyCard(player, drinkSips, `Platz 2 (${generatedCards[chosenIdx].label})! Knappe Niederlage, du musst trinken.`);
+          } else if (rank === 3) {
+            // Platz 3: Mittelfeld -> Trinkt etwas mehr Schlucke
+            const drinkSips = app.calculateMinigameSips(2);
+            this.showPenaltyCard(player, drinkSips, `Platz 3 (${generatedCards[chosenIdx].label})! Mittelfeld, du musst trinken.`);
+          } else if (rank === 4) {
+            // Platz 4: Vorletzter -> Trinkt noch mehr Schlucke
+            const drinkSips = app.calculateMinigameSips(3);
+            this.showPenaltyCard(player, drinkSips, `Platz 4 (${generatedCards[chosenIdx].label})! Schwache Karte, du musst trinken.`);
+          } else {
+            // Platz 5: Niedrigste Karte -> Trinkt Höchststrafe (maxSips)
+            this.showPenaltyCard(player, maxSips, `Platz 5! Niedrigste Karte (${generatedCards[chosenIdx].label}) – Volle Strafe!`);
+          }
+        }, 1200);
+
+      }, 400);
+    }
+  }, 650);
+}
+
+
+
 
     }
-
     const minigames = new MinigameEngine();
     const app = new DrinkingApp();
 
