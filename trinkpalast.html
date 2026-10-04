@@ -986,7 +986,7 @@ classic: {
   },
   duel: {
     id: 'duel',
-    name: 'Duelle & Regeln',
+    name: 'Duelle',
     icon: '⚔️',
     cards: [
       { text: 'DUELL: {player} gegen {player2}! Stein-Schere-Papier Best-of-3. Der Verlierer trinkt {sips} Schlücke!', baseSips: 2, isGroup: true },
@@ -1911,6 +1911,9 @@ confirmBothDrink() {
           }
         }, 5000);
       }
+	  
+	  
+//------------------------------------#1-Glücksrad------------------------------------
 
 initWheel(player) {
   document.getElementById('mg-icon').innerText = '🎡';
@@ -2064,6 +2067,8 @@ spinWheel(player) {
   animate();
 }
 
+//------------------------------------#2-Reaktionstest------------------------------------
+
       initReaction(player) {
   document.getElementById('mg-icon').innerText = '⚡';
   document.getElementById('mg-title').innerText = 'Reaktionstest';
@@ -2116,8 +2121,11 @@ spinWheel(player) {
         document.getElementById('react-sub').innerText = 'Überhaupt nicht reagiert!';
         
         const maxSips = app.getMaxSipsForDifficulty();
+        const mode = app.difficulty || (maxSips <= 3 ? 'easy' : maxSips <= 5 ? 'medium' : 'hard');
+        const penaltySips = { easy: 3, medium: 5, hard: 8 }[mode];
+
         setTimeout(() => {
-          this.showPenaltyCard(player, maxSips, 'Gar nicht reagiert! Volle Strafe.');
+          this.showPenaltyCard(player, penaltySips, `Gar nicht reagiert! Du musst ${penaltySips} Schlucke trinken.`);
         }, 1500);
       }
     }, 3500);
@@ -2130,6 +2138,7 @@ handleReactionTap(event, player) {
   if (!this.canTap || this.reactState === 'finished') return;
 
   const maxSips = app.getMaxSipsForDifficulty();
+  const mode = app.difficulty || (maxSips <= 3 ? 'easy' : maxSips <= 5 ? 'medium' : 'hard');
 
   if (this.reactState === 'waiting') {
     clearTimeout(this.reactTimer);
@@ -2143,8 +2152,10 @@ handleReactionTap(event, player) {
       document.getElementById('react-sub').innerText = 'Zu früh getippt!';
     }
 
+    const earlyPenalty = { easy: 3, medium: 5, hard: 8 }[mode];
+
     setTimeout(() => {
-      this.showPenaltyCard(player, maxSips, `Frühstart! Du musst die volle Strafe trinken.`); // Höchststrafe
+      this.showPenaltyCard(player, earlyPenalty, `Frühstart! Du musst die volle Strafe von ${earlyPenalty} Schlucken trinken.`);
     }, 1800);
 
   } else if (this.reactState === 'ready') {
@@ -2157,31 +2168,59 @@ handleReactionTap(event, player) {
       box.className = "w-full h-56 rounded-2xl bg-indigo-600 border-2 border-indigo-400 flex flex-col items-center justify-center p-4 text-center";
       document.getElementById('react-icon').innerText = '⏱️';
       document.getElementById('react-msg').innerText = `${elapsed} ms`;
-      document.getElementById('react-sub').innerText = elapsed < 230 ? 'Blitzschnell!' : elapsed <= 330 ? 'Gut reagiert!' : elapsed <= 430 ? 'Mäßige Zeit' : 'Zu langsam!';
+      document.getElementById('react-sub').innerText = elapsed < 270 ? 'Blitzschnell!' : elapsed < 400 ? 'Gute Reaktion!' : 'Zu langsam!';
     }
 
     setTimeout(() => {
-      if (elapsed < 230) {
+      if (elapsed < 400) {
+        // Schlucke zum Verteilen
+        let winSips = 1;
+        if (elapsed < 270) {
+          winSips = { easy: 3, medium: 5, hard: 8 }[mode];
+        } else if (elapsed < 300) {
+          winSips = { easy: 3, medium: 5, hard: 7 }[mode];
+        } else if (elapsed < 330) {
+          winSips = { easy: 2, medium: 4, hard: 6 }[mode];
+        } else if (elapsed < 370) {
+          winSips = { easy: 2, medium: 3, hard: 5 }[mode];
+        } else { // 370ms bis 399ms
+          winSips = { easy: 1, medium: 2, hard: 4 }[mode];
+        }
+
         soundManager.playSuccess();
         app.closeMinigame();
-        app.openDistributeModal(player, maxSips, `Blitzschnelle Reflexe (${elapsed} ms)`, () => {}); // Höchstgewinn
-      } else if (elapsed <= 330) {
-        const distSips = app.calculateMinigameSips(2);
-        soundManager.playSuccess();
-        app.closeMinigame();
-        app.openDistributeModal(player, distSips, `Gute Reaktion (${elapsed} ms)`, () => {});
-      } else if (elapsed <= 430) {
-        const drinkSips = app.calculateMinigameSips(1);
-        this.showPenaltyCard(player, drinkSips, `Mäßige Reaktion (${elapsed} ms).`);
-      } else if (elapsed <= 550) {
-        const drinkSips = app.calculateMinigameSips(2);
-        this.showPenaltyCard(player, drinkSips, `Langsame Reaktion (${elapsed} ms)!`);
+        app.openDistributeModal(
+          player, 
+          winSips, 
+          `Starke Reaktion (${elapsed} ms)! Verteile ${winSips} Schluck${winSips > 1 ? 'e' : ''}.`, 
+          () => {}
+        );
       } else {
-        this.showPenaltyCard(player, maxSips, `Sehr langsame Reflexe (${elapsed} ms)!`); // Höchststrafe
+        // Schlucke selber trinken
+        let penaltySips = 1;
+        if (elapsed < 430) {        // 400 - 429 ms
+          penaltySips = { easy: 1, medium: 2, hard: 4 }[mode];
+        } else if (elapsed < 460) { // 430 - 459 ms
+          penaltySips = { easy: 2, medium: 3, hard: 5 }[mode];
+        } else if (elapsed < 490) { // 460 - 489 ms
+          penaltySips = { easy: 2, medium: 4, hard: 6 }[mode];
+        } else if (elapsed < 510) { // 490 - 509 ms
+          penaltySips = { easy: 3, medium: 5, hard: 7 }[mode];
+        } else {                    // >= 510 ms
+          penaltySips = { easy: 3, medium: 5, hard: 8 }[mode];
+        }
+
+        this.showPenaltyCard(
+          player, 
+          penaltySips, 
+          `Zu langsam! (${elapsed} ms). Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`
+        );
       }
     }, 2200);
   }
 }
+
+//------------------------------------#3-Klick-Marathon------------------------------------
 
       initClickSprint(player) {
   document.getElementById('mg-icon').innerText = '👆';
@@ -2259,6 +2298,8 @@ handleClickSprintTap(event, player) {
 evaluateClickSprint(player) {
   const count = this.clickCount;
   const maxSips = app.getMaxSipsForDifficulty();
+  const mode = app.difficulty || (maxSips <= 3 ? 'easy' : maxSips <= 5 ? 'medium' : 'hard');
+
   const btn = document.getElementById('click-target-btn');
   const status = document.getElementById('click-status');
 
@@ -2266,61 +2307,95 @@ evaluateClickSprint(player) {
   if (status) status.innerText = `Zeit vorbei! (${count} Klicks geschafft)`;
 
   setTimeout(() => {
-    if (count >= 40) {
+    if (count >= 35) {
+      // Verteilen: Ab 35 Klicks
+      let winSips = 1;
+
+      if (count < 38) {        // 35-37 Klicks
+        winSips = { easy: 1, medium: 2, hard: 4 }[mode];
+      } else if (count < 41) { // 38-40 Klicks
+        winSips = { easy: 2, medium: 3, hard: 5 }[mode];
+      } else if (count < 44) { // 41-43 Klicks
+        winSips = { easy: 2, medium: 4, hard: 6 }[mode];
+      } else if (count < 47) { // 44-46 Klicks
+        winSips = { easy: 3, medium: 4, hard: 7 }[mode];
+      } else {                 // 47+ Klicks
+        winSips = { easy: 3, medium: 5, hard: 8 }[mode];
+      }
+
       soundManager.playSuccess();
       app.closeMinigame();
-      app.openDistributeModal(player, maxSips, `Klick-König (${count} Klicks)`, () => {}); // Höchstgewinn
-    } else if (count >= 35) {
-      const distSips = app.calculateMinigameSips(2);
-      soundManager.playSuccess();
-      app.closeMinigame();
-      app.openDistributeModal(player, distSips, `Gute Klickrate (${count} Klicks)`, () => {});
-    } else if (count >= 30) {
-      const drinkSips = app.calculateMinigameSips(1);
-      this.showPenaltyCard(player, drinkSips, `Mäßige Klickrate (${count} Klicks).`);
-    } else if (count >= 20) {
-      const drinkSips = app.calculateMinigameSips(2);
-      this.showPenaltyCard(player, drinkSips, `Zu langsame Finger! (${count} Klicks)`);
+      app.openDistributeModal(
+        player,
+        winSips,
+        `Klick-Marathon (${count} Klicks – Verteile ${winSips} Schluck${winSips > 1 ? 'e' : ''})`,
+        () => {}
+      );
     } else {
-      this.showPenaltyCard(player, maxSips, `Schlechte Klick-Performance! (${count} Klicks)`); // Höchststrafe
+      // Selber trinken: Unter 35 Klicks
+      let penaltySips = 1;
+
+      if (count < 22) {        // 0-21 Klicks
+        penaltySips = { easy: 3, medium: 5, hard: 8 }[mode];
+      } else if (count < 25) { // 22-24 Klicks
+        penaltySips = { easy: 3, medium: 4, hard: 8 }[mode];
+      } else if (count < 28) { // 25-27 Klicks
+        penaltySips = { easy: 2, medium: 4, hard: 7 }[mode];
+      } else if (count < 31) { // 28-30 Klicks
+        penaltySips = { easy: 2, medium: 3, hard: 6 }[mode];
+      } else if (count < 33) { // 31-32 Klicks
+        penaltySips = { easy: 1, medium: 3, hard: 5 }[mode];
+      } else {                 // 33-34 Klicks
+        penaltySips = { easy: 1, medium: 2, hard: 4 }[mode];
+      }
+
+      this.showPenaltyCard(
+        player,
+        penaltySips,
+        `Zu wenig Klicks! (${count} Klicks). Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`
+      );
     }
   }, 2000);
 }
 
-      initTimeGuess(player) {
-        document.getElementById('mg-icon').innerText = '⏱️';
-        document.getElementById('mg-title').innerText = 'Exakt X Sekunden';
-        
-        const targetSecs = (Math.floor(Math.random() * 4) + 5).toFixed(2);
-        this.timeTarget = parseFloat(targetSecs);
+//------------------------------------#4-Exakt X Sekunden------------------------------------
 
-        document.getElementById('mg-subtitle').innerText = `Stoppe die Uhr nach genau ${targetSecs}s!`;
+initTimeGuess(player) {
+  document.getElementById('mg-icon').innerText = '⏱️';
+  document.getElementById('mg-title').innerText = 'Exakt X Sekunden';
 
-        const container = document.getElementById('mg-content');
-        container.innerHTML = `
-          <div class="w-full flex flex-col items-center space-y-5">
-            <div class="glass-panel p-6 rounded-2xl w-full text-center border-2 border-cyan-500/40">
-              <span class="text-xs uppercase tracking-widest text-slate-400 block mb-1">Zielzeit</span>
-              <span class="font-heading font-black text-4xl text-cyan-300">${targetSecs} s</span>
-            </div>
+  const targetSecs = (Math.floor(Math.random() * 4) + 5).toFixed(2);
+  this.timeTarget = parseFloat(targetSecs);
 
-            <div class="w-full h-32 glass-card rounded-2xl flex items-center justify-center border border-slate-700">
-              <span id="time-display" class="font-heading font-black text-6xl text-amber-300 font-mono">0.00s</span>
-            </div>
+  document.getElementById('mg-subtitle').innerText = `Stoppe die Uhr nach genau ${targetSecs}s!`;
 
-            <button id="time-btn" onclick="minigames.handleTimeGuessBtn('${player}')" class="w-full py-4 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-heading font-black text-xl shadow-lg active:scale-95 transition-all">
-              START!
-            </button>
-          </div>
-        `;
+  const container = document.getElementById('mg-content');
+  container.innerHTML = `
+    <div class="w-full flex flex-col items-center space-y-5">
+      <div class="glass-panel p-6 rounded-2xl w-full text-center border-2 border-cyan-500/40">
+        <span class="text-xs uppercase tracking-widest text-slate-400 block mb-1">Zielzeit</span>
+        <span class="font-heading font-black text-4xl text-cyan-300">${targetSecs} s</span>
+      </div>
 
-        this.timeState = 'idle';
-      }
+      <div class="w-full h-32 glass-card rounded-2xl flex items-center justify-center border border-slate-700">
+        <span id="time-display" class="font-heading font-black text-6xl text-amber-300 font-mono">0.00s</span>
+      </div>
+
+      <button id="time-btn" onclick="minigames.handleTimeGuessBtn('${player}')" class="w-full py-4 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-heading font-black text-xl shadow-lg active:scale-95 transition-all">
+        START!
+      </button>
+    </div>
+  `;
+
+  this.timeState = 'idle';
+  this.timePlayer = player;
+}
 
 handleTimeGuessBtn(player) {
   const btn = document.getElementById('time-btn');
   const display = document.getElementById('time-display');
   const maxSips = app.getMaxSipsForDifficulty();
+  const mode = app.difficulty || (maxSips <= 3 ? 'easy' : maxSips <= 5 ? 'medium' : 'hard');
 
   if (this.timeState === 'idle') {
     this.timeState = 'running';
@@ -2331,45 +2406,92 @@ handleTimeGuessBtn(player) {
   } else if (this.timeState === 'running') {
     cancelAnimationFrame(this.timeAnim);
     this.timeState = 'stopped';
-    
+
     btn.disabled = true;
     btn.className = "w-full py-4 rounded-xl bg-slate-800 text-slate-500 font-heading font-black text-xl cursor-not-allowed";
 
     const elapsed = (performance.now() - this.timeStart) / 1000;
     const diff = Math.abs(elapsed - this.timeTarget);
-    display.innerText = `${elapsed.toFixed(2)}s`;
+    const diffMs = Math.round(diff * 1000);
+    if (display) display.innerText = `${elapsed.toFixed(2)}s`;
 
     setTimeout(() => {
-      if (diff <= 0.25) {
+      if (diffMs < 600) {
+        // Schlucke verteilen
+        let winSips = 1;
+        if (diffMs <= 100) {
+          winSips = { easy: 3, medium: 5, hard: 8 }[mode];
+        } else if (diffMs <= 200) {
+          winSips = { easy: 3, medium: 5, hard: 7 }[mode];
+        } else if (diffMs <= 300) {
+          winSips = { easy: 2, medium: 4, hard: 6 }[mode];
+        } else if (diffMs <= 400) {
+          winSips = { easy: 2, medium: 3, hard: 5 }[mode];
+        } else { // 500ms bis 599ms
+          winSips = { easy: 1, medium: 2, hard: 4 }[mode];
+        }
+
         soundManager.playSuccess();
         app.closeMinigame();
-        app.openDistributeModal(player, maxSips, 'Zeitgefühl-Gott', () => {}); // Höchstgewinn
-      } else if (diff <= 0.60) {
-        const distSips = app.calculateMinigameSips(2);
-        soundManager.playSuccess();
-        app.closeMinigame();
-        app.openDistributeModal(player, distSips, 'Gutes Zeitgefühl', () => {});
+        app.openDistributeModal(
+          player,
+          winSips,
+          `Exakte Zeit! (${diffMs}ms Abweichung) – Verteile ${winSips} Schluck${winSips > 1 ? 'e' : ''}.`,
+          () => {}
+        );
       } else {
-        const penalty = app.calculateMinigameSips(Math.round(diff * 2));
-        this.showPenaltyCard(player, penalty, `Zu weit daneben! (${diff.toFixed(2)}s Abweichung)`);
+        // Schlucke selber trinken
+        let penaltySips = 1;
+        let msg = "";
+
+        if (diffMs >= 2000) {
+          penaltySips = { easy: 3, medium: 5, hard: 8 }[mode];
+          msg = `Eingeschlafen, nicht reagiert! (${(diffMs / 1000).toFixed(2)}s Abweichung). Du musst ${penaltySips} Schlucke trinken!`;
+        } else if (diffMs < 630) {        // 600ms - 629ms
+          penaltySips = { easy: 1, medium: 2, hard: 4 }[mode];
+          msg = `Knapp daneben! (${diffMs}ms Abweichung). Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`;
+        } else if (diffMs < 660) { // 630ms - 659ms
+          penaltySips = { easy: 2, medium: 3, hard: 5 }[mode];
+          msg = `Zu weit daneben! (${diffMs}ms Abweichung). Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`;
+        } else if (diffMs < 690) { // 660ms - 689ms
+          penaltySips = { easy: 2, medium: 4, hard: 6 }[mode];
+          msg = `Zu weit daneben! (${diffMs}ms Abweichung). Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`;
+        } else if (diffMs < 720) { // 690ms - 719ms
+          penaltySips = { easy: 3, medium: 4, hard: 7 }[mode];
+          msg = `Schlechtes Zeitgefühl! (${diffMs}ms Abweichung). Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`;
+        } else {                   // 720ms - 1999ms
+          penaltySips = { easy: 3, medium: 5, hard: 8 }[mode];
+          msg = `Schlechtes Zeitgefühl! (${diffMs}ms Abweichung). Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`;
+        }
+
+        this.showPenaltyCard(player, penaltySips, msg);
       }
-    }, 2500);
+    }, 2000);
   }
 }
 
-      updateTimeGuessLoop() {
-        if (this.timeState !== 'running') return;
-        const elapsed = (performance.now() - this.timeStart) / 1000;
-        const display = document.getElementById('time-display');
-        
-        if (elapsed > 1.8) {
-          display.innerText = '??.??s';
-        } else {
-          display.innerText = `${elapsed.toFixed(2)}s`;
-        }
-        
-        this.timeAnim = requestAnimationFrame(() => this.updateTimeGuessLoop());
-      }
+updateTimeGuessLoop() {
+  if (this.timeState !== 'running') return;
+  const elapsed = (performance.now() - this.timeStart) / 1000;
+  const display = document.getElementById('time-display');
+
+  // Auto-Stopp bei mehr als 2.5 Sekunden Überschreitung (Inaktivität)
+  if (elapsed > this.timeTarget + 2.5) {
+    cancelAnimationFrame(this.timeAnim);
+    this.handleTimeGuessBtn(this.timePlayer);
+    return;
+  }
+
+  if (elapsed > 1.8) {
+    if (display) display.innerText = '??.??s';
+  } else {
+    if (display) display.innerText = `${elapsed.toFixed(2)}s`;
+  }
+
+  this.timeAnim = requestAnimationFrame(() => this.updateTimeGuessLoop());
+}
+	  
+//------------------------------------#5-Höher oder Tiefer------------------------------------
 
       initCardShark(player) {
         document.getElementById('mg-icon').innerText = '🃏';
@@ -2462,8 +2584,23 @@ guessCardShark(player, choice) {
       }, 900);
     }
   } else {
-    const penalty = app.calculateMinigameSips(2);
-    this.showPenaltyCard(player, penalty, 'Falsch geraten! Die Karte lag daneben.');
+    // Modus ermitteln & Zufällige Strafe fürs Selbertrinken berechnen
+    const mode = app.difficulty || (maxSips <= 3 ? 'easy' : maxSips <= 4 ? 'medium' : 'hard');
+    let penaltySips = 1;
+
+    if (mode === 'easy') {
+      penaltySips = Math.floor(Math.random() * (3 - 1 + 1)) + 1; // 1 bis 3
+    } else if (mode === 'medium') {
+      penaltySips = Math.floor(Math.random() * (5 - 2 + 1)) + 2; // 2 bis 4
+    } else {
+      penaltySips = Math.floor(Math.random() * (8 - 4 + 1)) + 4; // 4 bis 8
+    }
+
+    this.showPenaltyCard(
+      player, 
+      penaltySips, 
+      `Falsch geraten! Die Karte lag daneben. Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`
+    );
   }
 }
 
@@ -2474,7 +2611,8 @@ guessCardShark(player, choice) {
         app.openDistributeModal(player, sips, 'Card Shark Gewinnserie', () => {});
       }
 
-      /* === BOXEN ÖFFNEN / KISTE DES GRAUENS === */
+//------------------------------------#6-Kiste des Grauens------------------------------------
+
       initMinesweeper(player) {
         document.getElementById('mg-icon').innerText = '📦';
         document.getElementById('mg-title').innerText = 'Kiste des Grauens';
@@ -2530,55 +2668,72 @@ guessCardShark(player, choice) {
         `;
       }
 
-      openBox(player, idx) {
-        const btn = document.getElementById(`box-${idx}`);
-        if (!btn || btn.disabled) return;
+openBox(player, idx) {
+  const btn = document.getElementById(`box-${idx}`);
+  if (!btn || btn.disabled) return;
 
-        btn.disabled = true;
-        const maxLimit = app.getMaxSipsForDifficulty();
-        const item = this.boxItems[idx];
-        this.boxOpenedCount++;
+  btn.disabled = true;
+  const maxLimit = app.getMaxSipsForDifficulty();
+  const item = this.boxItems[idx];
+  this.boxOpenedCount++;
 
-        if (item === '☠️') {
-          btn.innerText = '☠️';
-          btn.classList.add('bg-rose-600/80', 'border-rose-400');
-          this.showPenaltyCard(player, maxLimit, 'NIETE GEZOGEN ☠️! Maximale Strafe!');
-        } else if (item === '🍺') {
-          if (this.boxSipsAccumulated < maxLimit) {
-            this.boxSipsAccumulated++;
-            btn.innerText = '🍺';
-            btn.classList.add('bg-emerald-600/40', 'border-emerald-400');
-            soundManager.playSuccess();
-            app.showToast(`+1 Schluck gesammelt! (${this.boxSipsAccumulated}/${maxLimit})`);
-          } else {
-            // Max limit reached -> Count as no effect
-            btn.innerText = '🍃';
-            btn.classList.add('bg-slate-800/60', 'border-slate-600');
-            soundManager.playClickTick();
-            app.showToast(`Limit von ${maxLimit} Schlücken bereits erreicht!`);
-          }
+  if (item === '☠️') {
+    btn.innerText = '☠️';
+    btn.classList.add('bg-rose-600/80', 'border-rose-400');
 
-          const cashoutBtn = document.getElementById('box-cashout-btn');
-          cashoutBtn.classList.remove('hidden');
-          cashoutBtn.innerText = `💰 ${this.boxSipsAccumulated} Schluck(e) verteilen & aufhören`;
+    // Modus ermitteln & Zufällige Strafe für die Niete berechnen
+    const mode = app.difficulty || (maxLimit <= 3 ? 'easy' : maxLimit <= 4 ? 'medium' : 'hard');
+    let penaltySips = 1;
 
-          if (this.boxSipsAccumulated >= maxLimit) {
-            app.showToast(`Maximum von ${maxLimit} Schlücken erreicht!`);
-          }
-        } else {
-          // "Nichts geschieht"
-          btn.innerText = '🍃';
-          btn.classList.add('bg-slate-800/60', 'border-slate-600');
-          soundManager.playClickTick();
-          app.showToast('Nichts geschieht! 🍃');
+    if (mode === 'easy') {
+      penaltySips = Math.floor(Math.random() * (3 - 1 + 1)) + 1; // 1 bis 3
+    } else if (mode === 'medium') {
+      penaltySips = Math.floor(Math.random() * (5 - 2 + 1)) + 2; // 2 bis 4
+    } else {
+      penaltySips = Math.floor(Math.random() * (8 - 4 + 1)) + 4; // 4 bis 8
+    }
 
-          const cashoutBtn = document.getElementById('box-cashout-btn');
-          if (this.boxSipsAccumulated > 0) {
-            cashoutBtn.classList.remove('hidden');
-            cashoutBtn.innerText = `💰 ${this.boxSipsAccumulated} Schluck(e) verteilen & aufhören`;
-          }
-        }
-      }
+    this.showPenaltyCard(
+      player, 
+      penaltySips, 
+      `NIETE GEZOGEN ☠️! Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`
+    );
+  } else if (item === '🍺') {
+    if (this.boxSipsAccumulated < maxLimit) {
+      this.boxSipsAccumulated++;
+      btn.innerText = '🍺';
+      btn.classList.add('bg-emerald-600/40', 'border-emerald-400');
+      soundManager.playSuccess();
+      app.showToast(`+1 Schluck gesammelt! (${this.boxSipsAccumulated}/${maxLimit})`);
+    } else {
+      // Max Limit erreicht -> Als "Nichts geschieht" zählen
+      btn.innerText = '🍃';
+      btn.classList.add('bg-slate-800/60', 'border-slate-600');
+      soundManager.playClickTick();
+      app.showToast(`Limit von ${maxLimit} Schlücken bereits erreicht!`);
+    }
+
+    const cashoutBtn = document.getElementById('box-cashout-btn');
+    cashoutBtn.classList.remove('hidden');
+    cashoutBtn.innerText = `💰 ${this.boxSipsAccumulated} Schluck(e) verteilen & aufhören`;
+
+    if (this.boxSipsAccumulated >= maxLimit) {
+      app.showToast(`Maximum von ${maxLimit} Schlücken erreicht!`);
+    }
+  } else {
+    // "Nichts geschieht"
+    btn.innerText = '🍃';
+    btn.classList.add('bg-slate-800/60', 'border-slate-600');
+    soundManager.playClickTick();
+    app.showToast('Nichts geschieht! 🍃');
+
+    const cashoutBtn = document.getElementById('box-cashout-btn');
+    if (this.boxSipsAccumulated > 0) {
+      cashoutBtn.classList.remove('hidden');
+      cashoutBtn.innerText = `💰 ${this.boxSipsAccumulated} Schluck(e) verteilen & aufhören`;
+    }
+  }
+}
 
       cashoutBoxes(player) {
         const sips = Math.max(1, this.boxSipsAccumulated);
@@ -2592,7 +2747,8 @@ getRoulettePot(survivedShots, maxSips) {
   return Math.min(maxSips, Math.ceil((survivedShots / 5) * maxSips));
 }
 
-/* === 1. INITIALISIERUNG (initRoulette) === */
+//------------------------------------#7-Russisch Roulette------------------------------------
+
 initRoulette(player) {
   document.getElementById('mg-icon').innerText = '🔫';
   document.getElementById('mg-title').innerText = 'Russisches Roulette';
@@ -2690,7 +2846,7 @@ pullTriggerRoulette(player) {
 
     this.survivedShots++;
     this.currentChamber++;
-    
+
     this.rouletteRot -= 60;
     const cylinder = document.getElementById('revolver-cylinder');
     if (cylinder) cylinder.style.transform = `rotate(${this.rouletteRot}deg)`;
@@ -2709,10 +2865,16 @@ pullTriggerRoulette(player) {
       cashoutBtn.innerText = `💰 Pott sichern (${potSips} Schlucke verteilen)`;
     }
 
-    // AUTOMATISCHER STOPP BEI ERREICHEN DER MAXIMALEN SCHLÜCKE
-    if (potSips >= maxSips) {
-      this.isGameOver = true;
-      app.showToast(`🎯 Maximum von ${maxSips} Schlücken erreicht! Automatische Auszahlung.`);
+    // AUTOMATISCHER STOPP BEI ERREICHEN DER MAXIMALEN SCHLÜCKE ODER ALLER 5 LEEREN KAMMERN
+    if (potSips >= maxSips || this.survivedShots >= 5) {
+      // Trigger-Button dauerhaft deaktiviert lassen
+      if (triggerBtn) triggerBtn.disabled = true;
+
+      const message = this.survivedShots >= 5 
+        ? `🏆 Alle leeren Kammern überlebt! Automatische Auszahlung.`
+        : `🎯 Maximum von ${maxSips} Schlücken erreicht! Automatische Auszahlung.`;
+
+      app.showToast(message);
       setTimeout(() => {
         this.cashoutRoulette(player);
       }, 1000);
@@ -2736,6 +2898,7 @@ cashoutRoulette(player) {
   }
 }
 
+//------------------------------------#8-Zahlen Jagd------------------------------------
 
 initNumberHunt(player) {
   document.getElementById('mg-icon').innerText = '🔢';
@@ -2744,7 +2907,10 @@ initNumberHunt(player) {
 
   this.huntNext = 1;
   this.huntStartTime = null;
-  if (this.huntInterval) clearInterval(this.huntInterval);
+  if (this.huntInterval) {
+    clearInterval(this.huntInterval);
+    this.huntInterval = null;
+  }
 
   // Zahlen 1 bis 15 zufällig mischen
   const numbers = Array.from({ length: 15 }, (_, i) => i + 1).sort(() => Math.random() - 0.5);
@@ -2782,14 +2948,40 @@ initNumberHunt(player) {
 }
 
 clickNumber(num, player) {
+  const maxSips = app.getMaxSipsForDifficulty();
+  const mode = app.difficulty || (maxSips <= 3 ? 'easy' : maxSips <= 4 ? 'medium' : 'hard');
+
   if (!this.huntStartTime) {
     this.huntStartTime = Date.now();
     const timerEl = document.getElementById('hunt-timer');
-    
+
     this.huntInterval = setInterval(() => {
-      if (timerEl && this.huntStartTime) {
-        const currentElapsed = ((Date.now() - this.huntStartTime) / 1000).toFixed(1);
-        timerEl.innerText = `${currentElapsed}s`;
+      if (this.huntStartTime) {
+        const elapsed = (Date.now() - this.huntStartTime) / 1000;
+        if (timerEl) timerEl.innerText = `${elapsed.toFixed(1)}s`;
+
+        // Abbruch bei 20 Sekunden
+        if (elapsed >= 20.0) {
+          clearInterval(this.huntInterval);
+          this.huntInterval = null;
+
+          // Alle Buttons sperren
+          for (let i = 1; i <= 15; i++) {
+            const btn = document.getElementById(`hunt-btn-${i}`);
+            if (btn) btn.classList.add('pointer-events-none', 'opacity-30');
+          }
+
+          const timeoutPenalties = { easy: 3, medium: 5, hard: 8 };
+          const timeoutSips = timeoutPenalties[mode] || 5;
+
+          setTimeout(() => {
+            this.showPenaltyCard(
+              player,
+              timeoutSips,
+              `Zeit abgelaufen! ⏳ 20 Sekunden überschritten (${timeoutSips} Schlucke trinken).`
+            );
+          }, 300);
+        }
       }
     }, 100);
 
@@ -2816,28 +3008,58 @@ clickNumber(num, player) {
 
     if (this.huntNext > 15) {
       clearInterval(this.huntInterval);
-      const elapsedSeconds = parseFloat(((Date.now() - this.huntStartTime) / 1000).toFixed(1));
-      const maxSips = app.getMaxSipsForDifficulty();
+      this.huntInterval = null;
 
+      const elapsedSeconds = parseFloat(((Date.now() - this.huntStartTime) / 1000).toFixed(1));
       const timerEl = document.getElementById('hunt-timer');
       if (timerEl) timerEl.innerText = `${elapsedSeconds}s`;
 
-      if (elapsedSeconds <= 8.0) {
+      if (elapsedSeconds <= 10.0) {
+        // Schlucke zum Verteilen berechnen
+        let winSips = 1;
+        if (elapsedSeconds <= 8.0) {
+          winSips = { easy: 3, medium: 5, hard: 8 }[mode];
+        } else if (elapsedSeconds <= 8.5) {
+          winSips = { easy: 3, medium: 5, hard: 7 }[mode];
+        } else if (elapsedSeconds <= 9.0) {
+          winSips = { easy: 2, medium: 4, hard: 6 }[mode];
+        } else if (elapsedSeconds <= 9.5) {
+          winSips = { easy: 2, medium: 3, hard: 5 }[mode];
+        } else { // 9.5s - 10.0s
+          winSips = { easy: 1, medium: 2, hard: 4 }[mode];
+        }
+
         soundManager.playSuccess();
-        app.showToast(`🔥 Rekord! In nur ${elapsedSeconds}s geschafft!`);
+        app.showToast(`🔥 In ${elapsedSeconds}s geschafft!`);
         setTimeout(() => {
           app.closeMinigame();
-          app.openDistributeModal(player, maxSips, `Zahlen-Jagd Rekordzeit (${elapsedSeconds}s)`, () => {}); // Höchstgewinn
+          app.openDistributeModal(
+            player,
+            winSips,
+            `Zahlen-Jagd in ${elapsedSeconds}s (${winSips} Schluck${winSips > 1 ? 'e' : ''} verteilen)`,
+            () => {}
+          );
         }, 800);
       } else {
-        const extraTime = elapsedSeconds - 8.0;
-        const penaltySips = app.calculateMinigameSips(Math.ceil(extraTime / 2));
+        // Schlucke zum Selbertrinken berechnen
+        let penaltySips = 1;
+        if (elapsedSeconds <= 10.5) {
+          penaltySips = { easy: 1, medium: 2, hard: 4 }[mode];
+        } else if (elapsedSeconds <= 11.0) {
+          penaltySips = { easy: 2, medium: 3, hard: 5 }[mode];
+        } else if (elapsedSeconds <= 11.5) {
+          penaltySips = { easy: 2, medium: 4, hard: 6 }[mode];
+        } else if (elapsedSeconds <= 12.0) {
+          penaltySips = { easy: 3, medium: 5, hard: 7 }[mode];
+        } else { // 12.0s - 20.0s
+          penaltySips = { easy: 3, medium: 5, hard: 8 }[mode];
+        }
 
         setTimeout(() => {
           this.showPenaltyCard(
-            player, 
-            penaltySips, 
-            `Zu langsam! (${elapsedSeconds}s gebraucht – Limit war 8.0s)`
+            player,
+            penaltySips,
+            `Zu langsam! (${elapsedSeconds}s gebraucht – Limit war 10.0s). Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`
           );
         }, 800);
       }
@@ -2850,6 +3072,8 @@ clickNumber(num, player) {
     }
   }
 }
+
+//------------------------------------#9-Formen Zähler------------------------------------
 
 initShapeCounter(player) {
   document.getElementById('mg-icon').innerText = '🔺';
@@ -2893,7 +3117,12 @@ initShapeCounter(player) {
 
   const container = document.getElementById('mg-content');
   container.innerHTML = `
-    <div class="flex flex-col items-center justify-center space-y-4 w-full">
+    <div class="flex flex-col items-center justify-center space-y-3 w-full">
+      <!-- Visueller Timer-Balken (8 Sekunden) -->
+      <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden border border-slate-700 shadow-inner">
+        <div id="shape-timer-bar" class="bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 h-full w-full"></div>
+      </div>
+
       <div class="text-xs font-bold text-amber-400 animate-pulse">⏰ 8 Sekunden Zeit... Genau mitzählen!</div>
 
       <div id="shape-box" class="relative w-full h-56 glass-panel rounded-2xl border border-slate-700 overflow-hidden shadow-inner bg-slate-950/60">
@@ -2906,7 +3135,7 @@ initShapeCounter(player) {
     </div>
   `;
 
-  // Start der Physik-Engine nach Rendern des DOM
+  // Start der Physik-Engine & Timer nach Rendern des DOM
   setTimeout(() => {
     const box = document.getElementById('shape-box');
     if (!box) return;
@@ -2915,12 +3144,14 @@ initShapeCounter(player) {
     const maxX = box.clientWidth - shapeSize;
     const maxY = box.clientHeight - shapeSize;
 
+    const startTime = performance.now();
+    const duration = 8000;
+
     // Physikalische Daten für jedes Objekt erzeugen
     const physicsNodes = totalShapes.map((_, idx) => {
       const el = document.getElementById(`shape-item-${idx}`);
-      // Geschwindigkeiten in Pixel pro Frame (dynamisch positiv oder negativ)
-		const vx = (Math.random() * 0.2 + 0.1) * (Math.random() > 0.5 ? 1 : -1); // 0.6 bis 1.6 px/frame
-		const vy = (Math.random() * 0.2 + 0.1) * (Math.random() > 0.5 ? 1 : -1);
+      const vx = (Math.random() * 0.2 + 0.1) * (Math.random() > 0.5 ? 1 : -1);
+      const vy = (Math.random() * 0.2 + 0.1) * (Math.random() > 0.5 ? 1 : -1);
 
       return {
         el,
@@ -2932,6 +3163,14 @@ initShapeCounter(player) {
     });
 
     const updatePhysics = () => {
+      // Fortschrittsbalken in Echtzeit reduzieren
+      const elapsed = performance.now() - startTime;
+      const remainingPct = Math.max(0, 100 - (elapsed / duration) * 100);
+      const timerBar = document.getElementById('shape-timer-bar');
+      if (timerBar) {
+        timerBar.style.width = `${remainingPct}%`;
+      }
+
       physicsNodes.forEach(node => {
         if (!node.el) return;
 
@@ -2965,7 +3204,7 @@ initShapeCounter(player) {
     this.shapeAnimFrame = requestAnimationFrame(updatePhysics);
   }, 50);
 
-  // Nach 5 Sekunden: Animation stoppen & Frage einblenden
+  // Nach 8 Sekunden: Animation stoppen & Frage einblenden
   setTimeout(() => {
     if (this.shapeAnimFrame) {
       cancelAnimationFrame(this.shapeAnimFrame);
@@ -3001,31 +3240,90 @@ initShapeCounter(player) {
 
 answerShapeCounter(player, chosen, correct) {
   const maxSips = app.getMaxSipsForDifficulty();
+  const mode = app.difficulty || (maxSips <= 3 ? 'easy' : maxSips <= 4 ? 'medium' : 'hard');
+
+  // Hilfsfunktion zur zufälligen Berechnung der Schlucke je nach Modus
+  const getRandomSips = () => {
+    if (mode === 'easy') {
+      return Math.floor(Math.random() * (3 - 1 + 1)) + 1; // 1 bis 3
+    } else if (mode === 'medium') {
+      return Math.floor(Math.random() * (5 - 2 + 1)) + 2; // 2 bis 5
+    } else {
+      return Math.floor(Math.random() * (8 - 4 + 1)) + 4; // 4 bis 8
+    }
+  };
+
   if (chosen === correct) {
+    const winSips = getRandomSips();
     soundManager.playSuccess();
     app.showToast(`Richtig! Es waren genau ${correct}! 🎉`);
+    
     setTimeout(() => {
       app.closeMinigame();
-      app.openDistributeModal(player, maxSips, 'Formen-Zähler Meister', () => {}); // Höchstgewinn
+      app.openDistributeModal(
+        player, 
+        winSips, 
+        `Formen-Zähler Meister (${winSips} Schluck${winSips > 1 ? 'e' : ''} verteilen)`, 
+        () => {}
+      );
     }, 600);
   } else {
-    const penalty = app.calculateMinigameSips(2);
-    this.showPenaltyCard(player, penalty, `Falsch! Es waren ${correct} (du tipptest ${chosen}).`);
+    const penaltySips = getRandomSips();
+    
+    this.showPenaltyCard(
+      player, 
+      penaltySips, 
+      `Falsch! Es waren ${correct} (du tipptest ${chosen}). Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`
+    );
   }
 }
 
+//------------------------------------#10-Karten-Trick------------------------------------
 
 initCardSharkShuffle(player) {
   document.getElementById('mg-icon').innerText = '🃏';
-  document.getElementById('mg-title').innerText = 'Karten-Hai';
+  document.getElementById('mg-title').innerText = 'Karten-Trick';
   document.getElementById('mg-subtitle').innerText = 'Merk dir die Karte und verfolge sie!';
 
-  const maxSips = app.getMaxSipsForDifficulty();
+  // Hilfsfunktion zur zufälligen Berechnung der Schlucke je nach Modus
+  const getRandomSips = () => {
+    const maxSips = app.getMaxSipsForDifficulty();
+    const mode = app.difficulty || (maxSips <= 3 ? 'easy' : maxSips <= 4 ? 'medium' : 'hard');
+    
+    if (mode === 'easy') {
+      return Math.floor(Math.random() * (3 - 1 + 1)) + 1; // 1 bis 3
+    } else if (mode === 'medium') {
+      return Math.floor(Math.random() * (5 - 2 + 1)) + 2; // 2 bis 4
+    } else {
+      return Math.floor(Math.random() * (8 - 4 + 1)) + 4; // 4 bis 8
+    }
+  };
+
+  const winSips = getRandomSips();
+  const loseSips = getRandomSips();
 
   this.cards = [
-    { id: 0, type: 'win', label: `Verteile ${maxSips} Schlucke`, icon: '🏆' },
-    { id: 1, type: 'safe', label: 'Glück gehabt! Nichts.', icon: '🛡️' },
-    { id: 2, type: 'lose', label: `Trinke ${maxSips} Schlucke`, icon: '💀' }
+    { 
+      id: 0, 
+      type: 'win', 
+      sips: winSips, 
+      label: `Verteile ${winSips} Schluck${winSips > 1 ? 'e' : ''}`, 
+      icon: '🏆' 
+    },
+    { 
+      id: 1, 
+      type: 'safe', 
+      sips: 0, 
+      label: 'Glück gehabt! Nichts.', 
+      icon: '🛡️' 
+    },
+    { 
+      id: 2, 
+      type: 'lose', 
+      sips: loseSips, 
+      label: `Trinke ${loseSips} Schluck${loseSips > 1 ? 'e' : ''}`, 
+      icon: '💀' 
+    }
   ].sort(() => Math.random() - 0.5);
 
   // Initialen Slot festlegen (0, 1, 2)
@@ -3039,52 +3337,8 @@ initCardSharkShuffle(player) {
     <div class="flex flex-col items-center space-y-5">
       <p id="card-status-text" class="text-xs font-bold text-amber-300 animate-pulse">Merk dir die Verteilung!</p>
 
-      <!-- Vergrößerter Container (min-h-[190px]) -->
-      <div id="card-deck" class="flex justify-center items-center gap-2 sm:gap-3 w-full my-2 relative min-h-[190px]">
-        ${this.cards.map((c, i) => `
-          <!-- Vergrößerte Karte: w-28 h-42 -->
-          <div id="shuffle-card-${i}" class="w-28 h-42 rounded-2xl border-2 border-slate-600 glass-panel flex flex-col items-center justify-center p-2 text-center transition-all duration-300 shadow-xl">
-            <span class="text-3xl mb-1.5">${c.icon}</span>
-            <span class="text-xs font-bold text-slate-200 leading-tight">${c.label}</span>
-          </div>
-        `).join('')}
-      </div>
-
-      <button id="start-shuffle-btn" onclick="minigames.startCardShuffle('${player}')" class="w-full py-3 bg-gradient-to-r from-amber-500 to-purple-600 hover:from-amber-600 hover:to-purple-700 text-white font-heading font-black text-base rounded-xl shadow-lg active:scale-95 transition-all">
-        🔀 Karten verdecken & mischen!
-      </button>
-    </div>
-  `;
-}
-
-initCardSharkShuffle(player) {
-  document.getElementById('mg-icon').innerText = '🃏';
-  document.getElementById('mg-title').innerText = 'Karten-Hai';
-  document.getElementById('mg-subtitle').innerText = 'Merk dir die Karte und verfolge sie!';
-
-  const maxSips = app.getMaxSipsForDifficulty();
-
-  this.cards = [
-    { id: 0, type: 'win', label: `Verteile ${maxSips} Schlucke`, icon: '🏆' },
-    { id: 1, type: 'safe', label: 'Glück gehabt! Nichts.', icon: '🛡️' },
-    { id: 2, type: 'lose', label: `Trinke ${maxSips} Schlucke`, icon: '💀' }
-  ].sort(() => Math.random() - 0.5);
-
-  // Initialen Slot festlegen (0, 1, 2)
-  this.cards.forEach((c, i) => {
-    c.initialSlot = i;
-    c.slot = i;
-  });
-
-  const container = document.getElementById('mg-content');
-  container.innerHTML = `
-    <div class="flex flex-col items-center space-y-5">
-      <p id="card-status-text" class="text-xs font-bold text-amber-300 animate-pulse">Merk dir die Verteilung!</p>
-
-      <!-- Container mit ausreichend Platz für die Bogen-Animationen -->
       <div id="card-deck" class="flex justify-center items-center gap-2 sm:gap-3 w-full my-2 relative min-h-[200px]">
         ${this.cards.map((c, i) => `
-          <!-- Echte Pokerkarten-Proportionen: w-28 (112px) x h-[160px] -->
           <div id="shuffle-card-${i}" class="w-28 h-[160px] rounded-xl border-2 border-slate-600 glass-panel flex flex-col items-center justify-between p-3 text-center transition-all duration-300 shadow-xl select-none">
             <span class="text-3xl mt-4">${c.icon}</span>
             <span class="text-xs font-bold text-slate-200 leading-tight mb-1">${c.label}</span>
@@ -3092,12 +3346,8 @@ initCardSharkShuffle(player) {
         `).join('')}
       </div>
 
-      <!--<button id="start-shuffle-btn" onclick="minigames.startCardShuffle('${player}')" class="w-full py-3 bg-gradient-to-r from-amber-500 to-purple-600 hover:from-amber-600 hover:to-purple-700 text-white font-heading font-black text-base rounded-xl shadow-lg active:scale-95 transition-all">
+      <button id="start-shuffle-btn" onclick="minigames.startCardShuffle('${player}')" class="w-full py-4 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-heading font-black text-xl shadow-lg active:scale-95 transition-all">
         🔀 Karten verdecken & mischen!
-      </button>-->
-	  
-	  <button id="start-shuffle-btn" onclick="minigames.startCardShuffle('${player}')" class="w-full py-4 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-heading font-black text-xl shadow-lg active:scale-95 transition-all">
-              🔀 Karten verdecken & mischen!
       </button>
     </div>
   `;
@@ -3110,100 +3360,108 @@ startCardShuffle(player) {
   const statusText = document.getElementById('card-status-text');
   statusText.innerText = 'Karten werden verdeckt & gemischt...';
 
-  // 1. Karten umdrehen & Transition aktivieren
+  // 1. Karten umdrehen & GPU-Eigenschaften setzen
   this.cards.forEach((card) => {
     const cardEl = document.getElementById(`shuffle-card-${card.initialSlot}`);
     if (cardEl) {
       cardEl.classList.add('bg-slate-900');
       cardEl.innerHTML = '<span class="text-4xl my-auto">❓</span>';
-      cardEl.style.transition = 'transform 0.28s cubic-bezier(0.4, 0, 0.2, 1)';
+      cardEl.style.willChange = 'transform';
+      cardEl.style.transition = 'transform 0.28s ease-in-out';
     }
   });
 
-  // 2. Exakten Pixel-Abstand zwischen den Slot-Mitten berechnen
   const c0 = document.getElementById('shuffle-card-0');
   const c1 = document.getElementById('shuffle-card-1');
   const slotDistance = (c0 && c1) ? Math.abs(c1.offsetLeft - c0.offsetLeft) : 120;
 
   let swapsCount = 0;
-  const maxSwaps = 16; // Längeres Mischen
+  const maxSwaps = 14; // Angenehme Länge & gute Herausforderung
   let lastS1 = -1;
 
-  setTimeout(() => {
-    const interval = setInterval(() => {
-      swapsCount++;
-      soundManager.playClickTick();
+  const performSwap = () => {
+    swapsCount++;
+    soundManager.playClickTick();
 
-      // Zwei unterschiedliche Slots für den Tausch wählen
-      let s1 = Math.floor(Math.random() * 3);
-      while (s1 === lastS1) s1 = Math.floor(Math.random() * 3);
-      let s2 = Math.floor(Math.random() * 3);
-      while (s2 === s1) s2 = Math.floor(Math.random() * 3);
-      lastS1 = s1;
+    // Zwei unterschiedliche Slots wählen
+    let s1 = Math.floor(Math.random() * 3);
+    while (s1 === lastS1) s1 = Math.floor(Math.random() * 3);
+    let s2 = Math.floor(Math.random() * 3);
+    while (s2 === s1) s2 = Math.floor(Math.random() * 3);
+    lastS1 = s1;
 
-      const cardA = this.cards.find(c => c.slot === s1);
-      const cardB = this.cards.find(c => c.slot === s2);
+    const cardA = this.cards.find(c => c.slot === s1);
+    const cardB = this.cards.find(c => c.slot === s2);
 
-      // Logischen Slot tauschen
-      cardA.slot = s2;
-      cardB.slot = s1;
+    cardA.slot = s2;
+    cardB.slot = s1;
 
-      // Visuelle Transformation anwenden (mit Bogenbewegung nach oben/unten)
+    // PHASE 1: Bogenbewegung ausführen (Karte A nach oben, Karte B nach unten)
+    this.cards.forEach(card => {
+      const cardEl = document.getElementById(`shuffle-card-${card.initialSlot}`);
+      if (cardEl) {
+        const x = (card.slot - card.initialSlot) * slotDistance;
+        let y = 0;
+        if (card === cardA) {
+          y = -35; // Eleganter Bogen nach oben
+          cardEl.style.zIndex = '20';
+        } else if (card === cardB) {
+          y = 35; // Eleganter Bogen nach unten
+          cardEl.style.zIndex = '10';
+        } else {
+          cardEl.style.zIndex = '1';
+        }
+        cardEl.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      }
+    });
+
+    // PHASE 2: Nach halber Bewegung (140ms) Karten wieder auf der Baseline absenken
+    setTimeout(() => {
       this.cards.forEach(card => {
         const cardEl = document.getElementById(`shuffle-card-${card.initialSlot}`);
         if (cardEl) {
           const x = (card.slot - card.initialSlot) * slotDistance;
-          let y = 0;
-          if (card === cardA) y = -30; // Bogen nach oben
-          if (card === cardB) y = 30;  // Bogen nach unten
-          cardEl.style.transform = `translate(${x}px, ${y}px)`;
+          cardEl.style.transform = `translate3d(${x}px, 0px, 0)`;
         }
       });
+    }, 140);
 
-      // Nach der Hälfte der Bewegung Karten wieder auf einer Linie ausrichten
+    // Nächsten Tausch ansetzen oder beenden
+    if (swapsCount < maxSwaps) {
+      setTimeout(performSwap, 320);
+    } else {
       setTimeout(() => {
-        this.cards.forEach(card => {
-          const cardEl = document.getElementById(`shuffle-card-${card.initialSlot}`);
+        this.cards.sort((a, b) => a.slot - b.slot);
+
+        statusText.innerText = 'Wähle eine Karte!';
+        statusText.classList.remove('animate-pulse');
+
+        [0, 1, 2].forEach(slotIdx => {
+          const cardInSlot = this.cards[slotIdx];
+          const cardEl = document.getElementById(`shuffle-card-${cardInSlot.initialSlot}`);
           if (cardEl) {
-            const x = (card.slot - card.initialSlot) * slotDistance;
-            cardEl.style.transform = `translate(${x}px, 0px)`;
+            cardEl.style.zIndex = '1';
+            cardEl.classList.add('cursor-pointer', 'hover:border-amber-400', 'hover:scale-105');
+            cardEl.onclick = () => this.pickShuffleCard(player, slotIdx);
           }
         });
-      }, 180);
+      }, 300);
+    }
+  };
 
-      // Ende des Mischens
-      if (swapsCount >= maxSwaps) {
-        clearInterval(interval);
-
-        setTimeout(() => {
-          this.cards.sort((a, b) => a.slot - b.slot);
-
-          statusText.innerText = 'Wähle eine Karte!';
-          statusText.classList.remove('animate-pulse');
-
-          [0, 1, 2].forEach(slotIdx => {
-            const cardInSlot = this.cards[slotIdx];
-            const cardEl = document.getElementById(`shuffle-card-${cardInSlot.initialSlot}`);
-            if (cardEl) {
-              cardEl.classList.add('cursor-pointer', 'hover:border-amber-400', 'hover:scale-105');
-              cardEl.onclick = () => this.pickShuffleCard(player, slotIdx);
-            }
-          });
-        }, 170);
-      }
-    }, 350);
-  }, 500);
+  setTimeout(performSwap, 400);
 }
 
 pickShuffleCard(player, pickedSlotIndex) {
   this.cards.forEach(card => {
     const cardEl = document.getElementById(`shuffle-card-${card.initialSlot}`);
-    if (cardEl) cardEl.onclick = null;
+    if (cardEl) {
+      cardEl.onclick = null;
+      cardEl.style.willChange = 'auto';
+    }
   });
 
-  const maxSips = app.getMaxSipsForDifficulty();
-
-  // Alle Karten an ihren aktuellen Positionen aufdecken
+  // Alle Karten aufdecken
   this.cards.forEach((card, slotIdx) => {
     const cardEl = document.getElementById(`shuffle-card-${card.initialSlot}`);
     if (cardEl) {
@@ -3223,9 +3481,18 @@ pickShuffleCard(player, pickedSlotIndex) {
     if (pickedCard.type === 'win') {
       soundManager.playSuccess();
       app.closeMinigame();
-      app.openDistributeModal(player, maxSips, 'Hauptgewinn beim Karten-Hai', () => {});
+      app.openDistributeModal(
+        player, 
+        pickedCard.sips, 
+        `Gewinn beim Karten-Hai (${pickedCard.sips} Schlucke verteilen)`, 
+        () => {}
+      );
     } else if (pickedCard.type === 'lose') {
-      this.showPenaltyCard(player, maxSips, 'Niete gezogen! Der Hai hat zugebissen.');
+      this.showPenaltyCard(
+        player, 
+        pickedCard.sips, 
+        `Niete gezogen! Der Hai hat zugebissen (${pickedCard.sips} Schlucke trinken).`
+      );
     } else {
       soundManager.playClickTick();
       app.showToast(`🛡️ Glück gehabt! Keine Strafe für ${player}.`);
@@ -3234,8 +3501,8 @@ pickShuffleCard(player, pickedSlotIndex) {
   }, 1200);
 }
 
+//------------------------------------#11-Five Cards------------------------------------
 
-/* === 8. HÖCHSTE KARTE (NUR Platz 1 verteilt, Platz 2-5 trinken steigend) === */
 initFiveCards(player) {
   document.getElementById('mg-icon').innerText = '🎴';
   document.getElementById('mg-title').innerText = 'Höchste Karte';
@@ -3397,28 +3664,43 @@ pickFiveCard(player, chosenIdx) {
         });
 
         const maxSips = app.getMaxSipsForDifficulty();
+        // Modus ermitteln
+        const mode = app.difficulty || (maxSips <= 3 ? 'easy' : maxSips <= 4 ? 'medium' : 'hard');
 
         setTimeout(() => {
           if (rank === 1) {
-            // Platz 1: Höchste Karte -> EINZIGER GEWINNER (verteilt maxSips)
+            // Platz 1: Zufall im erlaubten Bereich des Modus
+            let winSips = 1;
+            if (mode === 'easy') {
+              winSips = Math.floor(Math.random() * (3 - 1 + 1)) + 1; // 1 bis 3
+            } else if (mode === 'medium') {
+              winSips = Math.floor(Math.random() * (5 - 2 + 1)) + 2; // 2 bis 4
+            } else {
+              winSips = Math.floor(Math.random() * (8 - 4 + 1)) + 4; // 4 bis 8
+            }
+
             soundManager.playSuccess();
             app.closeMinigame();
-            app.openDistributeModal(player, maxSips, `🥇 Platz 1! Höchste Karte (${generatedCards[chosenIdx].label}) gezogen!`, () => {});
-          } else if (rank === 2) {
-            // Platz 2: Knappe Niederlage -> Trinkt wenige Schlucke
-            const drinkSips = app.calculateMinigameSips(1);
-            this.showPenaltyCard(player, drinkSips, `Platz 2 (${generatedCards[chosenIdx].label})! Knappe Niederlage, du musst trinken.`);
-          } else if (rank === 3) {
-            // Platz 3: Mittelfeld -> Trinkt etwas mehr Schlucke
-            const drinkSips = app.calculateMinigameSips(2);
-            this.showPenaltyCard(player, drinkSips, `Platz 3 (${generatedCards[chosenIdx].label})! Mittelfeld, du musst trinken.`);
-          } else if (rank === 4) {
-            // Platz 4: Vorletzter -> Trinkt noch mehr Schlucke
-            const drinkSips = app.calculateMinigameSips(3);
-            this.showPenaltyCard(player, drinkSips, `Platz 4 (${generatedCards[chosenIdx].label})! Schwache Karte, du musst trinken.`);
+            app.openDistributeModal(player, winSips, `🥇 Platz 1! Höchste Karte (${generatedCards[chosenIdx].label}) gezogen! Verteile ${winSips} Schlucke.`, () => {});
           } else {
-            // Platz 5: Niedrigste Karte -> Trinkt Höchststrafe (maxSips)
-            this.showPenaltyCard(player, maxSips, `Platz 5! Niedrigste Karte (${generatedCards[chosenIdx].label}) – Volle Strafe!`);
+            // Platz 2-5: Strafen nach Tabelle
+            const penalties = {
+              easy:   { 2: 1, 3: 2, 4: 2, 5: 3 },
+              medium: { 2: 2, 3: 3, 4: 4, 5: 5 },
+              hard:   { 2: 4, 3: 5, 4: 7, 5: 8 }
+            };
+
+            const activePenalties = penalties[mode] || penalties['medium'];
+            const drinkSips = activePenalties[rank];
+
+            const rankMessages = {
+              2: `Platz 2 (${generatedCards[chosenIdx].label})! Knappe Niederlage, du musst trinken.`,
+              3: `Platz 3 (${generatedCards[chosenIdx].label})! Mittelfeld, du musst trinken.`,
+              4: `Platz 4 (${generatedCards[chosenIdx].label})! Schwache Karte, du musst trinken.`,
+              5: `Platz 5 (${generatedCards[chosenIdx].label})! Niedrigste Karte – Volle Strafe!`
+            };
+
+            this.showPenaltyCard(player, drinkSips, rankMessages[rank]);
           }
         }, 1200);
 
