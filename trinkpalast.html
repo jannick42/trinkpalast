@@ -9,6 +9,20 @@
   <!-- Tailwind CSS CDN -->
   <script src="css/tailwind.css"></script>
   
+  <!-- Drag & Drop Touch Polyfill -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0/default.css">
+<script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0/index.min.js"></script>
+
+<script>
+  // Aktiviert Drag & Drop für Touch-Geräte
+  MobileDragDrop.polyfill({
+    holdToDrag: 150 // 150ms gedrückt halten, um das Scrollen nicht zu blockieren
+  });
+
+  // Wichtig für iOS Safari: Verhindert, dass die Seite beim Ziehen mitscrollt
+  window.addEventListener('touchmove', function() {}, { passive: false });
+</script>
+  
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
