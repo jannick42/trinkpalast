@@ -1093,7 +1093,7 @@ classic: {
 constructor() {
     // 1. Daten aus dem LocalStorage laden (mit Standard-Fallbacks falls leer)
     const savedPlayers = localStorage.getItem('tp_players');
-    this.players = savedPlayers ? JSON.parse(savedPlayers) : ['']; //['Jannick', 'Florian', 'Nico', 'Elly'];
+    this.players = savedPlayers ? JSON.parse(savedPlayers) : []; //['Jannick', 'Florian', 'Nico', 'Elly'];
 
     const savedDecks = localStorage.getItem('tp_decks');
     this.selectedDecks = savedDecks ? JSON.parse(savedDecks) : ['minigames', 'classic', 'truth_dare', 'vote', 'never_have_i_ever', 'duel'];
