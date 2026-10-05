@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>🍻 TrinkPalast 3000 | by Jannick</title>
+  <link rel="icon" type="icon.ico" href="icon.ico">
+  <title>TrinkPalast v1.0 | by Jannick</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="css/tailwind.css"></script>
@@ -179,7 +180,7 @@
         </div>
         <div>
           <h1 class="font-heading font-black text-xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-300 to-cyan-400">
-            TRINKPALAST <span class="inline-block -translate-y-[4px] text-xs px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30 font-mono">by Jannick</span>
+            TRINKPALAST v1.0 <span class="inline-block -translate-y-[4px] text-xs px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30 font-mono">by Jannick</span>
 			<span id="mg-player-name" style="display: none;"></span>
           </h1>
           <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Don't drink & drive - Just sauf & lauf :)</p>
@@ -713,11 +714,22 @@ function playTickSound() {
   }
 }
 
+// Globaler Event-Listener für den ersten Klick/Touch auf der Seite
+['click', 'touchstart'].forEach(eventType => {
+  document.addEventListener(eventType, unlockAudioContext, { once: true });
+});
+
 function playTimeoutSound() {
   try {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) return;
-    const audioCtx = new AudioContext();
+    const audioCtx = getAudioContext();
+    if (!audioCtx) return;
+
+    // Falls iOS den Status noch auf 'suspended' hat, erneut aufwecken
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+
+    const now = audioCtx.currentTime;
 
     // 3 kurze, präzise Pieptöne hintereinander (beep-beep-beep)
     [0, 0.1, 0.2].forEach(delay => {
@@ -725,19 +737,22 @@ function playTimeoutSound() {
       const gain = audioCtx.createGain();
 
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(1800, audioCtx.currentTime + delay);
+      osc.frequency.setValueAtTime(1800, now + delay);
 
-      gain.gain.setValueAtTime(0, audioCtx.currentTime + delay);
-      gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + delay + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + 0.07);
+      // Startwert leicht über 0 setzen, um WebAudio-Clipped-Glitches auf iOS zu verhindern
+      gain.gain.setValueAtTime(0.0001, now + delay);
+      gain.gain.linearRampToValueAtTime(0.2, now + delay + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + delay + 0.07);
 
       osc.connect(gain);
       gain.connect(audioCtx.destination);
 
-      osc.start(audioCtx.currentTime + delay);
-      osc.stop(audioCtx.currentTime + delay + 0.07);
+      osc.start(now + delay);
+      osc.stop(now + delay + 0.07);
     });
-  } catch (e) {}
+  } catch (e) {
+    console.error('Audio-Fehler:', e);
+  }
 }
 
     const soundManager = new SoundEngine();
@@ -871,7 +886,6 @@ classic: {
       { text: 'Alle, die ein schwarzes Oberteil tragen, trinken {sips} Schluck!', baseSips: 1, isGroup: true },
       { text: '{player}, reime 30 Sekunden lang auf jedes Wort von {player2}. Versagst du, trinke {sips} Schlücke!', baseSips: 2 },
       { text: 'Wer die kürzesten Haare in der Runde hat, darf {sips} Schlücke verteilen!', baseSips: 1, isGroup: true },
-      { text: '{player}, buchstabiere deinen Vornamen rückwärts. Bei Fehler: {sips} Schlücke!', baseSips: 1 },
       { text: '{player}, balanciere deinen Drink 10 Sekunden lang auf deinem Kopf. Fällt er oder verweigerst du: {sips} Schlücke!', baseSips: 2 },
       { text: 'Alle, die heute noch keinen Alkohol getrunken haben außer diesem Spiel, trinken {sips} Schlucke!', baseSips: 1, isGroup: true },
       { text: '{player}, ertappe den Blick von {player2} und halte ihn 15 Sekunden ohne zu lachen. Wer lacht, trinkt {sips} Schlücke!', baseSips: 1, isGroup: true },
@@ -882,6 +896,7 @@ classic: {
       { text: 'Wer als Letztes den Tisch berührt, trinkt sofort {sips} Schlücke!', baseSips: 1, isGroup: true },
       { text: '{player}, versuche 10 Sekunden auf einem Bein zu stehen und dir dabei auf den Kopf zu tippen. Wenn du umkippst: {sips} Schlücke!', baseSips: 1 },
       { text: 'Alle, die kleiner als 1,70m sind, trinken {sips} Schlucke!', baseSips: 1, isGroup: true },
+	  { text: 'KÖNIGS-KARTE: Alle Spieler stoßen jetzt gemeinsam an und trinken {sips} Schlücke! CHEERS! 🍻', baseSips: 2, isGroup: true, isAll: true },
       { text: '{player}, tausche für die nächsten 2 Runden einen Schuh mit {player2} oder trinke {sips} Schlücke!', baseSips: 2 }
     ]
   },
@@ -900,7 +915,8 @@ classic: {
 		  { text: '🔷 MINISPIEL: FORMEN-ZÄHLER! Augen auf, {player}! Zähle alle sich bewegenden Formen – du hast genau 8 Sekunden!', baseSips: 2, minigameId: 'form' },
 		  { text: '🪄 MINISPIEL: KARTEN-TRICK! Merke dir deine Wunschkarte, {player} – verfolge sie beim Mischen und wähle die Richtige!', baseSips: 2, minigameId: 'card_ask' },
 		  { text: '⏱️ MINISPIEL: ZAHLEN-JAGD! {player}, finde und klicke alle 15 Zahlen der Reihe nach in unter 8 Sekunden!', baseSips: 2, minigameId: 'number_hunt' },
-		  { text: '🎴 MINISPIEL: HÖCHSTE KARTE! {player}, wähle dein Schicksal! Nur Platz 1 verteilt Schlucke – der Rest trinkt!', baseSips: 2, minigameId: 'five_card' }
+		  { text: '🎴 MINISPIEL: HÖCHSTE KARTE! {player}, wähle dein Schicksal! Nur Platz 1 verteilt Schlucke – der Rest trinkt!', baseSips: 2, minigameId: 'five_card' },
+		  { text: '🎰 MINISPIEL: EINARMIGER BANDIT! {player}, lass die Walzen rollen und beweise dein Glück!', baseSips: 2, minigameId: 'slot_machine' }
         ]
       },
       truth_dare: {
@@ -911,7 +927,7 @@ classic: {
       { text: 'WAHRHEIT: {player}, was ist der peinlichste Song in deiner Playlist? Sag die Wahrheit oder trinke {sips} Schlücke!', baseSips: 2 },
       { text: 'PFLICHT: {player}, tanze 15 Sekunden ohne Musik. Wenn du verweigerst, trinke {sips} Schlücke!', baseSips: 2 },
       { text: 'WAHRHEIT: {player}, was ist die dümmste Ausrede, die du je benutzt hast? Sag es oder trinke {sips} Schlücke.', baseSips: 1 },
-      { text: 'PFLICHT: {player}, lass {player2} ein Emoji an deinen ersten WhatsApp-Kontakt schicken oder trinke {sips} Schlücke!', baseSips: 2 },
+      //{ text: 'PFLICHT: {player}, lass {player2} ein Emoji an deinen ersten WhatsApp-Kontakt schicken oder trinke {sips} Schlücke!', baseSips: 2 },
       { text: 'WAHRHEIT: {player}, was war deine peinlichste Jugendsünde? Erzähle es oder trinke {sips} Schlücke!', baseSips: 2 },
       { text: 'PFLICHT: {player}, mache {player2} einen romantischen Heiratsantrag auf den Knien oder trinke {sips} Schlücke!', baseSips: 2 },
       { text: 'WAHRHEIT: {player}, welche Person in diesem Raum würdest du auf eine einsame Insel mitnehmen und warum? Antworte ehrlich oder trinke {sips} Schlücke!', baseSips: 2 },
@@ -921,7 +937,7 @@ classic: {
       { text: 'WAHRHEIT: {player}, hast du schon einmal über das Essen von jemandem in dieser Runde gelogen? Erzähle die Wahrheit oder trinke {sips} Schlücke!', baseSips: 1 },
       { text: 'PFLICHT: {player}, sprich die nächsten 2 Runden nur noch mit verstellter, extrem hoher Stimme oder trinke {sips} Schlücke!', baseSips: 2 },
       { text: 'WAHRHEIT: {player}, was war der schlimmste Fehlkauf deines Lebens? Antworte ehrlich oder trinke {sips} Schlücke!', baseSips: 1 },
-      { text: 'PFLICHT: {player}, trinke einen Schluck aus dem Glas von {player2} – ohne deine Hände zu benutzen! Wenn du es schaffst, verteilt ihr {sips} Schlücke!', baseSips: 2 },
+      //{ text: 'PFLICHT: {player}, trinke einen Schluck aus dem Glas von {player2} – ohne deine Hände zu benutzen! Wenn du es schaffst, verteilt ihr {sips} Schlücke!', baseSips: 2 },
       { text: 'WAHRHEIT: {player}, was war der merkwürdigste Traum, an den du dich erinnern kannst? Sag die Wahrheit oder trinke {sips} Schlücke!', baseSips: 1 },
       { text: 'PFLICHT: {player}, ziehe deine Socken für den Rest des Spiels über deine Hände oder trinke {sips} Schlücke!', baseSips: 2 },
       { text: 'WAHRHEIT: {player}, hast du schon mal eine Nachricht gelesen und extra stundenlang ignoriert? Bei wem und warum? Ehrlich sein oder {sips} Schlücke!', baseSips: 2 },
@@ -992,22 +1008,22 @@ classic: {
       { text: 'DUELL: {player} gegen {player2}! Stein-Schere-Papier Best-of-3. Der Verlierer trinkt {sips} Schlücke!', baseSips: 2, isGroup: true },
       { text: 'DUELL: {player} und {player2} schauen sich tief in die Augen. Wer zuerst blinzelt oder lacht, trinkt {sips} Schlücke!', baseSips: 1, isGroup: true },
       { text: 'KATEGORIE: {player} nennt ein Thema (z.B. Biersorten). Reihum nennt jeder einen Begriff. Wer stockt: {sips} Schlücke!', baseSips: 2, isGroup: true },
-      { text: 'REGEL: Ab sofort darf niemand mehr fluchen! Wer flucht, trinkt jedes Mal {sips} Schluck. (3 Runden)', baseSips: 1, isGroup: true },
+      //{ text: 'REGEL: Ab sofort darf niemand mehr fluchen! Wer flucht, trinkt jedes Mal {sips} Schluck. (3 Runden)', baseSips: 1, isGroup: true },
       { text: 'DUELL: {player} und {player2} machen Daumenringen! Wer verliert, muss {sips} Schlücke trinken!', baseSips: 2, isGroup: true },
-      { text: 'REGEL: Wer ab jetzt sein Handy anfasst, muss sofort {sips} Schlücke trinken! (Gilt für 3 Runden)', baseSips: 2, isGroup: true },
+      //{ text: 'REGEL: Wer ab jetzt sein Handy anfasst, muss sofort {sips} Schlücke trinken! (Gilt für 3 Runden)', baseSips: 2, isGroup: true },
       { text: 'KATEGORIE: {player} startet mit einer Automarke. Im Uhrzeigersinn nennt jeder eine andere. Wer doppelt nennt oder stockt: {sips} Schlücke!', baseSips: 2, isGroup: true },
       { text: 'DUELL: {player} und {player2} müssen zeitgleich eine Zahl von 1 bis 5 rufen. Rufen sie dieselbe Zahl, trinken beide {sips} Schlücke!', baseSips: 1, isGroup: true },
-      { text: 'REGEL: Niemand darf ab sofort den Namen eines Mitspielers sagen. Wer es doch tut: {sips} Schluck!', baseSips: 1, isGroup: true },
+      //{ text: 'REGEL: Niemand darf ab sofort den Namen eines Mitspielers sagen. Wer es doch tut: {sips} Schluck!', baseSips: 1, isGroup: true },
       { text: 'DUELL: {player} nennt ein Wort, {player2} muss blitzschnell ein Reimwort nennen. Wer länger als 3 Sekunden braucht, trinkt {sips} Schlücke!', baseSips: 2, isGroup: true },
-      { text: 'REGEL: Alle Antworten müssen ab jetzt mit einer Gegenfrage beantwortet werden. Wer normal antwortet: {sips} Schluck! (2 Runden)', baseSips: 1, isGroup: true },
+      //{ text: 'REGEL: Alle Antworten müssen ab jetzt mit einer Gegenfrage beantwortet werden. Wer normal antwortet: {sips} Schluck! (2 Runden)', baseSips: 1, isGroup: true },
       { text: 'KATEGORIE: {player} gibt ein Thema vor (z.B. Automodelle, Cocktails). Reihum antworten. Wer versagt, nimmt {sips} Schlücke!', baseSips: 2, isGroup: true },
       { text: 'DUELL: {player} und {player2} machen Armdrücken auf dem Tisch (vorsichtig!). Der Verlierer trinkt {sips} Schlücke!', baseSips: 2, isGroup: true },
-      { text: 'REGEL: Trinken darf man ab sofort nur noch mit der nicht-dominanten Hand (Linkshänder rechts, Rechtshänder links). Fehler = {sips} Schluck!', baseSips: 1, isGroup: true },
+      //{ text: 'REGEL: Trinken darf man ab sofort nur noch mit der nicht-dominanten Hand (Linkshänder rechts, Rechtshänder links). Fehler = {sips} Schluck!', baseSips: 1, isGroup: true },
       { text: 'DUELL: {player} und {player2} würfeln virtuell oder schätzen eine Zahl. Wer näher an 50 liegt, verteilt {sips} Schlücke an den Verlierer!', baseSips: 2, isGroup: true },
       { text: 'KATEGORIE: Filme mit Leonardo DiCaprio! {player} beginnt. Wer keinen mehr weiß, muss {sips} Schlücke trinken!', baseSips: 2, isGroup: true },
-      { text: 'REGEL: Vor jedem Schluck muss der Spieler laut "Zum Wohl, die Herren und Damen!" sagen. Vergisst man es: noch {sips} Schluck extra!', baseSips: 1, isGroup: true },
+      //{ text: 'REGEL: Vor jedem Schluck muss der Spieler laut "Zum Wohl, die Herren und Damen!" sagen. Vergisst man es: noch {sips} Schluck extra!', baseSips: 1, isGroup: true },
       { text: 'DUELL: {player} summt einen bekannten Song. {player2} muss ihn erraten. Schafft er es nicht in 15 Sek, trinken beide {sips} Schlücke!', baseSips: 2, isBoth: true },
-      { text: 'REGEL: Die gesamte Runde darf 2 Runden lang nicht mehr lachen. Wer auch nur schmunzelt, trinkt {sips} Schluck!', baseSips: 1, isGroup: true },
+      //{ text: 'REGEL: Die gesamte Runde darf 2 Runden lang nicht mehr lachen. Wer auch nur schmunzelt, trinkt {sips} Schluck!', baseSips: 1, isGroup: true },
       { text: 'DUELL: {player} versucht {player2} innerhalb von 20 Sekunden zum Lachen zu bringen (ohne Anfassen!). Gelingt es: {player2} trinkt {sips} Schlücke, sonst {player}!', baseSips: 2, isGroup: true }
     ]
   },
@@ -1019,7 +1035,6 @@ classic: {
       { text: '{player}, flüstere {player2} ein süßes Kompliment ins Ohr, oder trinke {sips} Schlücke!', baseSips: 2 },
       { text: '{player}, verrate der Runde deinen merkwürdigsten Moment beim Daten oder trinke {sips} Schlücke.', baseSips: 2 },
       { text: 'Alle Singles in der Runde trinken {sips} Schluck auf die Freiheit! 🥂', baseSips: 1, isGroup: true },
-      { text: 'KÖNIGS-KARTE: Alle Spieler stoßen jetzt gemeinsam an und trinken {sips} Schlücke! CHEERS! 🍻', baseSips: 2, isGroup: true, isAll: true },
       { text: '{player}, gib {player2} einen sanften Kuss auf die Wange oder die Hand. Wenn du verweigerst: {sips} Schlücke!', baseSips: 2, isGroup: true },
       { text: '{player}, zeige der Runde dein sexiestes Lächeln oder deinen besten Flirt-Blick. Versagst du laut Abstimmung: {sips} Schlücke!', baseSips: 2 },
       { text: '{player}, flüstere {player2} etwas Schmutziges oder Anzügliches ins Ohr. Wenn {player2} rot wird, trinkt {player2} {sips} Schlücke, sonst {player}!', baseSips: 3, isGroup: true },
@@ -1062,11 +1077,12 @@ classic: {
       { text: '{player}, nenne 5 Dinge, die man im Supermarkt in der Tiefkühlung findet, in 6 Sekunden! Versagst du: {sips} Schlücke!', baseSips: 2 },
       { text: '{player}, nenne 4 Gelbtöne oder gelbe Gegenstände in 6 Sekunden! Zu langsam: {sips} Schlücke!', baseSips: 2 },
       { text: '{player}, nenne 3 deutsche Bundesländer, die mit "B" anfangen, in 5 Sekunden! Verfehlt: {sips} Schlücke!', baseSips: 2 },
-      { text: '{player}, zähle alle Finger und Zehen von {player2} zusammen und ziehe 7 ab. Sag das Ergebnis in 4 Sekunden! Falsch: {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: '{player}, zähle alle Finger und Zehen von {player2} zusammen und ziehe 7 ab. Sag das Ergebnis in 4 Sekunden! Falsch: {sips} Schlücke!', baseSips: 2 },
       { text: '{player}, sage 5 Wörter, die sich auf "Trinken" reimen, in 10 Sekunden. Schaffst du es nicht: {sips} Schlücke!', baseSips: 2 },
       { text: '{player}, wie viel ist 100 minus 37? Du hast 5 Sekunden! Falsch: {sips} Schlücke!', baseSips: 2 },
       { text: '{player}, nenne 3 englische Wörter, die mit "Z" beginnen, in 8 Sekunden. Sonst trinkst du {sips} Schlücke!', baseSips: 2 },
       { text: '{player}, buchstabiere das Wort "SCHNAPS" flüssig von hinten nach vorne in 7 Sekunden. Fehler: {sips} Schlücke!', baseSips: 2 },
+	  { text: '{player}, buchstabiere deinen Vornamen rückwärts. Bei Fehler: {sips} Schlücke!', baseSips: 1 },
       { text: '{player}, nenne 5 Musikinstrumente in 6 Sekunden. Verpasst du die Zeit: {sips} Schlücke!', baseSips: 2 }
     ]
   }
@@ -1075,7 +1091,7 @@ classic: {
     class DrinkingApp {
       constructor() {
         this.players = ['Jannick', 'Florian', 'Nico', 'Elly'];
-        this.selectedDecks = ['minigames', 'classic', 'truth_dare', 'vote'];
+        this.selectedDecks = ['minigames', 'classic', 'truth_dare', 'vote', 'never_have_i_ever', 'duel'];
         this.difficulty = 'medium'; 
         
         this.deckQueue = [];
@@ -1146,10 +1162,10 @@ classic: {
       }
 
       removePlayer(idx) {
-        if (this.players.length <= 2) {
-          this.showToast('Mindestens 2 Spieler erforderlich!');
-          return;
-        }
+        //if (this.players.length <= 2) {
+        //  this.showToast('Mindestens 2 Spieler erforderlich!');
+        //  return;
+        //}
         this.players.splice(idx, 1);
         soundManager.playClick();
         this.renderPlayerChips();
@@ -1215,10 +1231,10 @@ classic: {
       toggleDeck(id) {
         soundManager.playClick();
         if (this.selectedDecks.includes(id)) {
-          if (this.selectedDecks.length <= 1) {
-            this.showToast('Mindestens 1 Deck muss gewählt sein!');
-            return;
-          }
+          //if (this.selectedDecks.length <= 1) {
+          //  this.showToast('Mindestens 1 Deck muss gewählt sein!');
+          //  return;
+          //}
           this.selectedDecks = this.selectedDecks.filter(d => d !== id);
         } else {
           this.selectedDecks.push(id);
@@ -1229,7 +1245,8 @@ classic: {
       toggleAllDecks() {
         soundManager.playClick();
         if (this.selectedDecks.length === Object.keys(DECKS_DATABASE).length) {
-          this.selectedDecks = ['minigames', 'classic'];
+          //this.selectedDecks = ['minigames', 'classic'];
+		  this.selectedDecks = [''];
         } else {
           this.selectedDecks = Object.keys(DECKS_DATABASE);
         }
@@ -1803,7 +1820,8 @@ confirmBothDrink() {
 		  form: 'initShapeCounter',
 		  card_ask: 'initCardSharkShuffle',
 		  number_hunt: 'initNumberHunt',
-		  five_card: 'initFiveCards'
+		  five_card: 'initFiveCards',
+		  slot_machine: 'initSlotMachine'
         };
 
         const starterName = starters[String(mgId).trim()];
@@ -2614,59 +2632,62 @@ guessCardShark(player, choice) {
 //------------------------------------#6-Kiste des Grauens------------------------------------
 
       initMinesweeper(player) {
-        document.getElementById('mg-icon').innerText = '📦';
-        document.getElementById('mg-title').innerText = 'Kiste des Grauens';
-        
-        const mode = app.difficulty;
-        let subtitle = '';
-        let items = [];
+  document.getElementById('mg-icon').innerText = '📦';
+  document.getElementById('mg-title').innerText = 'Kiste des Grauens';
+  
+  const mode = app.difficulty;
+  let subtitle = '';
+  let items = [];
 
-        if (mode === 'easy') {
-          // Warm-Up: Max. 3 Schluckfelder, 1 Niete, 5 "Nichts geschieht"
-          subtitle = 'Warm-Up: 3 Schluckfelder, 1 Niete ☠️, 5x Nichts!';
-          items = ['🍺', '🍺', '🍺', '☠️', '🍃', '🍃', '🍃', '🍃', '🍃'];
-        } else if (mode === 'medium') {
-          // Party-Modus: 5 Schluckfelder, 1 Niete, 3 "Nichts geschieht"
-          subtitle = 'Party-Modus: 5 Schluckfelder, 1 Niete ☠️, 3x Nichts!';
-          items = ['🍺', '🍺', '🍺', '🍺', '🍺', '☠️', '🍃', '🍃', '🍃'];
-        } else {
-          // Abriss: 8 Schluckfelder (+1 Schluck) & 1 Niete
-          subtitle = 'Abriss!: 8 Schluckfelder (+1 Schluck) & 1 Niete ☠️!';
-          items = ['🍺', '🍺', '🍺', '🍺', '🍺', '🍺', '🍺', '🍺', '☠️'];
-        }
+  if (mode === 'easy') {
+    // Warm-Up: Max. 3 Schluckfelder, 1 Niete, 5 "Nichts geschieht"
+    subtitle = 'Warm-Up: 3 Schluckfelder, 1 Niete ☠️, 5x Nichts!';
+    items = ['🍺', '🍺', '🍺', '☠️', '🍃', '🍃', '🍃', '🍃', '🍃'];
+  } else if (mode === 'medium') {
+    // Party-Modus: 5 Schluckfelder, 1 Niete, 3 "Nichts geschieht"
+    subtitle = 'Party-Modus: 5 Schluckfelder, 1 Niete ☠️, 3x Nichts!';
+    items = ['🍺', '🍺', '🍺', '🍺', '🍺', '☠️', '🍃', '🍃', '🍃'];
+  } else {
+    // Abriss: 8 Schluckfelder (+1 Schluck) & 1 Niete
+    subtitle = 'Abriss!: 8 Schluckfelder (+1 Schluck) & 1 Niete ☠️!';
+    items = ['🍺', '🍺', '🍺', '🍺', '🍺', '🍺', '🍺', '🍺', '☠️'];
+  }
 
-        document.getElementById('mg-subtitle').innerText = subtitle;
+  document.getElementById('mg-subtitle').innerText = subtitle;
 
-        // Shuffle
-        for (let i = items.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [items[i], items[j]] = [items[j], items[i]];
-        }
+  // Shuffle
+  for (let i = items.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [items[i], items[j]] = [items[j], items[i]];
+  }
 
-        this.boxItems = items;
-        this.boxSipsAccumulated = 0;
-        this.boxOpenedCount = 0;
+  this.boxItems = items;
+  this.boxSipsAccumulated = 0;
+  this.boxOpenedCount = 0;
+  this.boxBeerOpenedCount = 0;
+  this.totalBeerCount = items.filter(item => item === '🍺').length;
+  this.totalSafeCount = items.filter(item => item !== '☠️').length;
 
-        const container = document.getElementById('mg-content');
-        let gridHTML = '<div class="grid grid-cols-3 gap-2.5 w-full max-w-xs mx-auto mb-4">';
-        for (let i = 0; i < 9; i++) {
-          gridHTML += `
-            <button onclick="minigames.openBox('${player}', ${i})" id="box-${i}" class="h-20 glass-panel rounded-xl border border-slate-700 hover:border-pink-500 text-2xl font-black flex items-center justify-center transition-all active:scale-90">
-              🎁
-            </button>
-          `;
-        }
-        gridHTML += '</div>';
+  const container = document.getElementById('mg-content');
+  let gridHTML = '<div class="grid grid-cols-3 gap-2.5 w-full max-w-xs mx-auto mb-4">';
+  for (let i = 0; i < 9; i++) {
+    gridHTML += `
+      <button onclick="minigames.openBox('${player}', ${i})" id="box-${i}" class="h-20 glass-panel rounded-xl border border-slate-700 hover:border-pink-500 text-2xl font-black flex items-center justify-center transition-all active:scale-90">
+        🎁
+      </button>
+    `;
+  }
+  gridHTML += '</div>';
 
-        container.innerHTML = `
-          <div class="w-full flex flex-col items-center">
-            ${gridHTML}
-            <button id="box-cashout-btn" onclick="minigames.cashoutBoxes('${player}')" class="hidden w-full py-2.5 bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold rounded-xl active:scale-95 transition-all text-xs">
-              💰 Schlucke verteilen & Aufhören
-            </button>
-          </div>
-        `;
-      }
+  container.innerHTML = `
+    <div class="w-full flex flex-col items-center">
+      ${gridHTML}
+      <button id="box-cashout-btn" onclick="minigames.cashoutBoxes('${player}')" class="hidden w-full py-2.5 bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold rounded-xl active:scale-95 transition-all text-xs">
+        💰 Schlucke verteilen & Aufhören
+      </button>
+    </div>
+  `;
+}
 
 openBox(player, idx) {
   const btn = document.getElementById(`box-${idx}`);
@@ -2698,7 +2719,11 @@ openBox(player, idx) {
       penaltySips, 
       `NIETE GEZOGEN ☠️! Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`
     );
-  } else if (item === '🍺') {
+    return;
+  } 
+
+  if (item === '🍺') {
+    this.boxBeerOpenedCount++;
     if (this.boxSipsAccumulated < maxLimit) {
       this.boxSipsAccumulated++;
       btn.innerText = '🍺';
@@ -2712,34 +2737,48 @@ openBox(player, idx) {
       soundManager.playClickTick();
       app.showToast(`Limit von ${maxLimit} Schlücken bereits erreicht!`);
     }
-
-    const cashoutBtn = document.getElementById('box-cashout-btn');
-    cashoutBtn.classList.remove('hidden');
-    cashoutBtn.innerText = `💰 ${this.boxSipsAccumulated} Schluck(e) verteilen & aufhören`;
-
-    if (this.boxSipsAccumulated >= maxLimit) {
-      app.showToast(`Maximum von ${maxLimit} Schlücken erreicht!`);
-    }
   } else {
     // "Nichts geschieht"
     btn.innerText = '🍃';
     btn.classList.add('bg-slate-800/60', 'border-slate-600');
     soundManager.playClickTick();
     app.showToast('Nichts geschieht! 🍃');
+  }
 
-    const cashoutBtn = document.getElementById('box-cashout-btn');
-    if (this.boxSipsAccumulated > 0) {
-      cashoutBtn.classList.remove('hidden');
-      cashoutBtn.innerText = `💰 ${this.boxSipsAccumulated} Schluck(e) verteilen & aufhören`;
+  const cashoutBtn = document.getElementById('box-cashout-btn');
+  if (this.boxSipsAccumulated > 0 && cashoutBtn) {
+    cashoutBtn.classList.remove('hidden');
+    cashoutBtn.innerText = `💰 ${this.boxSipsAccumulated} Schluck(e) verteilen & aufhören`;
+  }
+
+  // Automatische Beendigung prüfen
+  const allSafeOpened = (this.boxOpenedCount >= this.totalSafeCount);
+  const allBeersOpened = (this.boxBeerOpenedCount >= this.totalBeerCount);
+
+  if (allSafeOpened || allBeersOpened) {
+    // Alle verbleibenden Felder deaktivieren, um Mehrfachklicks zu verhindern
+    for (let i = 0; i < 9; i++) {
+      const b = document.getElementById(`box-${i}`);
+      if (b) b.disabled = true;
     }
+
+    const toastMsg = allSafeOpened 
+      ? '🛡️ Nur noch die Niete übrig! Automatische Auszahlung...' 
+      : '🎉 Alle Schluckfelder aufgedeckt! Automatische Auszahlung...';
+
+    app.showToast(toastMsg);
+
+    setTimeout(() => {
+      this.cashoutBoxes(player);
+    }, 800);
   }
 }
 
-      cashoutBoxes(player) {
-        const sips = Math.max(1, this.boxSipsAccumulated);
-        app.closeMinigame();
-        app.openDistributeModal(player, sips, 'Kiste des Grauens', () => {});
-      }
+cashoutBoxes(player) {
+  const sips = Math.max(1, this.boxSipsAccumulated);
+  app.closeMinigame();
+  app.openDistributeModal(player, sips, 'Kiste des Grauens', () => {});
+}
 
 getRoulettePot(survivedShots, maxSips) {
   if (survivedShots <= 0) return 0;
@@ -3281,224 +3320,401 @@ answerShapeCounter(player, chosen, correct) {
 //------------------------------------#10-Karten-Trick------------------------------------
 
 initCardSharkShuffle(player) {
+
   document.getElementById('mg-icon').innerText = '🃏';
+
   document.getElementById('mg-title').innerText = 'Karten-Trick';
+
   document.getElementById('mg-subtitle').innerText = 'Merk dir die Karte und verfolge sie!';
 
+
   // Hilfsfunktion zur zufälligen Berechnung der Schlucke je nach Modus
+
   const getRandomSips = () => {
+
     const maxSips = app.getMaxSipsForDifficulty();
+
     const mode = app.difficulty || (maxSips <= 3 ? 'easy' : maxSips <= 4 ? 'medium' : 'hard');
+
     
+
     if (mode === 'easy') {
+
       return Math.floor(Math.random() * (3 - 1 + 1)) + 1; // 1 bis 3
+
     } else if (mode === 'medium') {
+
       return Math.floor(Math.random() * (5 - 2 + 1)) + 2; // 2 bis 4
+
     } else {
+
       return Math.floor(Math.random() * (8 - 4 + 1)) + 4; // 4 bis 8
+
     }
+
   };
+
 
   const winSips = getRandomSips();
+
   const loseSips = getRandomSips();
 
+
   this.cards = [
+
     { 
+
       id: 0, 
+
       type: 'win', 
+
       sips: winSips, 
+
       label: `Verteile ${winSips} Schluck${winSips > 1 ? 'e' : ''}`, 
+
       icon: '🏆' 
+
     },
+
     { 
+
       id: 1, 
+
       type: 'safe', 
+
       sips: 0, 
+
       label: 'Glück gehabt! Nichts.', 
+
       icon: '🛡️' 
+
     },
+
     { 
+
       id: 2, 
+
       type: 'lose', 
+
       sips: loseSips, 
+
       label: `Trinke ${loseSips} Schluck${loseSips > 1 ? 'e' : ''}`, 
+
       icon: '💀' 
+
     }
+
   ].sort(() => Math.random() - 0.5);
 
+
   // Initialen Slot festlegen (0, 1, 2)
+
   this.cards.forEach((c, i) => {
+
     c.initialSlot = i;
+
     c.slot = i;
+
   });
+
 
   const container = document.getElementById('mg-content');
+
   container.innerHTML = `
+
     <div class="flex flex-col items-center space-y-5">
+
       <p id="card-status-text" class="text-xs font-bold text-amber-300 animate-pulse">Merk dir die Verteilung!</p>
 
+
+      <!-- Container mit ausreichend Platz für die Bogen-Animationen -->
+
       <div id="card-deck" class="flex justify-center items-center gap-2 sm:gap-3 w-full my-2 relative min-h-[200px]">
+
         ${this.cards.map((c, i) => `
+
+          <!-- Echte Pokerkarten-Proportionen: w-28 (112px) x h-[160px] -->
+
           <div id="shuffle-card-${i}" class="w-28 h-[160px] rounded-xl border-2 border-slate-600 glass-panel flex flex-col items-center justify-between p-3 text-center transition-all duration-300 shadow-xl select-none">
+
             <span class="text-3xl mt-4">${c.icon}</span>
+
             <span class="text-xs font-bold text-slate-200 leading-tight mb-1">${c.label}</span>
+
           </div>
+
         `).join('')}
+
       </div>
 
+
       <button id="start-shuffle-btn" onclick="minigames.startCardShuffle('${player}')" class="w-full py-4 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-heading font-black text-xl shadow-lg active:scale-95 transition-all">
+
         🔀 Karten verdecken & mischen!
+
       </button>
+
     </div>
+
   `;
+
 }
+
 
 startCardShuffle(player) {
+
   const btn = document.getElementById('start-shuffle-btn');
+
   if (btn) btn.style.display = 'none';
 
+
   const statusText = document.getElementById('card-status-text');
+
   statusText.innerText = 'Karten werden verdeckt & gemischt...';
 
-  // 1. Karten umdrehen & GPU-Eigenschaften setzen
+
+  // 1. Karten umdrehen & Transition aktivieren
+
   this.cards.forEach((card) => {
+
     const cardEl = document.getElementById(`shuffle-card-${card.initialSlot}`);
+
     if (cardEl) {
+
       cardEl.classList.add('bg-slate-900');
+
       cardEl.innerHTML = '<span class="text-4xl my-auto">❓</span>';
-      cardEl.style.willChange = 'transform';
-      cardEl.style.transition = 'transform 0.28s ease-in-out';
+
+      cardEl.style.transition = 'transform 0.28s cubic-bezier(0.4, 0, 0.2, 1)';
+
     }
+
   });
+
+
+  // 2. Exakten Pixel-Abstand zwischen den Slot-Mitten berechnen
 
   const c0 = document.getElementById('shuffle-card-0');
+
   const c1 = document.getElementById('shuffle-card-1');
+
   const slotDistance = (c0 && c1) ? Math.abs(c1.offsetLeft - c0.offsetLeft) : 120;
 
+
   let swapsCount = 0;
-  const maxSwaps = 14; // Angenehme Länge & gute Herausforderung
+
+  const maxSwaps = 16; // Längeres Mischen
+
   let lastS1 = -1;
 
-  const performSwap = () => {
-    swapsCount++;
-    soundManager.playClickTick();
 
-    // Zwei unterschiedliche Slots wählen
-    let s1 = Math.floor(Math.random() * 3);
-    while (s1 === lastS1) s1 = Math.floor(Math.random() * 3);
-    let s2 = Math.floor(Math.random() * 3);
-    while (s2 === s1) s2 = Math.floor(Math.random() * 3);
-    lastS1 = s1;
+  setTimeout(() => {
 
-    const cardA = this.cards.find(c => c.slot === s1);
-    const cardB = this.cards.find(c => c.slot === s2);
+    const interval = setInterval(() => {
 
-    cardA.slot = s2;
-    cardB.slot = s1;
+      swapsCount++;
 
-    // PHASE 1: Bogenbewegung ausführen (Karte A nach oben, Karte B nach unten)
-    this.cards.forEach(card => {
-      const cardEl = document.getElementById(`shuffle-card-${card.initialSlot}`);
-      if (cardEl) {
-        const x = (card.slot - card.initialSlot) * slotDistance;
-        let y = 0;
-        if (card === cardA) {
-          y = -35; // Eleganter Bogen nach oben
-          cardEl.style.zIndex = '20';
-        } else if (card === cardB) {
-          y = 35; // Eleganter Bogen nach unten
-          cardEl.style.zIndex = '10';
-        } else {
-          cardEl.style.zIndex = '1';
-        }
-        cardEl.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-      }
-    });
+      soundManager.playClickTick();
 
-    // PHASE 2: Nach halber Bewegung (140ms) Karten wieder auf der Baseline absenken
-    setTimeout(() => {
+
+      // Zwei unterschiedliche Slots für den Tausch wählen
+
+      let s1 = Math.floor(Math.random() * 3);
+
+      while (s1 === lastS1) s1 = Math.floor(Math.random() * 3);
+
+      let s2 = Math.floor(Math.random() * 3);
+
+      while (s2 === s1) s2 = Math.floor(Math.random() * 3);
+
+      lastS1 = s1;
+
+
+      const cardA = this.cards.find(c => c.slot === s1);
+
+      const cardB = this.cards.find(c => c.slot === s2);
+
+
+      // Logischen Slot tauschen
+
+      cardA.slot = s2;
+
+      cardB.slot = s1;
+
+
+      // Visuelle Transformation anwenden (mit Bogenbewegung nach oben/unten)
+
       this.cards.forEach(card => {
+
         const cardEl = document.getElementById(`shuffle-card-${card.initialSlot}`);
+
         if (cardEl) {
+
           const x = (card.slot - card.initialSlot) * slotDistance;
-          cardEl.style.transform = `translate3d(${x}px, 0px, 0)`;
+
+          let y = 0;
+
+          if (card === cardA) y = -30; // Bogen nach oben
+
+          if (card === cardB) y = 30;  // Bogen nach unten
+
+          cardEl.style.transform = `translate(${x}px, ${y}px)`;
+
         }
+
       });
-    }, 140);
 
-    // Nächsten Tausch ansetzen oder beenden
-    if (swapsCount < maxSwaps) {
-      setTimeout(performSwap, 320);
-    } else {
+
+      // Nach der Hälfte der Bewegung Karten wieder auf einer Linie ausrichten
+
       setTimeout(() => {
-        this.cards.sort((a, b) => a.slot - b.slot);
 
-        statusText.innerText = 'Wähle eine Karte!';
-        statusText.classList.remove('animate-pulse');
+        this.cards.forEach(card => {
 
-        [0, 1, 2].forEach(slotIdx => {
-          const cardInSlot = this.cards[slotIdx];
-          const cardEl = document.getElementById(`shuffle-card-${cardInSlot.initialSlot}`);
+          const cardEl = document.getElementById(`shuffle-card-${card.initialSlot}`);
+
           if (cardEl) {
-            cardEl.style.zIndex = '1';
-            cardEl.classList.add('cursor-pointer', 'hover:border-amber-400', 'hover:scale-105');
-            cardEl.onclick = () => this.pickShuffleCard(player, slotIdx);
-          }
-        });
-      }, 300);
-    }
-  };
 
-  setTimeout(performSwap, 400);
+            const x = (card.slot - card.initialSlot) * slotDistance;
+
+            cardEl.style.transform = `translate(${x}px, 0px)`;
+
+          }
+
+        });
+
+      }, 180);
+
+
+      // Ende des Mischens
+
+      if (swapsCount >= maxSwaps) {
+
+        clearInterval(interval);
+
+
+        setTimeout(() => {
+
+          this.cards.sort((a, b) => a.slot - b.slot);
+
+
+          statusText.innerText = 'Wähle eine Karte!';
+
+          statusText.classList.remove('animate-pulse');
+
+
+          [0, 1, 2].forEach(slotIdx => {
+
+            const cardInSlot = this.cards[slotIdx];
+
+            const cardEl = document.getElementById(`shuffle-card-${cardInSlot.initialSlot}`);
+
+            if (cardEl) {
+
+              cardEl.classList.add('cursor-pointer', 'hover:border-amber-400', 'hover:scale-105');
+
+              cardEl.onclick = () => this.pickShuffleCard(player, slotIdx);
+
+            }
+
+          });
+
+        }, 170);
+
+      }
+
+    }, 350);
+
+  }, 500);
+
 }
 
+
 pickShuffleCard(player, pickedSlotIndex) {
+
   this.cards.forEach(card => {
+
     const cardEl = document.getElementById(`shuffle-card-${card.initialSlot}`);
-    if (cardEl) {
-      cardEl.onclick = null;
-      cardEl.style.willChange = 'auto';
-    }
+
+    if (cardEl) cardEl.onclick = null;
+
   });
 
-  // Alle Karten aufdecken
+
+  // Alle Karten an ihren aktuellen Positionen aufdecken
+
   this.cards.forEach((card, slotIdx) => {
+
     const cardEl = document.getElementById(`shuffle-card-${card.initialSlot}`);
+
     if (cardEl) {
+
       cardEl.innerHTML = `
+
         <span class="text-3xl mt-4">${card.icon}</span>
+
         <span class="text-xs font-bold text-slate-200 leading-tight mb-1">${card.label}</span>
+
       `;
+
       if (slotIdx === pickedSlotIndex) {
+
         cardEl.classList.add('border-amber-400', 'ring-2', 'ring-amber-400/50');
+
       }
+
     }
+
   });
+
 
   const pickedCard = this.cards[pickedSlotIndex];
 
+
   setTimeout(() => {
+
     if (pickedCard.type === 'win') {
+
       soundManager.playSuccess();
+
       app.closeMinigame();
+
       app.openDistributeModal(
+
         player, 
+
         pickedCard.sips, 
+
         `Gewinn beim Karten-Hai (${pickedCard.sips} Schlucke verteilen)`, 
+
         () => {}
+
       );
+
     } else if (pickedCard.type === 'lose') {
+
       this.showPenaltyCard(
+
         player, 
+
         pickedCard.sips, 
+
         `Niete gezogen! Der Hai hat zugebissen (${pickedCard.sips} Schlucke trinken).`
+
       );
+
     } else {
+
       soundManager.playClickTick();
+
       app.showToast(`🛡️ Glück gehabt! Keine Strafe für ${player}.`);
+
       app.closeMinigame();
+
     }
+
   }, 1200);
+
 }
 
 //------------------------------------#11-Five Cards------------------------------------
@@ -3709,7 +3925,284 @@ pickFiveCard(player, chosenIdx) {
   }, 650);
 }
 
+//------------------------------------#12-Slot Machine------------------------------------
 
+initSlotMachine(player) {
+  document.getElementById('mg-icon').innerText = '🎰';
+  document.getElementById('mg-title').innerText = 'Einarmiger Bandit';
+  document.getElementById('mg-subtitle').innerText = 'Zieh am Hebel und fordere dein Glück heraus!';
+
+  this.symbols = ['🍺', '🍸', '🍷', '7️⃣', '🍋', '💀'];
+  this.slotSpinning = false;
+  this.currentResults = ['🍺', '🍸', '7️⃣']; // Start-Symbole
+
+  const container = document.getElementById('mg-content');
+  container.innerHTML = `
+    <div class="flex flex-col items-center space-y-5 w-full max-w-xs mx-auto">
+      
+      <!-- Slot Machine & Hebel Container -->
+      <div class="flex items-center justify-center w-full my-2">
+        
+        <!-- Slot Gehäuse -->
+        <div class="glass-panel p-3 rounded-2xl border-2 border-amber-500/40 shadow-2xl bg-slate-950/90 flex gap-2 overflow-hidden z-10" style="-webkit-mask-image: -webkit-radial-gradient(white, black);">
+          ${[0, 1, 2].map(i => `
+            <!-- Einzelnes Walzen-Fenster (Festes Maß: 76px x 96px) -->
+            <div id="slot-box-${i}" class="bg-slate-900 rounded-xl border border-slate-700 relative shadow-inner overflow-hidden transition-all duration-300" style="width: 76px; height: 96px;">
+              <div id="reel-strip-${i}" class="absolute top-0 left-0 w-full flex flex-col items-center" style="transform: translateY(0px);">
+                <div class="w-full flex items-center justify-center text-4xl select-none flex-shrink-0" style="height: 96px;">
+                  ${this.currentResults[i]}
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <!-- Interaktiver Hebel rechts -->
+        <div onclick="minigames.pullSlotLever('${player}')" class="cursor-pointer group flex flex-col items-center justify-center pl-3 -ml-1 py-4 select-none">
+          <div id="slot-lever-arm" class="w-3 h-20 bg-gradient-to-b from-slate-300 via-slate-500 to-slate-700 rounded-full relative origin-bottom transition-transform duration-200 shadow-md">
+            <!-- Roter Knauf -->
+            <div class="w-8 h-8 bg-gradient-to-tr from-rose-600 via-red-500 to-pink-400 rounded-full absolute -top-4 -left-2.5 shadow-lg group-hover:scale-110 transition-transform border border-rose-300"></div>
+          </div>
+          <div class="w-8 h-5 bg-slate-800 border border-slate-600 rounded-b-lg shadow-inner mt-[-2px]"></div>
+        </div>
+
+      </div>
+
+      <!-- Button unten -->
+      <button id="slot-spin-btn" onclick="minigames.pullSlotLever('${player}')" class="w-full py-4 rounded-xl bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 text-white font-heading font-black text-xl shadow-lg active:scale-95 transition-all">
+        🎰 HEBEL ZIEHEN!
+      </button>
+    </div>
+  `;
+}
+
+pullSlotLever(player) {
+  if (this.slotSpinning) return;
+  this.slotSpinning = true;
+
+  const leverArm = document.getElementById('slot-lever-arm');
+  const btn = document.getElementById('slot-spin-btn');
+
+  // Markierungen der Walzen vor dem neuen Dreh zurücksetzen
+  [0, 1, 2].forEach(i => {
+    const box = document.getElementById(`slot-box-${i}`);
+    if (box) {
+      box.className = "bg-slate-900 rounded-xl border border-slate-700 relative shadow-inner overflow-hidden transition-all duration-300";
+    }
+  });
+
+  // 1. Hebel-Animation
+  if (leverArm) {
+    leverArm.style.transform = 'rotateX(50deg) scaleY(0.5) translateY(25px)';
+    setTimeout(() => {
+      leverArm.style.transform = 'rotateX(0deg) scaleY(1) translateY(0px)';
+    }, 250);
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.className = "w-full py-4 rounded-xl bg-slate-800 text-slate-500 font-heading font-black text-xl cursor-not-allowed";
+    btn.innerText = "🎰 Walzen drehen...";
+  }
+
+  // 2. Ziel-Ergebnisse festlegen
+  const finalResults = [
+    this.symbols[Math.floor(Math.random() * this.symbols.length)],
+    this.symbols[Math.floor(Math.random() * this.symbols.length)],
+    this.symbols[Math.floor(Math.random() * this.symbols.length)]
+  ];
+
+  const symbolHeight = 96; 
+  const totalStripLength = 22; 
+  const stopTimes = [2000, 3000, 4000]; // Langsameres, versetztes Stoppen für Spannung
+
+  // Rhythmisches Ticken beim Drehen
+  const soundInterval = setInterval(() => {
+    if (typeof soundManager !== 'undefined' && soundManager.playClickTick) {
+      soundManager.playClickTick();
+    }
+  }, 90);
+
+  // 3. Walzen drehen lassen
+  [0, 1, 2].forEach(i => {
+    const stripEl = document.getElementById(`reel-strip-${i}`);
+    if (!stripEl) return;
+
+    // Walzenband aufbauen
+    const stripSymbols = [this.currentResults[i]];
+    for (let s = 0; s < totalStripLength - 2; s++) {
+      stripSymbols.push(this.symbols[Math.floor(Math.random() * this.symbols.length)]);
+    }
+    stripSymbols.push(finalResults[i]);
+
+    stripEl.innerHTML = stripSymbols.map(sym => `
+      <div class="w-full flex items-center justify-center text-4xl select-none flex-shrink-0" style="height: 96px;">
+        ${sym}
+      </div>
+    `).join('');
+
+    // Reset auf Startposition
+    stripEl.style.transition = 'none';
+    stripEl.style.transform = 'translateY(0px)';
+
+    // Animation abfeuern mit lang ausrollender Bezier-Kurve
+    setTimeout(() => {
+      const targetY = -(totalStripLength - 1) * symbolHeight;
+      const duration = stopTimes[i];
+      
+      stripEl.style.transition = `transform ${duration}ms cubic-bezier(0.05, 0.9, 0.1, 1.01)`;
+      stripEl.style.transform = `translateY(${targetY}px)`;
+    }, 40);
+
+    // Einrasten der einzelnen Walze
+    setTimeout(() => {
+      if (typeof soundManager !== 'undefined' && soundManager.playClickTick) {
+        soundManager.playClickTick();
+      }
+      
+      if (i === 2) {
+        clearInterval(soundInterval);
+        this.currentResults = finalResults;
+        setTimeout(() => this.evaluateSlotResults(player, finalResults), 200);
+      }
+    }, stopTimes[i]);
+  });
+}
+
+evaluateSlotResults(player, results) {
+  const maxLimit = app.getMaxSipsForDifficulty();
+  const mode = app.difficulty || (maxLimit <= 3 ? 'easy' : maxLimit <= 5 ? 'medium' : 'hard');
+
+  const [s1, s2, s3] = results;
+  const getRandomSips = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+  // Hilfsfunktion zur optischen Hervorhebung der Walzen-Boxen
+  const highlightBoxes = (states) => {
+    states.forEach((state, i) => {
+      const box = document.getElementById(`slot-box-${i}`);
+      if (!box) return;
+
+      if (state === 'win') {
+        box.className = "bg-amber-950/40 rounded-xl border-2 border-amber-400 ring-4 ring-amber-400/30 relative shadow-inner overflow-hidden transition-all duration-300 scale-105 z-20";
+      } else if (state === 'lose') {
+        box.className = "bg-rose-950/40 rounded-xl border-2 border-rose-500 ring-4 ring-rose-500/30 relative shadow-inner overflow-hidden transition-all duration-300 scale-105 z-20";
+      } else {
+        box.className = "bg-slate-900/60 rounded-xl border border-slate-700 relative shadow-inner overflow-hidden transition-all duration-300 opacity-70";
+      }
+    });
+  };
+
+  // 1. Dreifacher Totenkopf (Super-GAU) -> Maximalstrafe
+  if (s1 === '💀' && s2 === '💀' && s3 === '💀') {
+    highlightBoxes(['lose', 'lose', 'lose']);
+    // Easy: 3 | Medium: 5 | Hard: 8
+    const penalty = mode === 'easy' ? 3 : mode === 'medium' ? 5 : 8;
+
+    setTimeout(() => {
+      this.slotSpinning = false;
+      this.showPenaltyCard(player, penalty, `3x 💀 DER SUPER-GAU! Du musst ${penalty} Schlucke trinken!`);
+    }, 1000);
+    return;
+  }
+
+  // 2. Dreifacher Hauptgewinn (3x 🍺 oder 3x 7️⃣) -> Maximalgewinn
+  if ((s1 === '🍺' || s1 === '7️⃣') && s1 === s2 && s2 === s3) {
+    highlightBoxes(['win', 'win', 'win']);
+    // Easy: 3 | Medium: 5 | Hard: 8
+    const jackpotSips = mode === 'easy' ? 3 : mode === 'medium' ? 5 : 8;
+
+    setTimeout(() => {
+      this.slotSpinning = false;
+      if (typeof soundManager !== 'undefined' && soundManager.playSuccess) soundManager.playSuccess();
+      app.closeMinigame();
+      app.openDistributeModal(
+        player,
+        jackpotSips,
+        `JACKPOT! 3x ${s1} (${jackpotSips} Schlucke verteilen)`,
+        () => {}
+      );
+    }, 1000);
+    return;
+  }
+
+  // 3. Dreifaches gleiches Symbol (z.B. 3x 🍸, 3x 🍷, 3x 🍋) -> Hoher Gewinn
+  if (s1 === s2 && s2 === s3) {
+    highlightBoxes(['win', 'win', 'win']);
+    // Easy: 2-3 | Medium: 3-4 | Hard: 6-7
+    const winSips = mode === 'easy' ? getRandomSips(2, 3) : mode === 'medium' ? getRandomSips(3, 4) : getRandomSips(6, 7);
+
+    setTimeout(() => {
+      this.slotSpinning = false;
+      if (typeof soundManager !== 'undefined' && soundManager.playSuccess) soundManager.playSuccess();
+      app.closeMinigame();
+      app.openDistributeModal(
+        player,
+        winSips,
+        `Dreierpasch! 3x ${s1} (${winSips} Schlucke verteilen)`,
+        () => {}
+      );
+    }, 1000);
+    return;
+  }
+
+  // 4. Zwei gleiche Symbole (Paar) -> Mittlerer Gewinn oder Strafe
+  if (s1 === s2 || s2 === s3 || s1 === s3) {
+    const pairSymbol = (s1 === s2 || s1 === s3) ? s1 : s2;
+    const isSkullPair = pairSymbol === '💀';
+    
+    const states = [
+      (s1 === pairSymbol) ? (isSkullPair ? 'lose' : 'win') : 'neutral',
+      (s2 === pairSymbol) ? (isSkullPair ? 'lose' : 'win') : 'neutral',
+      (s3 === pairSymbol) ? (isSkullPair ? 'lose' : 'win') : 'neutral'
+    ];
+    highlightBoxes(states);
+
+    setTimeout(() => {
+      this.slotSpinning = false;
+      if (isSkullPair) {
+        // Easy: 2 | Medium: 3 | Hard: 5
+        const penalty = mode === 'easy' ? 2 : mode === 'medium' ? 3 : 5;
+        this.showPenaltyCard(player, penalty, `2x 💀 Pech gehabt! Du musst ${penalty} Schlucke trinken!`);
+      } else {
+        // Easy: 1-2 | Medium: 2-3 | Hard: 4-5
+        const winSips = mode === 'easy' ? getRandomSips(1, 2) : mode === 'medium' ? getRandomSips(2, 3) : getRandomSips(4, 5);
+        if (typeof soundManager !== 'undefined' && soundManager.playSuccess) soundManager.playSuccess();
+        app.closeMinigame();
+        app.openDistributeModal(
+          player,
+          winSips,
+          `Zweierpaar! 2x ${pairSymbol} (${winSips} Schluck${winSips > 1 ? 'e' : ''} verteilen)`,
+          () => {}
+        );
+      }
+    }, 1000);
+    return;
+  }
+
+  // 5. Kein Paar, aber mindestens ein Totenkopf vorhanden -> Mindeststrafe
+  if (results.includes('💀')) {
+    const states = results.map(sym => sym === '💀' ? 'lose' : 'neutral');
+    highlightBoxes(states);
+    // Easy: 1 | Medium: 2 | Hard: 4
+    const penalty = mode === 'easy' ? 1 : mode === 'medium' ? 2 : 4;
+
+    setTimeout(() => {
+      this.slotSpinning = false;
+      this.showPenaltyCard(player, penalty, `Ein Totenkopf 💀 erwischt! Du musst ${penalty} Schluck${penalty > 1 ? 'e' : ''} trinken.`);
+    }, 1000);
+    return;
+  }
+
+  // 6. Alle unterschiedlich & kein Totenkopf -> Glück gehabt
+  highlightBoxes(['neutral', 'neutral', 'neutral']);
+
+  setTimeout(() => {
+    this.slotSpinning = false;
+    if (typeof soundManager !== 'undefined' && soundManager.playClickTick) soundManager.playClickTick();
+    app.showToast(`🛡️ Bunt gemischt, kein Totenkopf! Glück gehabt.`);
+    app.closeMinigame();
+  }, 1000);
+}
 
 
     }
