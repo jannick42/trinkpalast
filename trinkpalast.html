@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="icon" type="icon.ico" href="icon.ico">
-  <title>TrinkPalast v1.0 | by Jannick</title>
+  <title>🍻 TrinkPalast v1.1 | by Jannick</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="css/tailwind.css"></script>
@@ -180,7 +180,7 @@
         </div>
         <div>
           <h1 class="font-heading font-black text-xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-300 to-cyan-400">
-            TRINKPALAST v1.0 <span class="inline-block -translate-y-[4px] text-xs px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30 font-mono">by Jannick</span>
+            TRINKPALAST v1.1 <span class="inline-block -translate-y-[4px] text-xs px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30 font-mono">by Jannick</span>
 			<span id="mg-player-name" style="display: none;"></span>
           </h1>
           <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Don't drink & drive - Just sauf & lauf :)</p>
@@ -228,30 +228,30 @@
         <div id="player-chips" class="flex flex-wrap gap-2 pt-2 min-h-[40px]"></div>
       </div>
 
-      <div class="glass-panel p-5 rounded-2xl space-y-3 shadow-2xl">
-        <h3 class="font-heading font-bold text-lg text-cyan-400 flex items-center gap-2">
-          <i class="fas fa-fire"></i> Intensität & Schluck-Modus
-        </h3>
-        <div class="grid grid-cols-3 gap-2.5">
-          <button onclick="app.setDifficulty('easy')" id="diff-easy" class="diff-btn glass-panel p-3 rounded-xl border-slate-700 text-center transition-all">
-            <div class="text-2xl mb-1">🍺</div>
-            <div class="font-bold text-xs sm:text-sm text-emerald-400">Warm-Up</div>
-            <div class="text-[11px] text-slate-400 mt-1">1-3 Schlücke</div>
-          </button>
+<div class="glass-panel p-5 rounded-2xl space-y-3 shadow-2xl">
+  <h3 class="font-heading font-bold text-lg text-cyan-400 flex items-center gap-2">
+    <i class="fas fa-fire"></i> Intensität & Schluck-Modus
+  </h3>
+  <div class="grid grid-cols-3 gap-2.5">
+    <button onclick="app.setDifficulty('easy')" id="diff-easy" class="diff-btn glass-panel p-3 rounded-xl border-slate-700 text-center transition-all">
+      <div class="text-2xl mb-1">🍺</div>
+      <div class="font-bold text-xs sm:text-sm text-emerald-400">Warm-Up</div>
+      <div class="text-[11px] text-slate-400 mt-1">1-3 Schlücke</div>
+    </button>
 
-          <button onclick="app.setDifficulty('medium')" id="diff-medium" class="diff-btn glass-panel p-3 rounded-xl border-pink-500 bg-pink-500/10 text-center transition-all shadow-lg shadow-pink-500/20">
-            <div class="text-2xl mb-1">🍻</div>
-            <div class="font-bold text-xs sm:text-sm text-pink-400">Party-Modus</div>
-            <div class="text-[11px] text-slate-400 mt-1">2-5 Schlücke</div>
-          </button>
+    <button onclick="app.setDifficulty('medium')" id="diff-medium" class="diff-btn glass-panel p-3 rounded-xl border-slate-700 text-center transition-all">
+      <div class="text-2xl mb-1">🍻</div>
+      <div class="font-bold text-xs sm:text-sm text-pink-400">Party-Modus</div>
+      <div class="text-[11px] text-slate-400 mt-1">2-5 Schlücke</div>
+    </button>
 
-          <button onclick="app.setDifficulty('hard')" id="diff-hard" class="diff-btn glass-panel p-3 rounded-xl border-slate-700 text-center transition-all">
-            <div class="text-2xl mb-1">🔥</div>
-            <div class="font-bold text-xs sm:text-sm text-amber-400">Abriss!</div>
-            <div class="text-[11px] text-slate-400 mt-1">4-8 Schlücke</div>
-          </button>
-        </div>
-      </div>
+    <button onclick="app.setDifficulty('hard')" id="diff-hard" class="diff-btn glass-panel p-3 rounded-xl border-slate-700 text-center transition-all">
+      <div class="text-2xl mb-1">🔥</div>
+      <div class="font-bold text-xs sm:text-sm text-amber-400">Abriss!</div>
+      <div class="text-[11px] text-slate-400 mt-1">4-8 Schlücke</div>
+    </button>
+  </div>
+</div>
 
       <div class="glass-panel p-5 rounded-2xl space-y-3 shadow-2xl">
         <div class="flex justify-between items-center">
@@ -886,7 +886,8 @@ classic: {
       { text: 'Alle, die ein schwarzes Oberteil tragen, trinken {sips} Schluck!', baseSips: 1, isGroup: true },
       { text: '{player}, reime 30 Sekunden lang auf jedes Wort von {player2}. Versagst du, trinke {sips} Schlücke!', baseSips: 2 },
       { text: 'Wer die kürzesten Haare in der Runde hat, darf {sips} Schlücke verteilen!', baseSips: 1, isGroup: true },
-      { text: '{player}, balanciere deinen Drink 10 Sekunden lang auf deinem Kopf. Fällt er oder verweigerst du: {sips} Schlücke!', baseSips: 2 },
+	  { text: '{player}, welches ist das absolute Hass-Lied von {player2}. Liegst du falsch, musst du {sips} Schlücke trinken!', baseSips: 1 },
+      //{ text: '{player}, balanciere deinen Drink 10 Sekunden lang auf deinem Kopf. Fällt er oder verweigerst du: {sips} Schlücke!', baseSips: 2 },
       { text: 'Alle, die heute noch keinen Alkohol getrunken haben außer diesem Spiel, trinken {sips} Schlucke!', baseSips: 1, isGroup: true },
       { text: '{player}, ertappe den Blick von {player2} und halte ihn 15 Sekunden ohne zu lachen. Wer lacht, trinkt {sips} Schlücke!', baseSips: 1, isGroup: true },
       { text: 'Wer das älteste Smartphone in der Runde hat, muss {sips} Schlücke trinken!', baseSips: 1, isGroup: true },
@@ -1012,7 +1013,7 @@ classic: {
       { text: 'DUELL: {player} und {player2} machen Daumenringen! Wer verliert, muss {sips} Schlücke trinken!', baseSips: 2, isGroup: true },
       //{ text: 'REGEL: Wer ab jetzt sein Handy anfasst, muss sofort {sips} Schlücke trinken! (Gilt für 3 Runden)', baseSips: 2, isGroup: true },
       { text: 'KATEGORIE: {player} startet mit einer Automarke. Im Uhrzeigersinn nennt jeder eine andere. Wer doppelt nennt oder stockt: {sips} Schlücke!', baseSips: 2, isGroup: true },
-      { text: 'DUELL: {player} und {player2} müssen zeitgleich eine Zahl von 1 bis 5 rufen. Rufen sie dieselbe Zahl, trinken beide {sips} Schlücke!', baseSips: 1, isGroup: true },
+      { text: 'DUELL: {player} und {player2} müssen zeitgleich eine Zahl von 1 bis 5 rufen. Rufen sie dieselbe Zahl, trinken beide {sips} Schlücke!', baseSips: 1, isBoth: true },
       //{ text: 'REGEL: Niemand darf ab sofort den Namen eines Mitspielers sagen. Wer es doch tut: {sips} Schluck!', baseSips: 1, isGroup: true },
       { text: 'DUELL: {player} nennt ein Wort, {player2} muss blitzschnell ein Reimwort nennen. Wer länger als 3 Sekunden braucht, trinkt {sips} Schlücke!', baseSips: 2, isGroup: true },
       //{ text: 'REGEL: Alle Antworten müssen ab jetzt mit einer Gegenfrage beantwortet werden. Wer normal antwortet: {sips} Schluck! (2 Runden)', baseSips: 1, isGroup: true },
@@ -1089,34 +1090,49 @@ classic: {
 };
 
     class DrinkingApp {
-      constructor() {
-        this.players = ['Jannick', 'Florian', 'Nico', 'Elly'];
-        this.selectedDecks = ['minigames', 'classic', 'truth_dare', 'vote', 'never_have_i_ever', 'duel'];
-        this.difficulty = 'medium'; 
-        
-        this.deckQueue = [];
-        this.currentCardIndex = 0;
-        this.currentCard = null;
-        this.isFlipped = false;
-        
-        this.lastPlayerIndex = -1;
-        this.sipStats = {};
-        this.selectedGroupDrinkers = new Set();
+constructor() {
+    // 1. Daten aus dem LocalStorage laden (mit Standard-Fallbacks falls leer)
+    const savedPlayers = localStorage.getItem('tp_players');
+    this.players = savedPlayers ? JSON.parse(savedPlayers) : ['']; //['Jannick', 'Florian', 'Nico', 'Elly'];
 
-        this.currentCardTimerSec = null;
-        this.cardTimerInterval = null;
+    const savedDecks = localStorage.getItem('tp_decks');
+    this.selectedDecks = savedDecks ? JSON.parse(savedDecks) : ['minigames', 'classic', 'truth_dare', 'vote', 'never_have_i_ever', 'duel'];
 
-        this.confetti = new ConfettiEngine();
-        this.pendingDistributeCallback = null;
-        this.initEventListeners();
-      }
+    this.difficulty = localStorage.getItem('tp_difficulty') || 'medium';
+    
+    this.deckQueue = [];
+    this.currentCardIndex = 0;
+    this.currentCard = null;
+    this.isFlipped = false;
+    
+    this.lastPlayerIndex = -1;
+    this.sipStats = {};
+    this.selectedGroupDrinkers = new Set();
 
-      init() {
-        new BubbleBackground();
-        this.renderDecks();
-        this.renderPlayerChips();
-        this.updateStatsTotalBadge();
-      }
+    this.currentCardTimerSec = null;
+    this.cardTimerInterval = null;
+
+    this.confetti = new ConfettiEngine();
+    this.pendingDistributeCallback = null;
+    this.initEventListeners();
+  }
+
+init() {
+    new BubbleBackground();
+    this.renderDecks();
+    this.renderPlayerChips();
+    this.setDifficulty(this.difficulty); // Stellt die visuelle Auswahl des Schwierigkeitsgrads wieder her
+    this.updateStatsTotalBadge();
+  }
+  
+  // Hilfsmethoden zum Speichern in den LocalStorage
+  savePlayers() {
+    localStorage.setItem('tp_players', JSON.stringify(this.players));
+  }
+
+  saveDecks() {
+    localStorage.setItem('tp_decks', JSON.stringify(this.selectedDecks));
+  }
 
       getMaxSipsForDifficulty() {
         if (this.difficulty === 'easy') return 3;    // Warm-Up
@@ -1145,31 +1161,29 @@ classic: {
       }
 
       /* === SETUP LOGIC === */
-      addPlayer() {
-        const input = document.getElementById('player-name-input');
-        const name = input.value.trim();
-        if (!name) return;
+addPlayer() {
+    const input = document.getElementById('player-name-input');
+    const name = input.value.trim();
+    if (!name) return;
 
-        if (this.players.includes(name)) {
-          this.showToast('Name existiert bereits!');
-          return;
-        }
+    if (this.players.includes(name)) {
+      this.showToast('Name existiert bereits!');
+      return;
+    }
 
-        this.players.push(name);
-        input.value = '';
-        soundManager.playClick();
-        this.renderPlayerChips();
-      }
+    this.players.push(name);
+    this.savePlayers(); // SPIELER SPEICHERN
+    input.value = '';
+    soundManager.playClick();
+    this.renderPlayerChips();
+  }
 
-      removePlayer(idx) {
-        //if (this.players.length <= 2) {
-        //  this.showToast('Mindestens 2 Spieler erforderlich!');
-        //  return;
-        //}
-        this.players.splice(idx, 1);
-        soundManager.playClick();
-        this.renderPlayerChips();
-      }
+  removePlayer(idx) {
+    this.players.splice(idx, 1);
+    this.savePlayers(); // SPIELER SPEICHERN
+    soundManager.playClick();
+    this.renderPlayerChips();
+  }
 
       renderPlayerChips() {
         const container = document.getElementById('player-chips');
@@ -1195,20 +1209,21 @@ classic: {
         }).join('');
       }
 
-      setDifficulty(diff) {
-        this.difficulty = diff;
-        soundManager.playClick();
-        document.querySelectorAll('.diff-btn').forEach(btn => {
-          btn.classList.remove('border-pink-500', 'bg-pink-500/10', 'shadow-lg', 'shadow-pink-500/20');
-          btn.classList.add('border-slate-700');
-        });
+setDifficulty(diff) {
+    this.difficulty = diff;
+    localStorage.setItem('tp_difficulty', diff); // DIFFICULTY SPEICHERN
+    soundManager.playClick();
+    document.querySelectorAll('.diff-btn').forEach(btn => {
+      btn.classList.remove('border-pink-500', 'bg-pink-500/10', 'shadow-lg', 'shadow-pink-500/20');
+      btn.classList.add('border-slate-700');
+    });
 
-        const activeBtn = document.getElementById(`diff-${diff}`);
-        if (activeBtn) {
-          activeBtn.classList.remove('border-slate-700');
-          activeBtn.classList.add('border-pink-500', 'bg-pink-500/10', 'shadow-lg', 'shadow-pink-500/20');
-        }
-      }
+    const activeBtn = document.getElementById(`diff-${diff}`);
+    if (activeBtn) {
+      activeBtn.classList.remove('border-slate-700');
+      activeBtn.classList.add('border-pink-500', 'bg-pink-500/10', 'shadow-lg', 'shadow-pink-500/20');
+    }
+  }
 
       renderDecks() {
         const container = document.getElementById('deck-grid');
@@ -1228,30 +1243,27 @@ classic: {
         }).join('');
       }
 
-      toggleDeck(id) {
-        soundManager.playClick();
-        if (this.selectedDecks.includes(id)) {
-          //if (this.selectedDecks.length <= 1) {
-          //  this.showToast('Mindestens 1 Deck muss gewählt sein!');
-          //  return;
-          //}
-          this.selectedDecks = this.selectedDecks.filter(d => d !== id);
-        } else {
-          this.selectedDecks.push(id);
-        }
-        this.renderDecks();
-      }
+toggleDeck(id) {
+    soundManager.playClick();
+    if (this.selectedDecks.includes(id)) {
+      this.selectedDecks = this.selectedDecks.filter(d => d !== id);
+    } else {
+      this.selectedDecks.push(id);
+    }
+    this.saveDecks(); // DECKS SPEICHERN
+    this.renderDecks();
+  }
 
-      toggleAllDecks() {
-        soundManager.playClick();
-        if (this.selectedDecks.length === Object.keys(DECKS_DATABASE).length) {
-          //this.selectedDecks = ['minigames', 'classic'];
-		  this.selectedDecks = [''];
-        } else {
-          this.selectedDecks = Object.keys(DECKS_DATABASE);
-        }
-        this.renderDecks();
-      }
+toggleAllDecks() {
+    soundManager.playClick();
+    if (this.selectedDecks.length === Object.keys(DECKS_DATABASE).length) {
+      this.selectedDecks = [''];
+    } else {
+      this.selectedDecks = Object.keys(DECKS_DATABASE);
+    }
+    this.saveDecks(); // DECKS SPEICHERN
+    this.renderDecks();
+  }
 
       /* === GAME ENGINE LOGIC === */
       startGame() {
@@ -1798,6 +1810,12 @@ confirmBothDrink() {
       restartSameGame() {
         this.startGame();
       }
+	  
+	  
+	  
+	  
+	  
+	  
 
       /* === MINIGAME LAUNCHER === */
       startCurrentMinigame() {
@@ -3968,8 +3986,12 @@ initSlotMachine(player) {
 
       </div>
 
-      <!-- Button unten -->
+      <!-- Button unten 
       <button id="slot-spin-btn" onclick="minigames.pullSlotLever('${player}')" class="w-full py-4 rounded-xl bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 text-white font-heading font-black text-xl shadow-lg active:scale-95 transition-all">
+        🎰 HEBEL ZIEHEN!
+      </button>-->
+	  
+	  <button id="slot-spin-btn" onclick="minigames.pullSlotLever('${player}')" class="w-full py-4 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-heading font-black text-xl shadow-lg active:scale-95 transition-all">
         🎰 HEBEL ZIEHEN!
       </button>
     </div>
