@@ -227,6 +227,24 @@
 
         <div id="player-chips" class="flex flex-wrap gap-2 pt-2 min-h-[40px]"></div>
       </div>
+	  
+	  <!-- ==================== SPIELER-REIHENFOLGE ==================== -->
+<div class="glass-panel p-5 rounded-2xl space-y-3 shadow-2xl">
+  <h3 class="font-heading font-bold text-lg text-purple-400 flex items-center gap-2">
+    <i class="fas fa-arrows-rotate"></i> Reihenfolge <span class="text-xs italic text-slate-400">(Spielernamen über Drag&Drop verschieben)</span>
+  </h3>
+  <div class="grid grid-cols-2 gap-2.5">
+    <button onclick="app.setOrderMode('random')" id="order-random" class="order-btn glass-panel p-3 rounded-xl border-slate-700 text-center transition-all">
+      <div class="text-2xl mb-1">🎲</div>
+      <div class="font-bold text-xs sm:text-sm text-pink-400">Zufallsprinzip</div>
+    </button>
+
+    <button onclick="app.setOrderMode('round_robin')" id="order-round_robin" class="order-btn glass-panel p-3 rounded-xl border-slate-700 text-center transition-all">
+      <div class="text-2xl mb-1">🔄</div>
+      <div class="font-bold text-xs sm:text-sm text-cyan-400">Reihum</div>
+    </button>
+  </div>
+</div>
 
 <div class="glass-panel p-5 rounded-2xl space-y-3 shadow-2xl">
   <h3 class="font-heading font-bold text-lg text-cyan-400 flex items-center gap-2">
@@ -1104,6 +1122,9 @@ constructor() {
     this.currentCardIndex = 0;
     this.currentCard = null;
     this.isFlipped = false;
+	
+	this.playerOrderMode = localStorage.getItem('tp_order_mode') || 'random';
+	this.roundRobinIndex = 0;	
     
     this.lastPlayerIndex = -1;
     this.sipStats = {};
@@ -1121,9 +1142,71 @@ init() {
     new BubbleBackground();
     this.renderDecks();
     this.renderPlayerChips();
+	this.setOrderMode(this.playerOrderMode);
     this.setDifficulty(this.difficulty); // Stellt die visuelle Auswahl des Schwierigkeitsgrads wieder her
     this.updateStatsTotalBadge();
   }
+  
+  // 1. Drag & Drop Event-Handler
+  handleDragStart(e, index) {
+    this.draggedIndex = index;
+    e.dataTransfer.effectAllowed = 'move';
+    e.currentTarget.classList.add('opacity-40', 'scale-95');
+  }
+
+  handleDragOver(e) {
+    e.preventDefault(); // Erforderlich, um Drop zu erlauben
+    e.dataTransfer.dropEffect = 'move';
+  }
+
+  handleDrop(e, targetIndex) {
+    e.preventDefault();
+    if (this.draggedIndex === null || this.draggedIndex === targetIndex) return;
+
+    // Spieler im Array an die neue Position verschieben
+    const [movedPlayer] = this.players.splice(this.draggedIndex, 1);
+    this.players.splice(targetIndex, 0, movedPlayer);
+
+    this.draggedIndex = null;
+    this.savePlayers();
+    soundManager.playClick();
+    this.renderPlayerChips();
+  }
+
+  handleDragEnd(e) {
+    e.currentTarget.classList.remove('opacity-40', 'scale-95');
+    this.draggedIndex = null;
+  }
+  
+movePlayer(idx, direction) {
+    const newIndex = idx + direction;
+    if (newIndex < 0 || newIndex >= this.players.length) return;
+
+    const temp = this.players[idx];
+    this.players[idx] = this.players[newIndex];
+    this.players[newIndex] = temp;
+
+    this.savePlayers();
+    soundManager.playClick();
+    this.renderPlayerChips();
+  }
+  
+  setOrderMode(mode) {
+  this.playerOrderMode = mode;
+  localStorage.setItem('tp_order_mode', mode);
+  soundManager.playClick();
+
+  document.querySelectorAll('.order-btn').forEach(btn => {
+    btn.classList.remove('border-pink-500', 'bg-pink-500/10', 'shadow-lg', 'shadow-pink-500/20');
+    btn.classList.add('border-slate-700');
+  });
+
+  const activeBtn = document.getElementById(`order-${mode}`);
+  if (activeBtn) {
+    activeBtn.classList.remove('border-slate-700');
+    activeBtn.classList.add('border-pink-500', 'bg-pink-500/10', 'shadow-lg', 'shadow-pink-500/20');
+  }
+}
   
   // Hilfsmethoden zum Speichern in den LocalStorage
   savePlayers() {
@@ -1164,10 +1247,15 @@ init() {
 addPlayer() {
     const input = document.getElementById('player-name-input');
     const name = input.value.trim();
-    if (!name) return;
+    
 
     if (this.players.includes(name)) {
       this.showToast('Name existiert bereits!');
+      return;
+    }
+	
+	if (!name) {
+      this.showToast('Bitte einen Namen eingeben!');
       return;
     }
 
@@ -1185,7 +1273,7 @@ addPlayer() {
     this.renderPlayerChips();
   }
 
-      renderPlayerChips() {
+      /*renderPlayerChips() {
         const container = document.getElementById('player-chips');
         document.getElementById('player-count').innerText = this.players.length;
 
@@ -1207,7 +1295,52 @@ addPlayer() {
             </div>
           `;
         }).join('');
-      }
+      }*/
+renderPlayerChips() {
+    const container = document.getElementById('player-chips');
+    document.getElementById('player-count').innerText = this.players.length;
+
+    container.innerHTML = this.players.map((p, i) => {
+      // Farbe hängt jetzt vom Namen ab, nicht mehr vom Platz in der Liste
+      const colorClass = this.getPlayerColor(p);
+
+      return `
+        <div
+          draggable="true"
+          ondragstart="app.handleDragStart(event, ${i})"
+          ondragover="app.handleDragOver(event)"
+          ondrop="app.handleDrop(event, ${i})"
+          ondragend="app.handleDragEnd(event)"
+          class="bg-gradient-to-r ${colorClass} border px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-2 shadow-sm cursor-grab active:cursor-grabbing select-none transition-all duration-150"
+        >
+          <i class="fas fa-grip-vertical text-slate-400/60 text-[10px]"></i>
+          <span>👤 ${p}</span>
+          <button onclick="app.removePlayer(${i})" class="hover:text-red-400 transition-colors ml-1 border-l border-slate-700/50 pl-1.5">
+            <i class="fas fa-times text-xs"></i>
+          </button>
+        </div>
+      `;
+    }).join('');
+  }
+  
+  // Berechnet eine feste Farbe basierend auf dem Spielernamen
+  getPlayerColor(name) {
+    const colors = [
+      'from-pink-500/20 to-purple-500/20 border-pink-500/40 text-pink-300',
+      'from-cyan-500/20 to-blue-500/20 border-cyan-500/40 text-cyan-300',
+      'from-amber-500/20 to-orange-500/20 border-amber-500/40 text-amber-300',
+      'from-emerald-500/20 to-teal-500/20 border-emerald-500/40 text-emerald-300',
+      'from-violet-500/20 to-fuchsia-500/20 border-violet-500/40 text-violet-300',
+      'from-rose-500/20 to-red-500/20 border-rose-500/40 text-rose-300'
+    ];
+
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    return colors[Math.abs(hash) % colors.length];
+  }
 
 setDifficulty(diff) {
     this.difficulty = diff;
@@ -1271,6 +1404,8 @@ toggleAllDecks() {
           this.showToast('Füge mindestens 2 Spieler hinzu!');
           return;
         }
+		
+		this.roundRobinIndex = 0;
 
         this.players.forEach(p => {
           if (this.sipStats[p] === undefined) this.sipStats[p] = 0;
@@ -1364,10 +1499,15 @@ calculateMinigameSips(baseSips) {
 
         const rawCard = this.deckQueue[this.currentCardIndex];
 
-        let player1Index;
-        do {
-          player1Index = Math.floor(Math.random() * this.players.length);
-        } while (this.players.length > 1 && player1Index === this.lastPlayerIndex);
+let player1Index;
+if (this.playerOrderMode === 'round_robin') {
+  player1Index = this.roundRobinIndex % this.players.length;
+  this.roundRobinIndex++;
+} else {
+  do {
+    player1Index = Math.floor(Math.random() * this.players.length);
+  } while (this.players.length > 1 && player1Index === this.lastPlayerIndex);
+}
         
         this.lastPlayerIndex = player1Index;
         const player1 = this.players[player1Index];
@@ -1527,7 +1667,7 @@ toggleCardTimer() {
       if (bar) bar.style.width = '0%';
       if (btnText) btnText.innerText = 'NEUSTART';
       if (icon) icon.className = 'fas fa-redo text-[10px]';
-      <!--soundManager.playGunshot();-->
+      //soundManager.playGunshot();
 	  playTimeoutSound();
       this.showToast('⏱️️ Zeit abgelaufen!');
     }
