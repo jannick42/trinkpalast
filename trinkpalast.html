@@ -9,20 +9,6 @@
   <!-- Tailwind CSS CDN -->
   <script src="css/tailwind.css"></script>
   
-  <!-- Drag & Drop Touch Polyfill -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0/default.css">
-<script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0/index.min.js"></script>
-
-<script>
-  // Aktiviert Drag & Drop für Touch-Geräte
-  MobileDragDrop.polyfill({
-    holdToDrag: 150 // 150ms gedrückt halten, um das Scrollen nicht zu blockieren
-  });
-
-  // Wichtig für iOS Safari: Verhindert, dass die Seite beim Ziehen mitscrollt
-  window.addEventListener('touchmove', function() {}, { passive: false });
-</script>
-  
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
@@ -244,9 +230,10 @@
 	  
 	  <!-- ==================== SPIELER-REIHENFOLGE ==================== -->
 <div class="glass-panel p-5 rounded-2xl space-y-3 shadow-2xl">
-  <h3 class="font-heading font-bold text-lg text-purple-400 flex items-center gap-2">
-    <i class="fas fa-arrows-rotate"></i> Reihenfolge <span class="text-xs italic text-slate-400">(Spielernamen über Drag&Drop verschieben)</span>
-  </h3>
+<h3 class="font-heading font-bold text-lg text-purple-400 flex items-center gap-2">
+  <i class="fas fa-arrows-rotate"></i> Reihenfolge 
+  <span class="text-xs italic text-slate-400">(2 Namen nacheinander antippen zum Tauschen)</span>
+</h3>
   <div class="grid grid-cols-2 gap-2.5">
     <button onclick="app.setOrderMode('random')" id="order-random" class="order-btn glass-panel p-3 rounded-xl border-slate-700 text-center transition-all">
       <div class="text-2xl mb-1">🎲</div>
@@ -1123,9 +1110,8 @@ classic: {
 
     class DrinkingApp {
 constructor() {
-    // 1. Daten aus dem LocalStorage laden (mit Standard-Fallbacks falls leer)
     const savedPlayers = localStorage.getItem('tp_players');
-    this.players = savedPlayers ? JSON.parse(savedPlayers) : []; //['Jannick', 'Florian', 'Nico', 'Elly'];
+    this.players = savedPlayers ? JSON.parse(savedPlayers) : [];
 
     const savedDecks = localStorage.getItem('tp_decks');
     this.selectedDecks = savedDecks ? JSON.parse(savedDecks) : ['minigames', 'classic', 'truth_dare', 'vote', 'never_have_i_ever', 'duel'];
@@ -1137,19 +1123,45 @@ constructor() {
     this.currentCard = null;
     this.isFlipped = false;
 	
-	this.playerOrderMode = localStorage.getItem('tp_order_mode') || 'random';
-	this.roundRobinIndex = 0;	
+    this.playerOrderMode = localStorage.getItem('tp_order_mode') || 'random';
+    this.roundRobinIndex = 0;	
     
     this.lastPlayerIndex = -1;
     this.sipStats = {};
     this.selectedGroupDrinkers = new Set();
+    this.selectedSwapIndex = null; // Status für die Position tauschen Funktion
 
     this.currentCardTimerSec = null;
     this.cardTimerInterval = null;
 
     this.confetti = new ConfettiEngine();
     this.pendingDistributeCallback = null;
-    this.initEventListeners();
+  }
+  
+  /* === Klick-zum-Tauschen Logik für Spieler-Chips === */
+  handlePlayerClick(index) {
+    soundManager.playClick();
+
+    if (this.selectedSwapIndex === null) {
+      // Ersten Spieler auswählen
+      this.selectedSwapIndex = index;
+      this.renderPlayerChips();
+    } else if (this.selectedSwapIndex === index) {
+      // Erneut angetippt -> Auswahl abbrechen
+      this.selectedSwapIndex = null;
+      this.renderPlayerChips();
+    } else {
+      // Zweiten Spieler angetippt -> Plätze tauschen
+      const firstIndex = this.selectedSwapIndex;
+      const temp = this.players[firstIndex];
+      this.players[firstIndex] = this.players[index];
+      this.players[index] = temp;
+
+      this.selectedSwapIndex = null;
+      this.savePlayers();
+      this.renderPlayerChips();
+      this.showToast('Positionen getauscht! 🔄');
+    }
   }
 
 init() {
@@ -1159,50 +1171,6 @@ init() {
 	this.setOrderMode(this.playerOrderMode);
     this.setDifficulty(this.difficulty); // Stellt die visuelle Auswahl des Schwierigkeitsgrads wieder her
     this.updateStatsTotalBadge();
-  }
-  
-  // 1. Drag & Drop Event-Handler
-  handleDragStart(e, index) {
-    this.draggedIndex = index;
-    e.dataTransfer.effectAllowed = 'move';
-    e.currentTarget.classList.add('opacity-40', 'scale-95');
-  }
-
-  handleDragOver(e) {
-    e.preventDefault(); // Erforderlich, um Drop zu erlauben
-    e.dataTransfer.dropEffect = 'move';
-  }
-
-  handleDrop(e, targetIndex) {
-    e.preventDefault();
-    if (this.draggedIndex === null || this.draggedIndex === targetIndex) return;
-
-    // Spieler im Array an die neue Position verschieben
-    const [movedPlayer] = this.players.splice(this.draggedIndex, 1);
-    this.players.splice(targetIndex, 0, movedPlayer);
-
-    this.draggedIndex = null;
-    this.savePlayers();
-    soundManager.playClick();
-    this.renderPlayerChips();
-  }
-
-  handleDragEnd(e) {
-    e.currentTarget.classList.remove('opacity-40', 'scale-95');
-    this.draggedIndex = null;
-  }
-  
-movePlayer(idx, direction) {
-    const newIndex = idx + direction;
-    if (newIndex < 0 || newIndex >= this.players.length) return;
-
-    const temp = this.players[idx];
-    this.players[idx] = this.players[newIndex];
-    this.players[newIndex] = temp;
-
-    this.savePlayers();
-    soundManager.playClick();
-    this.renderPlayerChips();
   }
   
   setOrderMode(mode) {
@@ -1280,9 +1248,17 @@ addPlayer() {
     this.renderPlayerChips();
   }
 
-  removePlayer(idx) {
+removePlayer(idx, event) {
+    if (event) event.stopPropagation(); // Verhindert das Auslösen des Tausch-Klicks
     this.players.splice(idx, 1);
-    this.savePlayers(); // SPIELER SPEICHERN
+    
+    if (this.selectedSwapIndex === idx) {
+      this.selectedSwapIndex = null;
+    } else if (this.selectedSwapIndex > idx) {
+      this.selectedSwapIndex--;
+    }
+
+    this.savePlayers();
     soundManager.playClick();
     this.renderPlayerChips();
   }
@@ -1312,24 +1288,35 @@ addPlayer() {
       }*/
 renderPlayerChips() {
     const container = document.getElementById('player-chips');
-    document.getElementById('player-count').innerText = this.players.length;
+    const countEl = document.getElementById('player-count');
+    if (countEl) countEl.innerText = this.players.length;
+
+    if (!container) return;
 
     container.innerHTML = this.players.map((p, i) => {
-      // Farbe hängt jetzt vom Namen ab, nicht mehr vom Platz in der Liste
+      const isSelected = this.selectedSwapIndex === i;
       const colorClass = this.getPlayerColor(p);
 
       return `
         <div
-          draggable="true"
-          ondragstart="app.handleDragStart(event, ${i})"
-          ondragover="app.handleDragOver(event)"
-          ondrop="app.handleDrop(event, ${i})"
-          ondragend="app.handleDragEnd(event)"
-          class="bg-gradient-to-r ${colorClass} border px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-2 shadow-sm cursor-grab active:cursor-grabbing select-none transition-all duration-150"
+          onclick="app.handlePlayerClick(${i})"
+          class="bg-gradient-to-r ${colorClass} border ${
+            isSelected 
+              ? 'border-pink-500 ring-2 ring-pink-500/80 shadow-lg shadow-pink-500/40 scale-105' 
+              : 'border-slate-700/80 hover:border-slate-500'
+          } px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-2 cursor-pointer select-none transition-all duration-200"
         >
-          <i class="fas fa-grip-vertical text-slate-400/60 text-[10px]"></i>
-          <span>👤 ${p}</span>
-          <button onclick="app.removePlayer(${i})" class="hover:text-red-400 transition-colors ml-1 border-l border-slate-700/50 pl-1.5">
+          <span class="w-5 h-5 rounded-full bg-slate-900/90 border ${
+            isSelected ? 'border-pink-400 text-pink-300 font-black' : 'border-slate-700 text-slate-300'
+          } flex items-center justify-center text-[11px] font-mono">
+            ${i + 1}
+          </span>
+          <span>${p}</span>
+          <button 
+            onclick="app.removePlayer(${i}, event)" 
+            class="hover:text-red-400 text-slate-400 transition-colors ml-1 border-l border-slate-700/50 pl-1.5"
+            title="Spieler entfernen"
+          >
             <i class="fas fa-times text-xs"></i>
           </button>
         </div>
