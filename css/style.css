@@ -15,3 +15,10 @@
   font-weight: 400;
   src: url('../fonts/plus-jakarta-sans-v12-latin-regular.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
 }
+
+/* Verhindert Textmarkierung und ungewolltes Scrollen beim Ziehen */
+[draggable="true"] {
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: none;
+}
