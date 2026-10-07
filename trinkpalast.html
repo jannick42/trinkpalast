@@ -957,18 +957,18 @@ classic: {
         name: 'Minispiele & Action',
         icon: '🎮',
         cards: [
-          //{ text: '🎮 MINISPIEL: {player} muss das GLÜCKSRAD drehen! Lass das Schicksal entscheiden.', baseSips: 2, minigameId: 'wheel' },
-          //{ text: '⚡ MINISPIEL: REAKTIONSTEST für {player}! Wie schnell sind deine Reflexe wirklich?', baseSips: 2, minigameId: 'reaction' },
-          //{ text: '👆 MINISPIEL: KLICK-MARATHON! {player} muss in 5 Sekunden so oft wie möglich klicken!', baseSips: 2, minigameId: 'click_sprint' },
-          //{ text: '⏱ MINISPIEL: EXAKT X SEKUNDEN! {player} muss ein Gefühl für die Zeit beweisen.', baseSips: 2, minigameId: 'time_guess' },
-          //{ text: '🃏 MINISPIEL: HÖHER ODER TIEFER! {player} zockt im Card Shark Style um Schlucke.', baseSips: 2, minigameId: 'card_shark' },
+          { text: '🎮 MINISPIEL: {player} muss das GLÜCKSRAD drehen! Lass das Schicksal entscheiden.', baseSips: 2, minigameId: 'wheel' },
+          { text: '⚡ MINISPIEL: REAKTIONSTEST für {player}! Wie schnell sind deine Reflexe wirklich?', baseSips: 2, minigameId: 'reaction' },
+          { text: '👆 MINISPIEL: KLICK-MARATHON! {player} muss in 5 Sekunden so oft wie möglich klicken!', baseSips: 2, minigameId: 'click_sprint' },
+          { text: '⏱ MINISPIEL: EXAKT X SEKUNDEN! {player} muss ein Gefühl für die Zeit beweisen.', baseSips: 2, minigameId: 'time_guess' },
+          { text: '🃏 MINISPIEL: HÖHER ODER TIEFER! {player} zockt im Card Shark Style um Schlucke.', baseSips: 2, minigameId: 'card_shark' },
           { text: '📦 MINISPIEL: DIE KISTE DES GRAUENS! {player} öffnet geheimnisvolle Boxen!', baseSips: 2, minigameId: 'minesweeper' },
-          //{ text: '🔫 MINISPIEL: RUSSISCHES ROULETTE! {player} drückt den Revolver ab. Wann hörst du auf?', baseSips: 3, minigameId: 'roulette' },
-		  //{ text: '🔷 MINISPIEL: FORMEN-ZÄHLER! Augen auf, {player}! Zähle alle sich bewegenden Formen – du hast genau 8 Sekunden!', baseSips: 2, minigameId: 'form' },
-		  //{ text: '🪄 MINISPIEL: KARTEN-TRICK! Merke dir deine Wunschkarte, {player} – verfolge sie beim Mischen und wähle die Richtige!', baseSips: 2, minigameId: 'card_ask' },
-		  //{ text: '⏱️ MINISPIEL: ZAHLEN-JAGD! {player}, finde und klicke alle 15 Zahlen der Reihe nach in unter 8 Sekunden!', baseSips: 2, minigameId: 'number_hunt' },
-		  //{ text: '🎴 MINISPIEL: HÖCHSTE KARTE! {player}, wähle dein Schicksal! Nur Platz 1 verteilt Schlucke – der Rest trinkt!', baseSips: 2, minigameId: 'five_card' },
-		  //{ text: '🎰 MINISPIEL: EINARMIGER BANDIT! {player}, lass die Walzen rollen und beweise dein Glück!', baseSips: 2, minigameId: 'slot_machine' }
+          { text: '🔫 MINISPIEL: RUSSISCHES ROULETTE! {player} drückt den Revolver ab. Wann hörst du auf?', baseSips: 3, minigameId: 'roulette' },
+		  { text: '🔷 MINISPIEL: FORMEN-ZÄHLER! Augen auf, {player}! Zähle alle sich bewegenden Formen – du hast genau 8 Sekunden!', baseSips: 2, minigameId: 'form' },
+		  { text: '🪄 MINISPIEL: KARTEN-TRICK! Merke dir deine Wunschkarte, {player} – verfolge sie beim Mischen und wähle die Richtige!', baseSips: 2, minigameId: 'card_ask' },
+		  { text: '⏱️ MINISPIEL: ZAHLEN-JAGD! {player}, finde und klicke alle 15 Zahlen der Reihe nach in unter 8 Sekunden!', baseSips: 2, minigameId: 'number_hunt' },
+		  { text: '🎴 MINISPIEL: HÖCHSTE KARTE! {player}, wähle dein Schicksal! Nur Platz 1 verteilt Schlucke – der Rest trinkt!', baseSips: 2, minigameId: 'five_card' },
+		  { text: '🎰 MINISPIEL: EINARMIGER BANDIT! {player}, lass die Walzen rollen und beweise dein Glück!', baseSips: 2, minigameId: 'slot_machine' }
         ]
       },
       truth_dare: {
@@ -2027,18 +2027,18 @@ confirmBothDrink() {
         document.getElementById('mg-player-name').innerText = player;
 
         const starters = {
-          //wheel: 'initWheel',
-          //reaction: 'initReaction',
-          //click_sprint: 'initClickSprint',
-          //time_guess: 'initTimeGuess',
-          //card_shark: 'initCardShark',
+          wheel: 'initWheel',
+          reaction: 'initReaction',
+          click_sprint: 'initClickSprint',
+          time_guess: 'initTimeGuess',
+          card_shark: 'initCardShark',
           minesweeper: 'initMinesweeper',
-          //roulette: 'initRoulette',
-		  //form: 'initShapeCounter',
-		  //card_ask: 'initCardSharkShuffle',
-		  //number_hunt: 'initNumberHunt',
-		  //five_card: 'initFiveCards',
-		  //slot_machine: 'initSlotMachine'
+          roulette: 'initRoulette',
+		  form: 'initShapeCounter',
+		  card_ask: 'initCardSharkShuffle',
+		  number_hunt: 'initNumberHunt',
+		  five_card: 'initFiveCards',
+		  slot_machine: 'initSlotMachine'
         };
 
         const starterName = starters[String(mgId).trim()];
