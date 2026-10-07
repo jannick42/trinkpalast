@@ -1120,9 +1120,9 @@ classic: {
       { text: '📜 REGEL: Ab sofort darf niemand mehr fluchen! Wer flucht, trinkt jedes Mal {sips} Schluck. (Dauer: 10 Karten)', shortText: 'Fluch-Verbot (Kein Fluchen)', baseSips: 1,  isRule: true, ruleRounds: 10},
 	  { text: '📜 REGEL: Wer ab jetzt sein Handy anfasst, muss sofort {sips} Schlucke trinken! (Dauer: 8 Karten)', shortText: 'Handy-Verbot', baseSips: 2, isRule: true, ruleRounds: 8 },
 	  { text: '📜 REGEL: Niemand darf ab sofort den Namen eines Mitspielers sagen. Wer es tut: {sips} Schluck! (Dauer: 9 Karten)', shortText: 'Keine Namen nennen', baseSips: 1, isRule: true, ruleRounds: 9 },
-	  { text: '📜 REGEL: Trinken darf man für 8 Karten ab sofort nur noch mit der nicht-dominanten Hand. Fehler = {sips} Schluck!', baseSips: 1, isRule: true, ruleRounds: 8 },
-	  { text: '📜 REGEL: Vor jedem Schluck muss der Spieler laut "Zum Wohl!" sagen. Vergisst man es: noch {sips} Schluck extra! (Dauer: 7 Karten)', baseSips: 1, isRule: true, ruleRounds: 7 },
-	  { text: '📜 REGEL: Die gesamte Runde darf 6 Karten lang nicht mehr lachen. Wer auch nur schmunzelt, trinkt {sips} Schluck!', baseSips: 1, isRule: true, ruleRounds: 6 },
+	  { text: '📜 REGEL: Trinken darf man für 8 Karten ab sofort nur noch mit der nicht-dominanten Hand. Fehler = {sips} Schluck!', shortText: 'Falsche Hand', baseSips: 1, isRule: true, ruleRounds: 8 },
+	  { text: '📜 REGEL: Vor jedem Schluck muss der Spieler laut "Zum Wohl!" sagen. Vergisst man es: noch {sips} Schluck extra! (Dauer: 7 Karten)', shortText: '"Zum Wohl!" sagen', baseSips: 1, isRule: true, ruleRounds: 7 },
+	  { text: '📜 REGEL: Die gesamte Runde darf 6 Karten lang nicht mehr lachen. Wer auch nur schmunzelt, trinkt {sips} Schluck!', shortText: 'Lachverbot', baseSips: 1, isRule: true, ruleRounds: 6 },
     ]
   },
   hot: {
@@ -1374,12 +1374,12 @@ advanceToNextCard() {
   setTimeout(() => {
     this.currentCardIndex++;
     this.loadNextCard();
-  }, 200);
+  }, 110); //TIMING
 
   // 3. Klicksperre erst nach Abschluss der kompletten Animation (600ms) aufheben
   setTimeout(() => {
     this.isBusy = false;
-  }, 400);
+  }, 300);
 }
   
   setOrderMode(mode) {
@@ -1815,7 +1815,7 @@ loadNextCard() {
       title: formattedRuleTitle,
       shortText: formattedRuleTitle,
       sips: calculatedSips,
-      remainingRounds: rawCard.ruleRounds || 3
+      remainingRounds: (rawCard.ruleRounds || 3) + 1
     };
   } else {
     this.pendingRule = null;
@@ -2030,11 +2030,11 @@ toggleCardTimer() {
     cardElem.classList.add('flipped');
     soundManager.playFlip();
 
-    if (this.pendingRule) {
+    /*if (this.pendingRule) {
       this.activeRule = { ...this.pendingRule };
       this.pendingRule = null;
       this.updateRuleBannerUI();
-    }
+    }*/
   } else {
     cardElem.classList.remove('flipped');
     soundManager.playFlip();
@@ -2042,6 +2042,15 @@ toggleCardTimer() {
 }
 
       resolveCard(didDrink) {
+if (this.pendingRule) {
+    const ruleToActivate = this.pendingRule;
+    this.pendingRule = null; // Sofort leeren, damit sie nicht doppelt verarbeitet wird
+
+    setTimeout(() => {
+      this.activeRule = ruleToActivate;
+      this.updateRuleBannerUI();
+    }, 180); // 180ms Verzögerung
+  }
 	    if (this.isBusy) return;
         if (!this.currentCard) return;
 
