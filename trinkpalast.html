@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="icon" type="icon.ico" href="icon.ico">
-  <title>🍻 TrinkPalast v1.2 | by Jannick</title>
+  <title>🍻 TrinkPalast v1.3 | by Jannick</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="css/tailwind.css"></script>
@@ -180,7 +180,7 @@
         </div>
         <div>
           <h1 class="font-heading font-black text-xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-300 to-cyan-400">
-            TRINKPALAST v1.2 <span class="inline-block -translate-y-[4px] text-xs px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30 font-mono">by Jannick</span>
+            TRINKPALAST v1.3 <span class="inline-block -translate-y-[4px] text-xs px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30 font-mono">by Jannick</span>
 			<span id="mg-player-name" style="display: none;"></span>
           </h1>
           <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Don't drink & drive - Just sauf & lauf :)</p>
@@ -473,7 +473,7 @@
       <div class="text-center space-y-1">
         <div class="text-4xl">🍻</div>
         <h3 class="font-heading font-black text-2xl text-amber-400">Schlücke Verteilen!</h3>
-        <p id="distribute-title" class="text-xs text-slate-300">Wähle, wer <span id="distribute-sip-count" class="text-amber-300 font-black">2</span> Schlücke trinken muss:</p>
+        <p id="distribute-title" class="text-xs text-slate-300">Wähle, wer <span id="distribute-sip-count" class="text-amber-300 font-black">2</span> <span id="distribute-sip-count-word">Schluck</span> trinken muss:</p>
       </div>
 
       <div id="distribute-players-list" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
@@ -486,7 +486,7 @@
       <div class="text-center space-y-1">
         <div class="text-4xl">👓🍻</div>
         <h3 class="font-heading font-black text-2xl text-pink-400">Wer hat getrunken?</h3>
-        <p class="text-xs text-slate-300">Wähle alle Spieler aus, die getrunken haben (<span id="group-sip-count" class="text-amber-300 font-black">1</span> Schluck pro Person):</p>
+        <p class="text-xs text-slate-300">Wähle alle Spieler aus, die getrunken haben (<span id="group-sip-count" class="text-amber-300 font-black">1</span> <span id="group-sip-count-word">Schluck</span> pro Person):</p>
       </div>
 
       <div id="group-drink-players-list" class="grid grid-cols-2 gap-2.5 max-h-60 overflow-y-auto pr-1"></div>
@@ -957,18 +957,18 @@ classic: {
         name: 'Minispiele & Action',
         icon: '🎮',
         cards: [
-          { text: '🎮 MINISPIEL: {player} muss das GLÜCKSRAD drehen! Lass das Schicksal entscheiden.', baseSips: 2, minigameId: 'wheel' },
-          { text: '⚡ MINISPIEL: REAKTIONSTEST für {player}! Wie schnell sind deine Reflexe wirklich?', baseSips: 2, minigameId: 'reaction' },
-          { text: '👆 MINISPIEL: KLICK-MARATHON! {player} muss in 5 Sekunden so oft wie möglich klicken!', baseSips: 2, minigameId: 'click_sprint' },
-          { text: '⏱ MINISPIEL: EXAKT X SEKUNDEN! {player} muss ein Gefühl für die Zeit beweisen.', baseSips: 2, minigameId: 'time_guess' },
-          { text: '🃏 MINISPIEL: HÖHER ODER TIEFER! {player} zockt im Card Shark Style um Schlucke.', baseSips: 2, minigameId: 'card_shark' },
+          //{ text: '🎮 MINISPIEL: {player} muss das GLÜCKSRAD drehen! Lass das Schicksal entscheiden.', baseSips: 2, minigameId: 'wheel' },
+          //{ text: '⚡ MINISPIEL: REAKTIONSTEST für {player}! Wie schnell sind deine Reflexe wirklich?', baseSips: 2, minigameId: 'reaction' },
+          //{ text: '👆 MINISPIEL: KLICK-MARATHON! {player} muss in 5 Sekunden so oft wie möglich klicken!', baseSips: 2, minigameId: 'click_sprint' },
+          //{ text: '⏱ MINISPIEL: EXAKT X SEKUNDEN! {player} muss ein Gefühl für die Zeit beweisen.', baseSips: 2, minigameId: 'time_guess' },
+          //{ text: '🃏 MINISPIEL: HÖHER ODER TIEFER! {player} zockt im Card Shark Style um Schlucke.', baseSips: 2, minigameId: 'card_shark' },
           { text: '📦 MINISPIEL: DIE KISTE DES GRAUENS! {player} öffnet geheimnisvolle Boxen!', baseSips: 2, minigameId: 'minesweeper' },
-          { text: '🔫 MINISPIEL: RUSSISCHES ROULETTE! {player} drückt den Revolver ab. Wann hörst du auf?', baseSips: 3, minigameId: 'roulette' },
-		  { text: '🔷 MINISPIEL: FORMEN-ZÄHLER! Augen auf, {player}! Zähle alle sich bewegenden Formen – du hast genau 8 Sekunden!', baseSips: 2, minigameId: 'form' },
-		  { text: '🪄 MINISPIEL: KARTEN-TRICK! Merke dir deine Wunschkarte, {player} – verfolge sie beim Mischen und wähle die Richtige!', baseSips: 2, minigameId: 'card_ask' },
-		  { text: '⏱️ MINISPIEL: ZAHLEN-JAGD! {player}, finde und klicke alle 15 Zahlen der Reihe nach in unter 8 Sekunden!', baseSips: 2, minigameId: 'number_hunt' },
-		  { text: '🎴 MINISPIEL: HÖCHSTE KARTE! {player}, wähle dein Schicksal! Nur Platz 1 verteilt Schlucke – der Rest trinkt!', baseSips: 2, minigameId: 'five_card' },
-		  { text: '🎰 MINISPIEL: EINARMIGER BANDIT! {player}, lass die Walzen rollen und beweise dein Glück!', baseSips: 2, minigameId: 'slot_machine' }
+          //{ text: '🔫 MINISPIEL: RUSSISCHES ROULETTE! {player} drückt den Revolver ab. Wann hörst du auf?', baseSips: 3, minigameId: 'roulette' },
+		  //{ text: '🔷 MINISPIEL: FORMEN-ZÄHLER! Augen auf, {player}! Zähle alle sich bewegenden Formen – du hast genau 8 Sekunden!', baseSips: 2, minigameId: 'form' },
+		  //{ text: '🪄 MINISPIEL: KARTEN-TRICK! Merke dir deine Wunschkarte, {player} – verfolge sie beim Mischen und wähle die Richtige!', baseSips: 2, minigameId: 'card_ask' },
+		  //{ text: '⏱️ MINISPIEL: ZAHLEN-JAGD! {player}, finde und klicke alle 15 Zahlen der Reihe nach in unter 8 Sekunden!', baseSips: 2, minigameId: 'number_hunt' },
+		  //{ text: '🎴 MINISPIEL: HÖCHSTE KARTE! {player}, wähle dein Schicksal! Nur Platz 1 verteilt Schlucke – der Rest trinkt!', baseSips: 2, minigameId: 'five_card' },
+		  //{ text: '🎰 MINISPIEL: EINARMIGER BANDIT! {player}, lass die Walzen rollen und beweise dein Glück!', baseSips: 2, minigameId: 'slot_machine' }
         ]
       },
       truth_dare: {
@@ -1095,7 +1095,7 @@ classic: {
       { text: '{player}, mache einen kurzen, 10-sekündigen "Lapdance" vor {player2} (lustig oder sexy). Verweigerst du: {sips} Schlücke!', baseSips: 3 },
       { text: '{player}, verrate der Runde deinen intimsten oder verrücktesten Ort, an dem du je jemanden geküsst hast. Sag es oder trinke {sips} Schlücke!', baseSips: 2 },
       { text: '{player}, streiche mit deinem Finger sanft über den Nacken von {player2}. Wenn {player2} zuckt, muss {player2} {sips} Schlücke trinken!', baseSips: 2, isGroup: true },
-      { text: '{player}, vergleiche die Lippen aller Mitspieler und entscheide, wer die weichsten zu haben scheint. Die gewählte Person verteilt {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, vergleiche die Lippen aller Mitspieler und entscheide, wer die weichsten zu haben scheint. Die gewählte Person verteilt {sips} Schlücke!', baseSips: 2, isGroup: true},
       { text: '{player}, ziehe ein Kleidungsstück deiner Wahl aus (Schuhe/Socken zählen!) oder trinke {sips} Schlücke!', baseSips: 3 },
       { text: '{player}, bei wem aus dieser Runde würdest du am ehesten schwach werden, wenn ihr alleine auf einer Insel wärt? Antworten oder {sips} Schlücke!', baseSips: 3 },
       { text: '{player}, beiße sanft in deine Unterlippe und schau {player2} 5 Sekunden lang intensiv an. Reagiert {player2} nervös: {sips} Schlücke für {player2}!', baseSips: 2, isGroup: true },
@@ -1807,7 +1807,9 @@ confirmBothDrink() {
         if (!this.currentCard) return;
         this.selectedGroupDrinkers = new Set();
         const modal = document.getElementById('modal-group-drink');
+		const sipWord = this.currentCard.sips === 1 ? 'Schluck' : 'Schlücke';
         document.getElementById('group-sip-count').innerText = this.currentCard.sips;
+		document.getElementById('group-sip-count-word').innerText = sipWord;
         this.renderGroupDrinkPlayerList();
         modal.classList.remove('hidden');
       }
@@ -1891,6 +1893,7 @@ confirmBothDrink() {
         const availableTargets = this.players.filter(p => p !== giverPlayer);
 		
 		const sipWord = sipCount === 1 ? 'Schluck' : 'Schlücke';
+		document.getElementById('distribute-sip-count-word').innerText = sipWord;
 
         list.innerHTML = availableTargets.map(p => `
           <button onclick="app.confirmDistribute('${giverPlayer}', '${p}', ${sipCount})" class="w-full py-3 px-4 rounded-xl bg-slate-800 hover:bg-pink-600/30 border border-slate-700 hover:border-pink-500 font-bold text-white flex justify-between items-center transition-all">
@@ -1906,7 +1909,8 @@ confirmBothDrink() {
       confirmDistribute(giver, target, sips) {
         soundManager.playDrink();
         this.addSipsToPlayer(target, sips);
-        this.showToast(`${target} bekommt ${sips} Schlucke von ${giver}! 🍻`);
+		const sipWord2 = sips === 1 ? 'Schluck' : 'Schlücke';
+        this.showToast(`${target} bekommt ${sips} ${sipWord2} von ${giver}! 🍻`);
         document.getElementById('modal-distribute').classList.add('hidden');
         if (this.pendingDistributeCallback) {
           this.pendingDistributeCallback();
@@ -2008,11 +2012,11 @@ confirmBothDrink() {
 	  
 	  
 	  
-	  
-	  
-	  
 
-      /* === MINIGAME LAUNCHER === */
+/* ============================================ MINIGAME LAUNCHER ============================================ */
+	  
+	  
+	  
       startCurrentMinigame() {
         if (!this.currentCard || !this.currentCard.minigameId) return;
         soundManager.playClick();
@@ -2023,18 +2027,18 @@ confirmBothDrink() {
         document.getElementById('mg-player-name').innerText = player;
 
         const starters = {
-          wheel: 'initWheel',
-          reaction: 'initReaction',
-          click_sprint: 'initClickSprint',
-          time_guess: 'initTimeGuess',
-          card_shark: 'initCardShark',
+          //wheel: 'initWheel',
+          //reaction: 'initReaction',
+          //click_sprint: 'initClickSprint',
+          //time_guess: 'initTimeGuess',
+          //card_shark: 'initCardShark',
           minesweeper: 'initMinesweeper',
-          roulette: 'initRoulette',
-		  form: 'initShapeCounter',
-		  card_ask: 'initCardSharkShuffle',
-		  number_hunt: 'initNumberHunt',
-		  five_card: 'initFiveCards',
-		  slot_machine: 'initSlotMachine'
+          //roulette: 'initRoulette',
+		  //form: 'initShapeCounter',
+		  //card_ask: 'initCardSharkShuffle',
+		  //number_hunt: 'initNumberHunt',
+		  //five_card: 'initFiveCards',
+		  //slot_machine: 'initSlotMachine'
         };
 
         const starterName = starters[String(mgId).trim()];
@@ -2179,16 +2183,25 @@ initWheel(player) {
   const drink2 = app.calculateMinigameSips(2);
   const drink3 = app.calculateMinigameSips(3);
   const drinkEx = maxSips; // Höchststrafe bleibt unverändert
-
+  
+  const sipWord1 = dist1 === 1 ? 'Schluck' : 'Schlücke';
+  const sipWord2 = dist2 === 1 ? 'Schluck' : 'Schlücke';
+  const sipWord4 = dist4 === 1 ? 'Schluck' : 'Schlücke';
+  
+  const sipWord_1 = drink1 === 1 ? 'Schluck' : 'Schlücke';
+  const sipWord_2 = drink2 === 1 ? 'Schluck' : 'Schlücke';
+  const sipWord_3 = drink3 === 1 ? 'Schluck' : 'Schlücke';
+  const sipWord_Ex = drinkEx === 1 ? 'Schluck' : 'Schlücke';
+  
   this.wheelSlices = [
-    { label: `Verteile ${dist2} Schlucke`, sips: dist2, action: 'distribute' },
-    { label: `Trinke ${drink1} Schluck`, sips: drink1, action: 'drink' },
+    { label: `Verteile ${dist2} ${sipWord2}`, sips: dist2, action: 'distribute' },
+    { label: `Trinke ${drink1} ${sipWord_1}`, sips: drink1, action: 'drink' },
     { label: 'Glück gehabt!', sips: 0, action: 'safe' },
-    { label: `Trinke ${drink3} Schlucke`, sips: drink3, action: 'drink' },
-    { label: `Verteile ${dist4} Schlucke`, sips: dist4, action: 'distribute' },
-    { label: `Trinke ${drink2} Schlucke`, sips: drink2, action: 'drink' },
-    { label: `Verteile ${dist1} Schluck`, sips: dist1, action: 'distribute' },
-    { label: `Trinke ${drinkEx} Schlucke`, sips: drinkEx, action: 'drink' }
+    { label: `Trinke ${drink3} ${sipWord_3}`, sips: drink3, action: 'drink' },
+    { label: `Verteile ${dist4} ${sipWord4}`, sips: dist4, action: 'distribute' },
+    { label: `Trinke ${drink2} ${sipWord_2}`, sips: drink2, action: 'drink' },
+    { label: `Verteile ${dist1} ${sipWord1}`, sips: dist1, action: 'distribute' },
+    { label: `Trinke ${drinkEx} ${sipWord_Ex}`, sips: drinkEx, action: 'drink' }
   ];
 
   this.wheelAngle = 0;
@@ -2357,9 +2370,11 @@ spinWheel(player) {
         const maxSips = app.getMaxSipsForDifficulty();
         const mode = app.difficulty || (maxSips <= 3 ? 'easy' : maxSips <= 5 ? 'medium' : 'hard');
         const penaltySips = { easy: 3, medium: 5, hard: 8 }[mode];
+		
+		const sipWord = penaltySips === 1 ? 'Schluck' : 'Schlücke';
 
         setTimeout(() => {
-          this.showPenaltyCard(player, penaltySips, `Gar nicht reagiert! Du musst ${penaltySips} Schlucke trinken.`);
+          this.showPenaltyCard(player, penaltySips, `Gar nicht reagiert! Du musst ${penaltySips} ${sipWord} trinken.`);
         }, 1500);
       }
     }, 3500);
@@ -2387,9 +2402,10 @@ handleReactionTap(event, player) {
     }
 
     const earlyPenalty = { easy: 3, medium: 5, hard: 8 }[mode];
+	const sipWord1 = earlyPenalty === 1 ? 'Schluck' : 'Schlücken';
 
     setTimeout(() => {
-      this.showPenaltyCard(player, earlyPenalty, `Frühstart! Du musst die volle Strafe von ${earlyPenalty} Schlucken trinken.`);
+      this.showPenaltyCard(player, earlyPenalty, `Frühstart! Du musst die volle Strafe von ${earlyPenalty} ${sipWord1} trinken.`);
     }, 1800);
 
   } else if (this.reactState === 'ready') {
@@ -2423,10 +2439,13 @@ handleReactionTap(event, player) {
 
         soundManager.playSuccess();
         app.closeMinigame();
+		
+		const sipWord = winSips === 1 ? 'Schluck' : 'Schlücke';
+		
         app.openDistributeModal(
           player, 
           winSips, 
-          `Starke Reaktion (${elapsed} ms)! Verteile ${winSips} Schluck${winSips > 1 ? 'e' : ''}.`, 
+          `Starke Reaktion (${elapsed} ms)! Verteile ${winSips} ${sipWord}.`, 
           () => {}
         );
       } else {
@@ -2443,11 +2462,13 @@ handleReactionTap(event, player) {
         } else {                    // >= 510 ms
           penaltySips = { easy: 3, medium: 5, hard: 8 }[mode];
         }
+		
+		const sipWord2 = penaltySips === 1 ? 'Schluck' : 'Schlücke';
 
         this.showPenaltyCard(
           player, 
           penaltySips, 
-          `Zu langsam! (${elapsed} ms). Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`
+          `Zu langsam! (${elapsed} ms). Du musst ${penaltySips} ${sipWord2} trinken!`
         );
       }
     }, 2200);
@@ -2463,7 +2484,7 @@ handleReactionTap(event, player) {
 
   // Alte Timer bereinigen
   if (this.clickTimer) clearInterval(this.clickTimer);
-
+  
   const container = document.getElementById('mg-content');
   container.innerHTML = `
     <div class="w-full flex flex-col items-center space-y-4 select-none">
@@ -2559,10 +2580,11 @@ evaluateClickSprint(player) {
 
       soundManager.playSuccess();
       app.closeMinigame();
+	  const sipWord = winSips === 1 ? 'Schluck' : 'Schlücke';
       app.openDistributeModal(
         player,
         winSips,
-        `Klick-Marathon (${count} Klicks – Verteile ${winSips} Schluck${winSips > 1 ? 'e' : ''})`,
+        `Klick-Marathon (${count} Klicks – Verteile ${winSips} ${sipWord})`,
         () => {}
       );
     } else {
@@ -2583,10 +2605,11 @@ evaluateClickSprint(player) {
         penaltySips = { easy: 1, medium: 2, hard: 4 }[mode];
       }
 
+	const sipWord2 = penaltySips === 1 ? 'Schluck' : 'Schlücke';
       this.showPenaltyCard(
         player,
         penaltySips,
-        `Zu wenig Klicks! (${count} Klicks). Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`
+        `Zu wenig Klicks! (${count} Klicks). Du musst ${penaltySips} ${sipWord2} trinken!`
       );
     }
   }, 2000);
@@ -2667,10 +2690,11 @@ handleTimeGuessBtn(player) {
 
         soundManager.playSuccess();
         app.closeMinigame();
+		const sipWord = winSips === 1 ? 'Schluck' : 'Schlücke';
         app.openDistributeModal(
           player,
           winSips,
-          `Exakte Zeit! (${diffMs}ms Abweichung) – Verteile ${winSips} Schluck${winSips > 1 ? 'e' : ''}.`,
+          `Exakte Zeit! (${diffMs}ms Abweichung) – Verteile ${winSips} ${sipWord}.`,
           () => {}
         );
       } else {
@@ -2680,22 +2704,28 @@ handleTimeGuessBtn(player) {
 
         if (diffMs >= 2000) {
           penaltySips = { easy: 3, medium: 5, hard: 8 }[mode];
-          msg = `Eingeschlafen, nicht reagiert! (${(diffMs / 1000).toFixed(2)}s Abweichung). Du musst ${penaltySips} Schlucke trinken!`;
+		  const sipWord2 = penaltySips === 1 ? 'Schluck' : 'Schlücke';
+          msg = `Eingeschlafen, nicht reagiert! (${(diffMs / 1000).toFixed(2)}s Abweichung). Du musst ${penaltySips} ${sipWord2} trinken!`;
         } else if (diffMs < 630) {        // 600ms - 629ms
           penaltySips = { easy: 1, medium: 2, hard: 4 }[mode];
-          msg = `Knapp daneben! (${diffMs}ms Abweichung). Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`;
+		  const sipWord2 = penaltySips === 1 ? 'Schluck' : 'Schlücke';
+          msg = `Knapp daneben! (${diffMs}ms Abweichung). Du musst ${penaltySips} ${sipWord2} trinken!`;
         } else if (diffMs < 660) { // 630ms - 659ms
           penaltySips = { easy: 2, medium: 3, hard: 5 }[mode];
-          msg = `Zu weit daneben! (${diffMs}ms Abweichung). Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`;
+		  const sipWord2 = penaltySips === 1 ? 'Schluck' : 'Schlücke';
+          msg = `Zu weit daneben! (${diffMs}ms Abweichung). Du musst ${penaltySips} ${sipWord2} trinken!`;
         } else if (diffMs < 690) { // 660ms - 689ms
           penaltySips = { easy: 2, medium: 4, hard: 6 }[mode];
-          msg = `Zu weit daneben! (${diffMs}ms Abweichung). Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`;
+		  const sipWord2 = penaltySips === 1 ? 'Schluck' : 'Schlücke';
+          msg = `Zu weit daneben! (${diffMs}ms Abweichung). Du musst ${penaltySips} ${sipWord2} trinken!`;
         } else if (diffMs < 720) { // 690ms - 719ms
           penaltySips = { easy: 3, medium: 4, hard: 7 }[mode];
-          msg = `Schlechtes Zeitgefühl! (${diffMs}ms Abweichung). Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`;
+		  const sipWord2 = penaltySips === 1 ? 'Schluck' : 'Schlücke';
+          msg = `Schlechtes Zeitgefühl! (${diffMs}ms Abweichung). Du musst ${penaltySips} ${sipWord2} trinken!`;
         } else {                   // 720ms - 1999ms
           penaltySips = { easy: 3, medium: 5, hard: 8 }[mode];
-          msg = `Schlechtes Zeitgefühl! (${diffMs}ms Abweichung). Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`;
+		  const sipWord2 = penaltySips === 1 ? 'Schluck' : 'Schlücke';
+          msg = `Schlechtes Zeitgefühl! (${diffMs}ms Abweichung). Du musst ${penaltySips} ${sipWord2} trinken!`;
         }
 
         this.showPenaltyCard(player, penaltySips, msg);
@@ -2759,7 +2789,7 @@ updateTimeGuessLoop() {
             </div>
 
             <button id="card-cashout-btn" onclick="minigames.cashoutCardShark('${player}')" class="hidden w-full py-2.5 bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold rounded-xl active:scale-95 transition-all text-xs">
-              💰 Serie sichern & Schlucke verteilen
+              💰 Serie sichern & Schlücke verteilen
             </button>
           </div>
         `;
@@ -2807,7 +2837,8 @@ guessCardShark(player, choice) {
     const accumulated = Math.min(maxSips, this.cardStreak);
     const cashoutBtn = document.getElementById('card-cashout-btn');
     cashoutBtn.classList.remove('hidden');
-    cashoutBtn.innerText = `💰 Serie sichern (${accumulated} Schlucke verteilen)`;
+	const sipWordX = accumulated === 1 ? 'Schluck' : 'Schlücke';
+    cashoutBtn.innerText = `💰 Serie sichern (${accumulated} ${sipWordX} verteilen)`;
 
     app.showToast(`Richtig! 🎉 Serie: ${this.cardStreak}`);
 
@@ -2830,10 +2861,11 @@ guessCardShark(player, choice) {
       penaltySips = Math.floor(Math.random() * (8 - 4 + 1)) + 4; // 4 bis 8
     }
 
+	const sipWord = penaltySips === 1 ? 'Schluck' : 'Schlücke';
     this.showPenaltyCard(
       player, 
       penaltySips, 
-      `Falsch geraten! Die Karte lag daneben. Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`
+      `Falsch geraten! Die Karte lag daneben. Du musst ${penaltySips} ${sipWord} trinken!`
     );
   }
 }
@@ -2899,7 +2931,7 @@ guessCardShark(player, choice) {
     <div class="w-full flex flex-col items-center">
       ${gridHTML}
       <button id="box-cashout-btn" onclick="minigames.cashoutBoxes('${player}')" class="hidden w-full py-2.5 bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold rounded-xl active:scale-95 transition-all text-xs">
-        💰 Schlucke verteilen & Aufhören
+        💰 Schlücke verteilen & Aufhören
       </button>
     </div>
   `;
@@ -2930,10 +2962,11 @@ openBox(player, idx) {
       penaltySips = Math.floor(Math.random() * (8 - 4 + 1)) + 4; // 4 bis 8
     }
 
+	const sipWord = penaltySips === 1 ? 'Schluck' : 'Schlücke';
     this.showPenaltyCard(
       player, 
       penaltySips, 
-      `NIETE GEZOGEN ☠️! Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`
+      `NIETE GEZOGEN ☠️! Du musst ${penaltySips} ${sipWord} trinken!`
     );
     return;
   } 
@@ -2963,8 +2996,9 @@ openBox(player, idx) {
 
   const cashoutBtn = document.getElementById('box-cashout-btn');
   if (this.boxSipsAccumulated > 0 && cashoutBtn) {
+	const sipWord2 = this.boxSipsAccumulated === 1 ? 'Schluck' : 'Schlücke';
     cashoutBtn.classList.remove('hidden');
-    cashoutBtn.innerText = `💰 ${this.boxSipsAccumulated} Schluck(e) verteilen & aufhören`;
+    cashoutBtn.innerText = `💰 ${this.boxSipsAccumulated} ${sipWord2} verteilen & aufhören`;
   }
 
   // Automatische Beendigung prüfen
@@ -3018,12 +3052,13 @@ initRoulette(player) {
   const maxSips = app.getMaxSipsForDifficulty();
 
   const container = document.getElementById('mg-content');
+  const sipWord2 = maxSips === 1 ? 'Schluck' : 'Schlücke';
   container.innerHTML = `
     <div id="roulette-wrapper" class="w-full flex flex-col items-center space-y-5 transition-all">
       <div class="glass-panel px-4 py-2 rounded-full border border-slate-700 flex items-center gap-3 text-xs font-bold text-slate-300">
         <span>Überlebt: <span id="roulette-survived" class="text-emerald-400 font-black text-sm">0</span>/5</span>
         <span class="text-slate-600">|</span>
-        <span>🎯 Pott: <span id="roulette-pot" class="text-amber-300 font-black text-sm">0</span> / ${maxSips} Schlucke</span>
+        <span>🎯 Pott: <span id="roulette-pot" class="text-amber-300 font-black text-sm">0</span> / ${maxSips} ${sipWord2} </span>
       </div>
 
       <!-- Revolver-Trommel Bereich -->
@@ -3058,7 +3093,7 @@ initRoulette(player) {
       </button>
 
       <button id="roulette-cashout-btn" onclick="minigames.cashoutRoulette('${player}')" class="hidden w-full py-2.5 bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold rounded-xl active:scale-95 transition-all text-xs">
-        💰 Pott sichern & Schlucke verteilen
+        💰 Pott sichern & Schlücke verteilen
       </button>
     </div>
   `;
@@ -3117,7 +3152,8 @@ pullTriggerRoulette(player) {
 
     if (cashoutBtn) {
       cashoutBtn.classList.remove('hidden', 'pointer-events-none', 'opacity-50');
-      cashoutBtn.innerText = `💰 Pott sichern (${potSips} Schlucke verteilen)`;
+	  const sipWord = potSips === 1 ? 'Schluck' : 'Schlücke';
+      cashoutBtn.innerText = `💰 Pott sichern (${potSips} ${sipWord} verteilen)`;
     }
 
     // AUTOMATISCHER STOPP BEI ERREICHEN DER MAXIMALEN SCHLÜCKE ODER ALLER 5 LEEREN KAMMERN
@@ -3145,11 +3181,12 @@ cashoutRoulette(player) {
 
   const maxSips = app.getMaxSipsForDifficulty();
   const potSips = this.getRoulettePot(this.survivedShots, maxSips);
+  const sipWordX = potSips === 1 ? 'Schluck' : 'Schlücke';
 
   if (potSips > 0) {
     soundManager.playSuccess();
     app.closeMinigame();
-    app.openDistributeModal(player, potSips, `Russisches Roulette Pott (${potSips} Schlucke)`, () => {});
+    app.openDistributeModal(player, potSips, `Russisches Roulette Pott (${potSips} ${sipWordX})`, () => {});
   }
 }
 
@@ -3230,10 +3267,11 @@ clickNumber(num, player) {
           const timeoutSips = timeoutPenalties[mode] || 5;
 
           setTimeout(() => {
+		  const sipWord = timeoutSips === 1 ? 'Schluck' : 'Schlücke';
             this.showPenaltyCard(
               player,
               timeoutSips,
-              `Zeit abgelaufen! ⏳ 20 Sekunden überschritten (${timeoutSips} Schlucke trinken).`
+              `Zeit abgelaufen! ⏳ 20 Sekunden überschritten (${timeoutSips} ${sipWord} trinken).`
             );
           }, 300);
         }
@@ -3288,10 +3326,11 @@ clickNumber(num, player) {
         app.showToast(`🔥 In ${elapsedSeconds}s geschafft!`);
         setTimeout(() => {
           app.closeMinigame();
+		  const sipWord2 = winSips === 1 ? 'Schluck' : 'Schlücke';
           app.openDistributeModal(
             player,
             winSips,
-            `Zahlen-Jagd in ${elapsedSeconds}s (${winSips} Schluck${winSips > 1 ? 'e' : ''} verteilen)`,
+            `Zahlen-Jagd in ${elapsedSeconds}s (${winSips} ${sipWord2} verteilen)`,
             () => {}
           );
         }, 800);
@@ -3311,10 +3350,11 @@ clickNumber(num, player) {
         }
 
         setTimeout(() => {
+		const sipWord1 = penaltySips === 1 ? 'Schluck' : 'Schlücke';
           this.showPenaltyCard(
             player,
             penaltySips,
-            `Zu langsam! (${elapsedSeconds}s gebraucht – Limit war 10.0s). Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`
+            `Zu langsam! (${elapsedSeconds}s gebraucht – Limit war 10.0s). Du musst ${penaltySips} ${sipWord1} trinken!`
           );
         }, 800);
       }
@@ -3375,7 +3415,7 @@ initShapeCounter(player) {
     <div class="flex flex-col items-center justify-center space-y-3 w-full">
       <!-- Visueller Timer-Balken (8 Sekunden) -->
       <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden border border-slate-700 shadow-inner">
-        <div id="shape-timer-bar" class="bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 h-full w-full"></div>
+        <div id="shape-timer-bar" class="bg-gradient-to-r from-pink-500 to-cyan-400 h-full w-full"></div>
       </div>
 
       <div class="text-xs font-bold text-amber-400 animate-pulse">⏰ 8 Sekunden Zeit... Genau mitzählen!</div>
@@ -3515,20 +3555,22 @@ answerShapeCounter(player, chosen, correct) {
     
     setTimeout(() => {
       app.closeMinigame();
+	  const sipWord = winSips === 1 ? 'Schluck' : 'Schlücke';
       app.openDistributeModal(
         player, 
         winSips, 
-        `Formen-Zähler Meister (${winSips} Schluck${winSips > 1 ? 'e' : ''} verteilen)`, 
+        `Formen-Zähler Meister (${winSips} ${sipWord} verteilen)`, 
         () => {}
       );
     }, 600);
   } else {
     const penaltySips = getRandomSips();
+	const sipWord2 = penaltySips === 1 ? 'Schluck' : 'Schlücke';
     
     this.showPenaltyCard(
       player, 
       penaltySips, 
-      `Falsch! Es waren ${correct} (du tipptest ${chosen}). Du musst ${penaltySips} Schluck${penaltySips > 1 ? 'e' : ''} trinken!`
+      `Falsch! Es waren ${correct} (du tipptest ${chosen}). Du musst ${penaltySips} ${sipWord2} trinken!`
     );
   }
 }
@@ -3536,401 +3578,219 @@ answerShapeCounter(player, chosen, correct) {
 //------------------------------------#10-Karten-Trick------------------------------------
 
 initCardSharkShuffle(player) {
-
   document.getElementById('mg-icon').innerText = '🃏';
-
   document.getElementById('mg-title').innerText = 'Karten-Trick';
-
   document.getElementById('mg-subtitle').innerText = 'Merk dir die Karte und verfolge sie!';
 
-
   // Hilfsfunktion zur zufälligen Berechnung der Schlucke je nach Modus
-
   const getRandomSips = () => {
-
     const maxSips = app.getMaxSipsForDifficulty();
-
     const mode = app.difficulty || (maxSips <= 3 ? 'easy' : maxSips <= 4 ? 'medium' : 'hard');
-
     
-
     if (mode === 'easy') {
-
       return Math.floor(Math.random() * (3 - 1 + 1)) + 1; // 1 bis 3
-
     } else if (mode === 'medium') {
-
       return Math.floor(Math.random() * (5 - 2 + 1)) + 2; // 2 bis 4
-
     } else {
-
       return Math.floor(Math.random() * (8 - 4 + 1)) + 4; // 4 bis 8
-
     }
-
   };
 
-
   const winSips = getRandomSips();
-
   const loseSips = getRandomSips();
-
+  const sipWord = winSips === 1 ? 'Schluck' : 'Schlücke';
+  const sipWord1 = loseSips === 1 ? 'Schluck' : 'Schlücke';
 
   this.cards = [
-
     { 
-
       id: 0, 
-
       type: 'win', 
-
       sips: winSips, 
-
-      label: `Verteile ${winSips} Schluck${winSips > 1 ? 'e' : ''}`, 
-
+      label: `Verteile ${winSips} ${sipWord}`, 
       icon: '🏆' 
-
     },
-
     { 
-
       id: 1, 
-
       type: 'safe', 
-
       sips: 0, 
-
       label: 'Glück gehabt! Nichts.', 
-
       icon: '🛡️' 
-
     },
-
     { 
-
       id: 2, 
-
       type: 'lose', 
-
       sips: loseSips, 
-
-      label: `Trinke ${loseSips} Schluck${loseSips > 1 ? 'e' : ''}`, 
-
+      label: `Trinke ${loseSips} ${sipWord1}`, 
       icon: '💀' 
-
     }
-
   ].sort(() => Math.random() - 0.5);
 
-
   // Initialen Slot festlegen (0, 1, 2)
-
   this.cards.forEach((c, i) => {
-
     c.initialSlot = i;
-
     c.slot = i;
-
   });
-
 
   const container = document.getElementById('mg-content');
-
   container.innerHTML = `
-
     <div class="flex flex-col items-center space-y-5">
-
       <p id="card-status-text" class="text-xs font-bold text-amber-300 animate-pulse">Merk dir die Verteilung!</p>
-
-
+	  
       <!-- Container mit ausreichend Platz für die Bogen-Animationen -->
-
       <div id="card-deck" class="flex justify-center items-center gap-2 sm:gap-3 w-full my-2 relative min-h-[200px]">
-
         ${this.cards.map((c, i) => `
-
           <!-- Echte Pokerkarten-Proportionen: w-28 (112px) x h-[160px] -->
-
           <div id="shuffle-card-${i}" class="w-28 h-[160px] rounded-xl border-2 border-slate-600 glass-panel flex flex-col items-center justify-between p-3 text-center transition-all duration-300 shadow-xl select-none">
-
             <span class="text-3xl mt-4">${c.icon}</span>
-
             <span class="text-xs font-bold text-slate-200 leading-tight mb-1">${c.label}</span>
-
           </div>
-
         `).join('')}
-
       </div>
 
-
       <button id="start-shuffle-btn" onclick="minigames.startCardShuffle('${player}')" class="w-full py-4 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-heading font-black text-xl shadow-lg active:scale-95 transition-all">
-
-        🔀 Karten verdecken & mischen!
-
+        🔀 Karten mischen!
       </button>
-
     </div>
-
   `;
-
 }
-
 
 startCardShuffle(player) {
-
   const btn = document.getElementById('start-shuffle-btn');
-
   if (btn) btn.style.display = 'none';
 
-
   const statusText = document.getElementById('card-status-text');
-
   statusText.innerText = 'Karten werden verdeckt & gemischt...';
 
-
   // 1. Karten umdrehen & Transition aktivieren
-
   this.cards.forEach((card) => {
-
     const cardEl = document.getElementById(`shuffle-card-${card.initialSlot}`);
-
     if (cardEl) {
-
       cardEl.classList.add('bg-slate-900');
-
       cardEl.innerHTML = '<span class="text-4xl my-auto">❓</span>';
-
       cardEl.style.transition = 'transform 0.28s cubic-bezier(0.4, 0, 0.2, 1)';
-
     }
-
   });
-
 
   // 2. Exakten Pixel-Abstand zwischen den Slot-Mitten berechnen
-
   const c0 = document.getElementById('shuffle-card-0');
-
   const c1 = document.getElementById('shuffle-card-1');
-
   const slotDistance = (c0 && c1) ? Math.abs(c1.offsetLeft - c0.offsetLeft) : 120;
 
-
   let swapsCount = 0;
-
   const maxSwaps = 16; // Längeres Mischen
-
   let lastS1 = -1;
 
-
   setTimeout(() => {
-
     const interval = setInterval(() => {
-
       swapsCount++;
-
       soundManager.playClickTick();
 
-
       // Zwei unterschiedliche Slots für den Tausch wählen
-
       let s1 = Math.floor(Math.random() * 3);
-
       while (s1 === lastS1) s1 = Math.floor(Math.random() * 3);
-
       let s2 = Math.floor(Math.random() * 3);
-
       while (s2 === s1) s2 = Math.floor(Math.random() * 3);
-
       lastS1 = s1;
 
-
       const cardA = this.cards.find(c => c.slot === s1);
-
       const cardB = this.cards.find(c => c.slot === s2);
 
-
       // Logischen Slot tauschen
-
       cardA.slot = s2;
-
       cardB.slot = s1;
 
-
       // Visuelle Transformation anwenden (mit Bogenbewegung nach oben/unten)
-
       this.cards.forEach(card => {
-
         const cardEl = document.getElementById(`shuffle-card-${card.initialSlot}`);
-
         if (cardEl) {
-
           const x = (card.slot - card.initialSlot) * slotDistance;
-
           let y = 0;
-
           if (card === cardA) y = -30; // Bogen nach oben
-
           if (card === cardB) y = 30;  // Bogen nach unten
-
           cardEl.style.transform = `translate(${x}px, ${y}px)`;
-
         }
-
       });
 
-
       // Nach der Hälfte der Bewegung Karten wieder auf einer Linie ausrichten
-
       setTimeout(() => {
-
         this.cards.forEach(card => {
-
           const cardEl = document.getElementById(`shuffle-card-${card.initialSlot}`);
-
           if (cardEl) {
-
             const x = (card.slot - card.initialSlot) * slotDistance;
-
             cardEl.style.transform = `translate(${x}px, 0px)`;
-
           }
-
         });
-
       }, 180);
 
-
       // Ende des Mischens
-
       if (swapsCount >= maxSwaps) {
-
         clearInterval(interval);
-
-
         setTimeout(() => {
-
           this.cards.sort((a, b) => a.slot - b.slot);
-
-
           statusText.innerText = 'Wähle eine Karte!';
-
           statusText.classList.remove('animate-pulse');
 
-
           [0, 1, 2].forEach(slotIdx => {
-
             const cardInSlot = this.cards[slotIdx];
-
             const cardEl = document.getElementById(`shuffle-card-${cardInSlot.initialSlot}`);
-
             if (cardEl) {
-
               cardEl.classList.add('cursor-pointer', 'hover:border-amber-400', 'hover:scale-105');
-
               cardEl.onclick = () => this.pickShuffleCard(player, slotIdx);
-
             }
-
           });
-
         }, 170);
-
       }
-
     }, 350);
-
   }, 500);
-
 }
 
-
 pickShuffleCard(player, pickedSlotIndex) {
-
   this.cards.forEach(card => {
-
     const cardEl = document.getElementById(`shuffle-card-${card.initialSlot}`);
-
     if (cardEl) cardEl.onclick = null;
-
   });
-
 
   // Alle Karten an ihren aktuellen Positionen aufdecken
-
   this.cards.forEach((card, slotIdx) => {
-
     const cardEl = document.getElementById(`shuffle-card-${card.initialSlot}`);
-
     if (cardEl) {
-
       cardEl.innerHTML = `
-
         <span class="text-3xl mt-4">${card.icon}</span>
-
         <span class="text-xs font-bold text-slate-200 leading-tight mb-1">${card.label}</span>
-
       `;
-
       if (slotIdx === pickedSlotIndex) {
-
         cardEl.classList.add('border-amber-400', 'ring-2', 'ring-amber-400/50');
-
       }
-
     }
-
   });
-
 
   const pickedCard = this.cards[pickedSlotIndex];
 
-
   setTimeout(() => {
-
     if (pickedCard.type === 'win') {
-
       soundManager.playSuccess();
-
       app.closeMinigame();
-
+	  const sipWord2 = pickedCard.sips === 1 ? 'Schluck' : 'Schlücke';
       app.openDistributeModal(
-
         player, 
-
         pickedCard.sips, 
-
-        `Gewinn beim Karten-Hai (${pickedCard.sips} Schlucke verteilen)`, 
-
+        `Richtige Karte gezogen (${pickedCard.sips} ${sipWord2} verteilen)`, 
         () => {}
-
       );
 
     } else if (pickedCard.type === 'lose') {
-
+	const sipWord3 = pickedCard.sips === 1 ? 'Schluck' : 'Schlücke';
       this.showPenaltyCard(
-
         player, 
-
         pickedCard.sips, 
-
-        `Niete gezogen! Der Hai hat zugebissen (${pickedCard.sips} Schlucke trinken).`
-
+        `Niete gezogen! Leider die falsche Karte (${pickedCard.sips} ${sipWord3} trinken).`
       );
-
     } else {
-
       soundManager.playClickTick();
-
       app.showToast(`🛡️ Glück gehabt! Keine Strafe für ${player}.`);
-
       app.closeMinigame();
-
     }
-
   }, 1200);
-
 }
 
 //------------------------------------#11-Five Cards------------------------------------
@@ -3945,12 +3805,14 @@ initFiveCards(player) {
   };
 
   const maxSips = app.getMaxSipsForDifficulty();
+  
+  const sipWord = maxSips === 1 ? 'Schluck' : 'Schlücke';
 
   const container = document.getElementById('mg-content');
   container.innerHTML = `
     <div class="w-full flex flex-col items-center space-y-4">
       <div class="glass-panel px-4 py-1.5 rounded-full border border-slate-700 flex items-center gap-2 text-xs font-bold text-slate-300">
-        <span>🏆 Max. Gewinn / Strafe: <span class="text-amber-300 font-black">${maxSips} Schlucke</span></span>
+        <span>🏆 Max. Gewinn / Strafe: <span class="text-amber-300 font-black">${maxSips} ${sipWord}</span></span>
       </div>
 
       <!-- 3D Perspective Container -->
@@ -4113,7 +3975,8 @@ pickFiveCard(player, chosenIdx) {
 
             soundManager.playSuccess();
             app.closeMinigame();
-            app.openDistributeModal(player, winSips, `🥇 Platz 1! Höchste Karte (${generatedCards[chosenIdx].label}) gezogen! Verteile ${winSips} Schlucke.`, () => {});
+			const sipWord = winSips === 1 ? 'Schluck' : 'Schlücke';
+            app.openDistributeModal(player, winSips, `🥇 Platz 1! Höchste Karte (${generatedCards[chosenIdx].label}) gezogen! Verteile ${winSips} ${sipWord}.`, () => {});
           } else {
             // Platz 2-5: Strafen nach Tabelle
             const penalties = {
@@ -4320,7 +4183,8 @@ evaluateSlotResults(player, results) {
 
     setTimeout(() => {
       this.slotSpinning = false;
-      this.showPenaltyCard(player, penalty, `3x 💀 DER SUPER-GAU! Du musst ${penalty} Schlucke trinken!`);
+	  const sipWord = penalty === 1 ? 'Schluck' : 'Schlücke';
+      this.showPenaltyCard(player, penalty, `3x 💀 DER SUPER-GAU! Du musst ${penalty} ${sipWord} trinken!`);
     }, 1000);
     return;
   }
@@ -4338,7 +4202,7 @@ evaluateSlotResults(player, results) {
       app.openDistributeModal(
         player,
         jackpotSips,
-        `JACKPOT! 3x ${s1} (${jackpotSips} Schlucke verteilen)`,
+        `JACKPOT! 3x ${s1} (${jackpotSips} Schlücke verteilen)`,
         () => {}
       );
     }, 1000);
@@ -4358,7 +4222,7 @@ evaluateSlotResults(player, results) {
       app.openDistributeModal(
         player,
         winSips,
-        `Dreierpasch! 3x ${s1} (${winSips} Schlucke verteilen)`,
+        `Dreierpasch! 3x ${s1} (${winSips} Schlücke verteilen)`,
         () => {}
       );
     }, 1000);
@@ -4382,16 +4246,17 @@ evaluateSlotResults(player, results) {
       if (isSkullPair) {
         // Easy: 2 | Medium: 3 | Hard: 5
         const penalty = mode === 'easy' ? 2 : mode === 'medium' ? 3 : 5;
-        this.showPenaltyCard(player, penalty, `2x 💀 Pech gehabt! Du musst ${penalty} Schlucke trinken!`);
+        this.showPenaltyCard(player, penalty, `2x 💀 Pech gehabt! Du musst ${penalty} Schlücke trinken!`);
       } else {
         // Easy: 1-2 | Medium: 2-3 | Hard: 4-5
         const winSips = mode === 'easy' ? getRandomSips(1, 2) : mode === 'medium' ? getRandomSips(2, 3) : getRandomSips(4, 5);
         if (typeof soundManager !== 'undefined' && soundManager.playSuccess) soundManager.playSuccess();
         app.closeMinigame();
+		const sipWord2 = winSips === 1 ? 'Schluck' : 'Schlücke';
         app.openDistributeModal(
           player,
           winSips,
-          `Zweierpaar! 2x ${pairSymbol} (${winSips} Schluck${winSips > 1 ? 'e' : ''} verteilen)`,
+          `Zweierpaar! 2x ${pairSymbol} (${winSips} ${sipWord2} verteilen)`,
           () => {}
         );
       }
@@ -4407,8 +4272,9 @@ evaluateSlotResults(player, results) {
     const penalty = mode === 'easy' ? 1 : mode === 'medium' ? 2 : 4;
 
     setTimeout(() => {
+	  const sipWord3 = penalty === 1 ? 'Schluck' : 'Schlücke';
       this.slotSpinning = false;
-      this.showPenaltyCard(player, penalty, `Ein Totenkopf 💀 erwischt! Du musst ${penalty} Schluck${penalty > 1 ? 'e' : ''} trinken.`);
+      this.showPenaltyCard(player, penalty, `Ein Totenkopf 💀 erwischt! Du musst ${penalty} ${sipWord3} trinken.`);
     }, 1000);
     return;
   }
