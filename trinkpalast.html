@@ -287,6 +287,21 @@
         <i class="fas fa-play text-2xl"></i> SPIEL STARTEN!
       </button>
     </div>
+	
+		    <!-- AKTIVE REGEL BANNER (dauerhaft sichtbar) -->
+<div id="active-rule-banner" class="hidden w-full glass-panel p-3 rounded-xl border border-amber-500/50 bg-amber-500/10 hover:bg-amber-500/20 cursor-pointer transition-all flex items-center justify-between shadow-lg mb-3" onclick="app.openRulePenaltyModal()">
+  <div class="flex items-center gap-2 overflow-hidden">
+    <span class="text-xl animate-bounce">📜</span>
+    <div class="truncate">
+      <div class="text-[10px] text-amber-400 font-bold uppercase tracking-wider">Aktive Regel (Tippen für Strafe)</div>
+      <div id="active-rule-text" class="text-xs text-slate-100 font-semibold truncate">Keine Regel aktiv</div>
+    </div>
+  </div>
+  <div class="flex items-center gap-2 shrink-0">
+    <span id="active-rule-rounds" class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono font-bold text-xs border border-amber-500/40">3 Karten</span>
+    <i class="fas fa-beer text-amber-400 text-sm"></i>
+  </div>
+</div>
 
     <!-- ==================== SCREEN 2: GAMEPLAY SCREEN ==================== -->
     <div id="screen-game" class="w-full max-w-lg hidden space-y-4">
@@ -402,6 +417,13 @@
                 <i class="fas fa-gamepad text-xl"></i> MINISPIEL STARTEN!
               </button>
             </div>
+			
+			<!-- NEU: Regel-Aktionsbutton -->
+<div id="rule-action" class="hidden pt-2 z-10">
+  <button onclick="event.stopPropagation(); app.resolveCard(false)" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-heading font-black text-lg tracking-wider uppercase shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2">
+    <i class="fas fa-check-circle text-xl"></i> Verstanden!
+  </button>
+</div>
 
           </div>
         </div>
@@ -479,6 +501,23 @@
       <div id="distribute-players-list" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
     </div>
   </div>
+  
+  <!-- REGEL STRAFSCHLUCK MODAL -->
+<div id="modal-rule-penalty" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
+  <div class="glass-panel w-full max-w-md rounded-2xl p-6 space-y-4 border border-amber-500/50 shadow-2xl relative">
+    <div class="text-center space-y-1">
+      <div class="text-4xl">📜🍻</div>
+      <h3 id="rule-modal-title" class="font-heading font-black text-2xl text-amber-400">Regel-Verstoß!</h3>
+      <p id="rule-modal-desc" class="text-xs text-slate-300">Wähle, wer wegen der Regel trinken muss:</p>
+    </div>
+
+    <div id="rule-penalty-players-list" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
+
+	      <button onclick="app.closeRulePenaltyModal()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl border border-slate-700 transition-all">
+        Schließen & Weiterfeiern
+      </button>
+  </div>
+</div>
 
   <!-- ==================== GROUP DRINK SELECTION MODAL ==================== -->
   <div id="modal-group-drink" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
@@ -968,6 +1007,8 @@ classic: {
 		  { text: '🪄 MINISPIEL: KARTEN-TRICK! Merke dir deine Wunschkarte, {player} – verfolge sie beim Mischen und wähle die Richtige!', baseSips: 2, minigameId: 'card_ask' },
 		  { text: '⏱️ MINISPIEL: ZAHLEN-JAGD! {player}, finde und klicke alle 15 Zahlen der Reihe nach in unter 8 Sekunden!', baseSips: 2, minigameId: 'number_hunt' },
 		  { text: '🎴 MINISPIEL: HÖCHSTE KARTE! {player}, wähle dein Schicksal! Nur Platz 1 verteilt Schlucke – der Rest trinkt!', baseSips: 2, minigameId: 'five_card' },
+		  //{ text: '🎴 MINISPIEL: MÜNZ-WURF! {player}, Kopf oder Zahl? Gehst du auf volles Risiko oder spielst du auf Nummer sicher?', baseSips: 2, minigameId: 'coin_flip' },
+		  //{ text: '🎴 MINISPIEL: DOSEN-WERFEN! {player}, ziele genau und räume mit einem gezielten Wurf alle Becher ab!', baseSips: 2, minigameId: 'cup_knockout' },
 		  { text: '🎰 MINISPIEL: EINARMIGER BANDIT! {player}, lass die Walzen rollen und beweise dein Glück!', baseSips: 2, minigameId: 'slot_machine' }
         ]
       },
@@ -1060,7 +1101,6 @@ classic: {
       { text: 'DUELL: {player} gegen {player2}! Stein-Schere-Papier Best-of-3. Der Verlierer trinkt {sips} Schlücke!', baseSips: 2, isGroup: true },
       { text: 'DUELL: {player} und {player2} schauen sich tief in die Augen. Wer zuerst blinzelt oder lacht, trinkt {sips} Schlücke!', baseSips: 1, isGroup: true },
       { text: 'KATEGORIE: {player} nennt ein Thema (z.B. Biersorten). Reihum nennt jeder einen Begriff. Wer stockt: {sips} Schlücke!', baseSips: 2, isGroup: true },
-      //{ text: 'REGEL: Ab sofort darf niemand mehr fluchen! Wer flucht, trinkt jedes Mal {sips} Schluck. (3 Runden)', baseSips: 1, isGroup: true },
       { text: 'DUELL: {player} und {player2} machen Daumenringen! Wer verliert, muss {sips} Schlücke trinken!', baseSips: 2, isGroup: true },
       //{ text: 'REGEL: Wer ab jetzt sein Handy anfasst, muss sofort {sips} Schlücke trinken! (Gilt für 3 Runden)', baseSips: 2, isGroup: true },
       { text: 'KATEGORIE: {player} startet mit einer Automarke. Im Uhrzeigersinn nennt jeder eine andere. Wer doppelt nennt oder stockt: {sips} Schlücke!', baseSips: 2, isGroup: true },
@@ -1077,6 +1117,16 @@ classic: {
       { text: 'DUELL: {player} summt einen bekannten Song. {player2} muss ihn erraten. Schaffen es beide nicht in 15 Sek, trinken beide {sips} Schlücke!', baseSips: 2, isBoth: true },
       //{ text: 'REGEL: Die gesamte Runde darf 2 Runden lang nicht mehr lachen. Wer auch nur schmunzelt, trinkt {sips} Schluck!', baseSips: 1, isGroup: true },
       { text: 'DUELL: {player} versucht {player2} innerhalb von 20 Sekunden zum Lachen zu bringen (ohne Anfassen!). Gelingt es: {player2} trinkt {sips} Schlücke, sonst {player}!', baseSips: 2, isGroup: true }
+    ]
+  },
+  rules: {
+    id: 'rules',
+    name: 'Regeln',
+    icon: '📜',
+    cards: [
+      { text: '📜 REGEL: Ab sofort darf niemand mehr fluchen! Wer flucht, trinkt jedes Mal {sips} Schluck. (Dauer: 6 Karten)', shortText: 'Fluch-Verbot (Kein Fluchen)', baseSips: 1,  isRule: true, ruleRounds: 6},
+	  { text: '📜 REGEL: Wer ab jetzt sein Handy anfasst, muss sofort {sips} Schlucke trinken! (Dauer: 6 Karten)', shortText: 'Handy-Verbot', baseSips: 2, isRule: true, ruleRounds: 6 },
+	  { text: '📜 REGEL: Niemand darf ab sofort den Namen eines Mitspielers sagen. Wer es tut: {sips} Schluck! (Dauer: 5 Karten)', shortText: 'Keine Namen nennen', baseSips: 1, isRule: true, ruleRounds: 5 }
     ]
   },
   hot: {
@@ -1142,11 +1192,14 @@ classic: {
 
     class DrinkingApp {
 constructor() {
+this.activeRule = null;
+this.pendingRule = null; // Zwischenspeicher für die gezogene, noch verdeckte Regel
+this.pendingExpiredRule = false;
     const savedPlayers = localStorage.getItem('tp_players');
     this.players = savedPlayers ? JSON.parse(savedPlayers) : [];
 
     const savedDecks = localStorage.getItem('tp_decks');
-    this.selectedDecks = savedDecks ? JSON.parse(savedDecks) : ['minigames', 'classic', 'truth_dare', 'vote', 'never_have_i_ever', 'duel'];
+    this.selectedDecks = savedDecks ? JSON.parse(savedDecks) : ['minigames', 'classic', 'truth_dare', 'vote', 'never_have_i_ever', 'duel', 'rules'];
 
     this.difficulty = localStorage.getItem('tp_difficulty') || 'medium';
     
@@ -1205,6 +1258,78 @@ init() {
     this.updateStatsTotalBadge();
   }
   
+updateRuleBannerUI() {
+  const banner = document.getElementById('active-rule-banner');
+  const textEl = document.getElementById('active-rule-text');
+  const roundsEl = document.getElementById('active-rule-rounds');
+
+  if (!this.activeRule) {
+    if (banner) banner.classList.add('hidden');
+    return;
+  }
+
+  // Banner erst anzeigen, wenn activeRule gesetzt ist (geschieht in flipCard)
+  if (banner) banner.classList.remove('hidden');
+  
+  // Zeige den prägnanten Kurztext
+  if (textEl) textEl.innerText = this.activeRule.shortText;
+  if (roundsEl) roundsEl.innerText = `${this.activeRule.remainingRounds} ${this.activeRule.remainingRounds === 1 ? 'Karte' : 'Karten'}`;
+}
+
+openRulePenaltyModal(isExpired = false) {
+  if (!this.activeRule) return;
+
+  const modal = document.getElementById('modal-rule-penalty');
+  const titleEl = document.getElementById('rule-modal-title');
+  const descEl = document.getElementById('rule-modal-desc');
+  const listEl = document.getElementById('rule-penalty-players-list');
+
+  this.pendingExpiredRule = isExpired;
+
+  if (titleEl) {
+    titleEl.innerText = isExpired ? '📜 Regel abgelaufen!' : '📜 Regel-Verstoß!';
+  }
+
+  if (descEl) {
+    descEl.innerHTML = isExpired 
+      ? `Die Regel ist vorbei! Letzte Chance, Strafschlücke zu verteilen:<br><b class="text-amber-300">${this.activeRule.title}</b>` 
+      : `Regel: <b class="text-amber-300">${this.activeRule.title}</b>`;
+  }
+
+  if (listEl) {
+    listEl.innerHTML = this.players.map(p => `
+      <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+        <span class="font-bold text-sm text-slate-200">👤 ${p}</span>
+        <button onclick="app.giveRulePenalty('${p}')" class="px-3.5 py-1.5 rounded-lg bg-pink-500/20 hover:bg-pink-500/40 text-pink-300 border border-pink-500/40 font-bold text-xs transition-all active:scale-95 flex items-center gap-1">
+          +${this.activeRule.sips} 🍺
+        </button>
+      </div>
+    `).join('');
+  }
+
+  if (modal) modal.classList.remove('hidden');
+}
+
+giveRulePenalty(player) {
+  if (!this.activeRule) return;
+  soundManager.playDrink();
+  this.addSipsToPlayer(player, this.activeRule.sips);
+  const sipWord = this.activeRule.sips === 1 ? 'Schluck' : 'Schlücke';
+  this.showToast(`${player} erhält ${this.activeRule.sips} Straf-${sipWord}! 🍺`);
+}
+
+closeRulePenaltyModal() {
+  const modal = document.getElementById('modal-rule-penalty');
+  if (modal) modal.classList.add('hidden');
+
+  // Wenn die Regel abgelaufen war, wird sie beim Schließen gelöscht
+  if (this.pendingExpiredRule) {
+    this.activeRule = null;
+    this.pendingExpiredRule = false;
+    this.updateRuleBannerUI();
+  }
+}
+  
   setOrderMode(mode) {
   this.playerOrderMode = mode;
   localStorage.setItem('tp_order_mode', mode);
@@ -1250,6 +1375,13 @@ init() {
 
       showScreen(screenId) {
         soundManager.playClick();
+		
+		if (screenId === 'setup') {
+    this.activeRule = null;
+    this.pendingRule = null;
+    this.updateRuleBannerUI();
+  }
+		
         ['setup', 'game', 'end'].forEach(id => {
           const el = document.getElementById(`screen-${id}`);
           if (el) el.classList.add('hidden');
@@ -1433,6 +1565,9 @@ toggleAllDecks() {
 
       /* === GAME ENGINE LOGIC === */
       startGame() {
+this.activeRule = null;
+this.pendingRule = null;
+this.updateRuleBannerUI();
         if (this.players.length < 2) {
           this.showToast('Füge mindestens 2 Spieler hinzu!');
           return;
@@ -1515,150 +1650,200 @@ calculateMinigameSips(baseSips) {
         return Math.min(maxLimit, Math.max(1, calculated));
       }*/
 
-      loadNextCard() {
-        if (this.currentCardIndex >= this.deckQueue.length) {
-          this.showEndScreen();
-          return;
-        }
 
-        if (this.cardTimerInterval) {
-          clearInterval(this.cardTimerInterval);
-          this.cardTimerInterval = null;
-        }
 
-        this.isFlipped = false;
-        const cardElem = document.getElementById('card-element');
-        cardElem.classList.remove('flipped');
+loadNextCard() {
+  if (this.currentCardIndex >= this.deckQueue.length) {
+    this.showEndScreen();
+    return;
+  }
 
-        const rawCard = this.deckQueue[this.currentCardIndex];
+  if (this.cardTimerInterval) {
+    clearInterval(this.cardTimerInterval);
+    this.cardTimerInterval = null;
+  }
 
-let player1Index;
-if (this.playerOrderMode === 'round_robin') {
-  player1Index = this.roundRobinIndex % this.players.length;
-  this.roundRobinIndex++;
-} else {
-  do {
-    player1Index = Math.floor(Math.random() * this.players.length);
-  } while (this.players.length > 1 && player1Index === this.lastPlayerIndex);
-}
-        
-        this.lastPlayerIndex = player1Index;
-        const player1 = this.players[player1Index];
-        
-        let player2 = this.players[(player1Index + 1) % this.players.length];
-        if (this.players.length > 2) {
-          let otherPlayers = this.players.filter(p => p !== player1);
-          player2 = otherPlayers[Math.floor(Math.random() * otherPlayers.length)];
-        }
+  this.isFlipped = false;
+  const cardElem = document.getElementById('card-element');
+  if (cardElem) cardElem.classList.remove('flipped');
 
-        const calculatedSips = rawCard.minigameId ? this.calculateMinigameSips(rawCard.baseSips) : this.calculateSips(rawCard.baseSips);
-        // Bei den Variablendefinitionen am Anfang von loadNextCard():
-		const isBothTask = rawCard.isBoth;
-		const isGroupTask = rawCard.isGroup || isBothTask || !rawCard.text.includes('{player}');
-        const isTwoPlayers = rawCard.text.includes('{player2}');
-        const isAllTask = rawCard.isAll;
+  // 1. Runden der bisherigen aktiven Regel herunterzählen
+  if (this.activeRule) {
+    this.activeRule.remainingRounds--;
+    this.updateRuleBannerUI();
 
-        //let formattedText = rawCard.text
-        //  .replace(/{player}/g, `<span class="text-amber-300 font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/30">${player1}</span>`)
-        //  .replace(/{player2}/g, `<span class="text-cyan-300 font-extrabold px-1.5 py-0.5 rounded bg-cyan-500/20 border border-cyan-500/30">${player2}</span>`)
-        //  .replace(/{sips}/g, `<span class="text-pink-400 font-black text-xl">${calculatedSips}</span>`);
-		
-		// Grammatikalisch passendes Wort wählen
-const sipWord = calculatedSips === 1 ? 'Schluck' : 'Schlücke';
+    if (this.activeRule.remainingRounds <= 0) {
+      this.openRulePenaltyModal(true);
+    }
+  }
 
-let formattedText = rawCard.text
-  .replace(/{player}/g, `<span class="text-amber-300 font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/30">${player1}</span>`)
-  .replace(/{player2}/g, `<span class="text-cyan-300 font-extrabold px-1.5 py-0.5 rounded bg-cyan-500/20 border border-cyan-500/30">${player2}</span>`)
-  // Ersetzt Kombinationen wie "{sips} Schlücke", "{sips} Schluck" oder "{sips} Schlucke" automatisch
-  .replace(/{sips}\s*(Schlücke|Schlucke|Schluck)/gi, `<span class="text-pink-400 font-black text-xl">${calculatedSips}</span> ${sipWord}`)
-  // Fallback, falls nur {sips} ohne Wort im Text steht
-  .replace(/{sips}/g, `<span class="text-pink-400 font-black text-xl">${calculatedSips}</span>`);
+  // 2. Regel-Sperre: Wenn bereits eine Regel aktiv ist und die nächste Karte eine Regel ist,
+  // verschiebe die Regelkarte im Stapel nach hinten, bis die aktuelle Regel abgelaufen ist.
+  if (this.activeRule && this.deckQueue[this.currentCardIndex].isRule) {
+    const nextNonRuleIdx = this.deckQueue.findIndex((c, idx) => idx > this.currentCardIndex && !c.isRule);
+    if (nextNonRuleIdx !== -1) {
+      [this.deckQueue[this.currentCardIndex], this.deckQueue[nextNonRuleIdx]] = 
+      [this.deckQueue[nextNonRuleIdx], this.deckQueue[this.currentCardIndex]];
+    }
+  }
 
-        this.currentCard = {
-          raw: rawCard,
-          player1: player1,
-          player2: player2,
-          sips: calculatedSips,
-          formattedText: formattedText,
-          minigameId: rawCard.minigameId || null,
-          isGroup: isGroupTask,
-          isTwoPlayers: isTwoPlayers,
-          isAll: isAllTask,
-		  isBoth: isBothTask
-        };
+  const rawCard = this.deckQueue[this.currentCardIndex];
 
-        // Render Front
-        document.getElementById('game-deck-badge').innerText = `${rawCard.categoryIcon} ${rawCard.categoryName}`;
-        document.getElementById('front-category-badge').innerText = rawCard.categoryName;
-        document.getElementById('front-player-label').innerText = isGroupTask ? 'Liest vor:' : 'Du bist am Zug:';
-        document.getElementById('front-player-name').innerText = player1;
-        document.getElementById('front-player-icon').innerText = rawCard.minigameId ? '🎮' : (isGroupTask ? '📣' : '🎯');
-        document.getElementById('current-card-num').innerText = this.currentCardIndex + 1;
+  // 3. Schluckanzahl EXAKT EINMAL berechnen (verhindert Abweichungen zwischen Text, Karte & UI)
+  const calculatedSips = rawCard.minigameId 
+    ? this.calculateMinigameSips(rawCard.baseSips) 
+    : this.calculateSips(rawCard.baseSips);
 
-        // Render Back
-        //document.getElementById('back-category-badge').innerText = rawCard.categoryName;
-        //document.getElementById('card-sip-count').innerText = calculatedSips;
-        //document.getElementById('card-sip-icons').innerText = '🍺'.repeat(Math.min(calculatedSips, 8));
-        //document.getElementById('card-task-text').innerHTML = formattedText;
-		
-		// Render Back
-document.getElementById('back-category-badge').innerText = rawCard.categoryName;
+  // 4. Spieler-Reihenfolge bestimmen
+  let player1Index;
+  if (this.playerOrderMode === 'round_robin') {
+    player1Index = this.roundRobinIndex % this.players.length;
+    this.roundRobinIndex++;
+  } else {
+    do {
+      player1Index = Math.floor(Math.random() * this.players.length);
+    } while (this.players.length > 1 && player1Index === this.lastPlayerIndex);
+  }
 
-if (rawCard.minigameId) {
-  document.getElementById('card-sip-count').innerText = 'Überraschung!';
-  document.getElementById('card-sip-icons').innerText = '';
-} else {
-  document.getElementById('card-sip-count').innerText = calculatedSips;
-  document.getElementById('card-sip-icons').innerText = '🍺'.repeat(Math.min(calculatedSips, 8));
-}
+  this.lastPlayerIndex = player1Index;
+  const player1 = this.players[player1Index];
 
-document.getElementById('card-task-text').innerHTML = formattedText;
+  let player2 = this.players[(player1Index + 1) % this.players.length];
+  if (this.players.length > 2) {
+    let otherPlayers = this.players.filter(p => p !== player1);
+    player2 = otherPlayers[Math.floor(Math.random() * otherPlayers.length)];
+  }
 
-        // Timer Detection for standard non-minigame cards
-        const timerContainer = document.getElementById('card-timer-container');
-        const timeMatch = !rawCard.minigameId ? rawCard.text.match(/(\d+)\s*(?:Sekunden|Sek\b)/i) : null;
+  // Karten-Typen bestimmen
+  const isBothTask = rawCard.isBoth;
+  const isGroupTask = rawCard.isGroup || isBothTask || !rawCard.text.includes('{player}');
+  const isTwoPlayers = rawCard.text.includes('{player2}');
+  const isAllTask = rawCard.isAll;
 
-        if (timeMatch) {
-          this.currentCardTimerSec = parseInt(timeMatch[1], 10);
-          if (timerContainer) timerContainer.classList.remove('hidden');
-          this.resetCardTimerUI();
-        } else {
-          this.currentCardTimerSec = null;
-          if (timerContainer) timerContainer.classList.add('hidden');
-        }
+  // Grammatik & Formatierung des Kartentextes
+  const sipWord = calculatedSips === 1 ? 'Schluck' : 'Schlücke';
 
-        // Toggle Actions
-        const stdActions = document.getElementById('standard-actions');
-        const groupActions = document.getElementById('group-actions');
-        const mgAction = document.getElementById('minigame-action');
-        const groupBtnText = document.getElementById('group-drink-btn-text');
-        const groupBtnIcon = document.getElementById('group-drink-btn-icon');
+  let formattedText = rawCard.text
+    .replace(/{player}/g, `<span class="text-amber-300 font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/30">${player1}</span>`)
+    .replace(/{player2}/g, `<span class="text-cyan-300 font-extrabold px-1.5 py-0.5 rounded bg-cyan-500/20 border border-cyan-500/30">${player2}</span>`)
+    .replace(/{sips}\s*(Schlücke|Schlucke|Schluck)/gi, `<span class="text-pink-400 font-black text-xl">${calculatedSips}</span> ${sipWord}`)
+    .replace(/{sips}/g, `<span class="text-pink-400 font-black text-xl">${calculatedSips}</span>`);
 
-        if (rawCard.minigameId) {
-          stdActions.classList.add('hidden');
-          groupActions.classList.add('hidden');
-          mgAction.classList.remove('hidden');
-        } else if (isGroupTask) {
-          stdActions.classList.add('hidden');
-          groupActions.classList.remove('hidden');
-          mgAction.classList.add('hidden');
+  // 5. Neue Regel VORMERKEN (mit identischem Schluckwert & ersetzten Platzhaltern)
+  if (rawCard.isRule) {
+    let formattedRuleTitle = (rawCard.shortText || rawCard.text)
+      .replace(/{player}/g, player1)
+      .replace(/{player2}/g, player2)
+      .replace(/{sips}\s*(Schlücke|Schlucke|Schluck)/gi, `${calculatedSips} ${sipWord}`)
+      .replace(/{sips}/g, calculatedSips);
 
-if (isAllTask) {
-  if (groupBtnText) groupBtnText.innerText = 'Alle trinken! 🍻';
-  if (groupBtnIcon) groupBtnIcon.className = 'fas fa-beer text-base';
-} else if (isBothTask) {
-  if (groupBtnText) groupBtnText.innerText = 'Beide trinken! 🍻';
-  if (groupBtnIcon) groupBtnIcon.className = 'fas fa-users text-base';
-} else {
-  if (groupBtnText) groupBtnText.innerText = 'Wer trinkt? 🍻';
-  if (groupBtnIcon) groupBtnIcon.className = 'fas fa-users text-base';
-}
-        } else {
-          stdActions.classList.remove('hidden');
-          groupActions.classList.add('hidden');
-          mgAction.classList.add('hidden');
-        }
+    this.pendingRule = {
+      title: formattedRuleTitle,
+      shortText: formattedRuleTitle,
+      sips: calculatedSips,
+      remainingRounds: rawCard.ruleRounds || 3
+    };
+  } else {
+    this.pendingRule = null;
+  }
+
+  // Current Card Objekt speichern
+  this.currentCard = {
+    raw: rawCard,
+    player1: player1,
+    player2: player2,
+    sips: calculatedSips,
+    formattedText: formattedText,
+    minigameId: rawCard.minigameId || null,
+    isGroup: isGroupTask,
+    isTwoPlayers: isTwoPlayers,
+    isAll: isAllTask,
+    isBoth: isBothTask,
+    isRule: rawCard.isRule || false
+  };
+
+  // 6. Action-Buttons verwalten (Standard, Gruppe, Minispiel, Regel)
+  const stdActions = document.getElementById('standard-actions');
+  const groupActions = document.getElementById('group-actions');
+  const mgAction = document.getElementById('minigame-action');
+  const ruleAction = document.getElementById('rule-action');
+
+  if (stdActions) stdActions.classList.add('hidden');
+  if (groupActions) groupActions.classList.add('hidden');
+  if (mgAction) mgAction.classList.add('hidden');
+  if (ruleAction) ruleAction.classList.add('hidden');
+
+  if (rawCard.isRule) {
+    if (ruleAction) ruleAction.classList.remove('hidden');
+  } else if (rawCard.minigameId) {
+    if (mgAction) mgAction.classList.remove('hidden');
+  } else if (isGroupTask) {
+    if (groupActions) groupActions.classList.remove('hidden');
+
+    // Dynamischer Text für Gruppen- / Alle- / Beide-Buttons
+    const groupBtnText = document.getElementById('group-drink-btn-text');
+    const groupBtnIcon = document.getElementById('group-drink-btn-icon');
+
+    if (groupBtnText) {
+      if (isAllTask) {
+        groupBtnText.innerText = 'Alle trinken! 🍻';
+        if (groupBtnIcon) groupBtnIcon.className = 'fas fa-beer text-base';
+      } else if (isBothTask) {
+        groupBtnText.innerText = 'Beide trinken! 🍻';
+        if (groupBtnIcon) groupBtnIcon.className = 'fas fa-users text-base';
+      } else {
+        groupBtnText.innerText = 'Wer trinkt? 🍻';
+        if (groupBtnIcon) groupBtnIcon.className = 'fas fa-users text-base';
       }
+    }
+  } else {
+    if (stdActions) stdActions.classList.remove('hidden');
+  }
+
+  // 7. Front- & Back-Karten-Labels befüllen
+  let playerLabelText = 'Du bist am Zug:';
+  if (rawCard.isRule) {
+    playerLabelText = 'Neue Regel:';
+  } else if (isAllTask) {
+    playerLabelText = 'Alle sind dran:';
+  } else if (isBothTask) {
+    playerLabelText = 'Beide sind dran:';
+  } else if (isGroupTask) {
+    playerLabelText = 'Liest vor:';
+  }
+
+  document.getElementById('game-deck-badge').innerText = `${rawCard.categoryIcon} ${rawCard.categoryName}`;
+  document.getElementById('front-category-badge').innerText = rawCard.categoryName;
+  document.getElementById('front-player-label').innerText = playerLabelText;
+  document.getElementById('front-player-name').innerText = player1;
+  document.getElementById('front-player-icon').innerText = rawCard.isRule ? '📜' : (rawCard.minigameId ? '🎮' : (isGroupTask ? '📣' : '🎯'));
+  document.getElementById('current-card-num').innerText = this.currentCardIndex + 1;
+
+  document.getElementById('back-category-badge').innerText = rawCard.categoryName;
+
+  if (rawCard.minigameId) {
+    document.getElementById('card-sip-count').innerText = 'Überraschung!';
+    document.getElementById('card-sip-icons').innerText = '';
+  } else {
+    document.getElementById('card-sip-count').innerText = calculatedSips;
+    document.getElementById('card-sip-icons').innerText = '🍺'.repeat(Math.min(calculatedSips, 8));
+  }
+
+  document.getElementById('card-task-text').innerHTML = formattedText;
+
+  // 8. Timer-Erkennung
+  const timerContainer = document.getElementById('card-timer-container');
+  const timeMatch = !rawCard.minigameId ? rawCard.text.match(/(\d+)\s*(?:Sekunden|Sek\b)/i) : null;
+
+  if (timeMatch && timerContainer) {
+    this.currentCardTimerSec = parseInt(timeMatch[1], 10);
+    timerContainer.classList.remove('hidden');
+    this.resetCardTimerUI();
+  } else if (timerContainer) {
+    this.currentCardTimerSec = null;
+    timerContainer.classList.add('hidden');
+  }
+}
 
       /* === CARD TIMER LOGIC === */
 /* === CARD TIMER LOGIC === */
@@ -1738,6 +1923,12 @@ toggleCardTimer() {
         this.isFlipped = !this.isFlipped;
         cardElem.classList.toggle('flipped', this.isFlipped);
         soundManager.playFlip();
+		
+		if (this.pendingRule) {
+    this.activeRule = this.pendingRule;
+    this.pendingRule = null;
+    this.updateRuleBannerUI(); // Banner wird erst jetzt sichtbar!
+  }
       }
 
       resolveCard(didDrink) {
@@ -2038,7 +2229,9 @@ confirmBothDrink() {
 		  card_ask: 'initCardSharkShuffle',
 		  number_hunt: 'initNumberHunt',
 		  five_card: 'initFiveCards',
-		  slot_machine: 'initSlotMachine'
+		  slot_machine: 'initSlotMachine',
+		  //coin_flip: 'initCoinFlip',
+		  //cup_knockout: 'initCupKnockout'
         };
 
         const starterName = starters[String(mgId).trim()];
