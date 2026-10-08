@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="icon" type="icon.ico" href="icon.ico">
-  <title>🍻 TrinkPalast v1.5 | by Jannick</title>
+  <title>🍻 TrinkPalast v1.6 | by Jannick</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="css/tailwind.css"></script>
@@ -187,7 +187,7 @@
         </div>
         <div>
           <h1 class="font-heading font-black text-xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-300 to-cyan-400">
-            TRINKPALAST v1.5 <span class="inline-block -translate-y-[4px] text-xs px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30 font-mono">by Jannick</span>
+            TRINKPALAST v1.6 <span class="inline-block -translate-y-[4px] text-xs px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30 font-mono">by Jannick</span>
 			<span id="mg-player-name" style="display: none;"></span>
           </h1>
           <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Don't drink & drive - Just sauf & lauf :)</p>
@@ -990,7 +990,7 @@ classic: {
       { text: 'Wer das älteste Smartphone in der Runde hat, muss {sips} Schlücke trinken!', baseSips: 1, isGroup: true },
       { text: '{player}, mache 15 Kniebeugen. Bei jedem Abducken muss die Runde klatschen. Vergisst es jemand, trinkt die Person {sips} Schluck!', baseSips: 2, isGroup: true},
       { text: 'Alle, die Socken mit Motiven tragen, verteilen {sips} Schlucke!', baseSips: 1, isGroup: true },
-      { text: '{player}, lasse dir von {player2} eine lustige Fratze mit dem Finger ins Gesicht zeichnen oder trinke {sips} Schlücke!', baseSips: 2, taskForSomeone: true },
+      { text: '{player}, lasse dir von {player2} eine lustige Fratze mit dem Finger ins Gesicht zeichnen oder trinke {sips} Schlücke!', baseSips: 2 },
       { text: 'Wer als Letztes den Tisch berührt, trinkt sofort {sips} Schlücke!', baseSips: 1, isGroup: true },
       { text: '{player}, versuche 10 Sekunden auf einem Bein zu stehen und dir dabei auf den Kopf zu tippen. Wenn du umkippst: {sips} Schlücke!', baseSips: 1, taskForSomeone: true },
       { text: 'Alle, die kleiner als 1,70m sind, trinken {sips} Schlucke!', baseSips: 1, isGroup: true },
@@ -1025,13 +1025,13 @@ classic: {
     icon: '🔥',
     cards: [
       { text: 'WAHRHEIT: {player}, was ist der peinlichste Song in deiner Playlist? Sag die Wahrheit oder trinke {sips} Schlücke!', baseSips: 2 },
-      { text: 'PFLICHT: {player}, tanze 15 Sekunden ohne Musik. Wenn du verweigerst, trinke {sips} Schlücke!', baseSips: 2 },
+      { text: 'PFLICHT: {player}, tanze 15 Sekunden ohne Musik. Wenn du verweigerst, trinke {sips} Schlücke!', baseSips: 2, taskForSomeone: true },
       { text: 'WAHRHEIT: {player}, was ist die dümmste Ausrede, die du je benutzt hast? Sag es oder trinke {sips} Schlücke.', baseSips: 1 },
       //{ text: 'PFLICHT: {player}, lass {player2} ein Emoji an deinen ersten WhatsApp-Kontakt schicken oder trinke {sips} Schlücke!', baseSips: 2 },
       { text: 'WAHRHEIT: {player}, was war deine peinlichste Jugendsünde? Erzähle es oder trinke {sips} Schlücke!', baseSips: 2 },
       { text: 'PFLICHT: {player}, mache {player2} einen romantischen Heiratsantrag auf den Knien oder trinke {sips} Schlücke!', baseSips: 2 },
       { text: 'WAHRHEIT: {player}, welche Person in diesem Raum würdest du auf eine einsame Insel mitnehmen und warum? Antworte ehrlich oder trinke {sips} Schlücke!', baseSips: 2 },
-      { text: 'PFLICHT: {player}, imitiere für 30 Sekunden eine berühmte Person, bis die Runde sie errät. Wenn es niemand errät: {sips} Schlücke!', baseSips: 2 },
+      { text: 'PFLICHT: {player}, imitiere für 30 Sekunden eine berühmte Person, bis die Runde sie errät. Wenn es niemand errät: {sips} Schlücke!', baseSips: 2, taskForSomeone: true },
       { text: 'WAHRHEIT: {player}, was ist deine peinlichste Eigenschaft, die kaum jemand kennt? Sag es oder trinke {sips} Schlücke!', baseSips: 2 },
       { text: 'PFLICHT: {player}, mache einen Handstand an der Wand oder 20 Strecksprünge. Verweigerst du: {sips} Schlücke!', baseSips: 3 },
       { text: 'WAHRHEIT: {player}, hast du schon einmal über das Essen von jemandem in dieser Runde gelogen? Erzähle die Wahrheit oder trinke {sips} Schlücke!', baseSips: 1 },
@@ -1039,11 +1039,11 @@ classic: {
       { text: 'WAHRHEIT: {player}, was war der schlimmste Fehlkauf deines Lebens? Antworte ehrlich oder trinke {sips} Schlücke!', baseSips: 1 },
       //{ text: 'PFLICHT: {player}, trinke einen Schluck aus dem Glas von {player2} – ohne deine Hände zu benutzen! Wenn du es schaffst, verteilt ihr {sips} Schlücke!', baseSips: 2 },
       { text: 'WAHRHEIT: {player}, was war der merkwürdigste Traum, an den du dich erinnern kannst? Sag die Wahrheit oder trinke {sips} Schlücke!', baseSips: 1 },
-      { text: 'PFLICHT: {player}, ziehe deine Socken für den Rest des Spiels über deine Hände oder trinke {sips} Schlücke!', baseSips: 2 },
+      //{ text: 'PFLICHT: {player}, ziehe deine Socken für den Rest des Spiels über deine Hände oder trinke {sips} Schlücke!', baseSips: 2 },
       { text: 'WAHRHEIT: {player}, hast du schon mal eine Nachricht gelesen und extra stundenlang ignoriert? Bei wem und warum? Ehrlich sein oder {sips} Schlücke!', baseSips: 2 },
-      { text: 'PFLICHT: {player}, umarme {player2} so fest und dramatisch wie in einem Hollywood-Film für 10 Sekunden oder trinke {sips} Schlücke!', baseSips: 2 },
+      { text: 'PFLICHT: {player}, umarme {player2} so fest und dramatisch wie in einem Hollywood-Film für 10 Sekunden oder trinke {sips} Schlücke!', baseSips: 2, taskForSomeone: true },
       { text: 'WAHRHEIT: {player}, welcher Moment in diesem Monat war dir am peinlichsten? Erzähle es oder trinke {sips} Schlücke!', baseSips: 2 },
-      { text: 'PFLICHT: {player}, spiele 20 Sekunden lang Luftgitarre zu einem Rocksong, den die Runde bestimmt, oder trinke {sips} Schlücke!', baseSips: 2 }
+      { text: 'PFLICHT: {player}, spiele 20 Sekunden lang Luftgitarre zu einem Rocksong, den die Runde bestimmt, oder trinke {sips} Schlücke!', baseSips: 2, taskForSomeone: true }
     ]
   },
   never_have_i_ever: {
@@ -1106,17 +1106,17 @@ classic: {
     icon: '⚔️',
     cards: [
       { text: 'DUELL: {player} gegen {player2}! Stein-Schere-Papier Best-of-3. Der Verlierer trinkt {sips} Schlücke!', baseSips: 2, isGroup: true },
-      { text: 'DUELL: {player} und {player2} schauen sich tief in die Augen. Wer zuerst blinzelt oder lacht, trinkt {sips} Schlücke!', baseSips: 1, isGroup: true },
+      { text: 'DUELL: {player} und {player2} schauen sich tief in die Augen. Wer zuerst blinzelt oder lacht, trinkt {sips} Schlücke!', baseSips: 1, isGroup: true, taskForSomeone: true },
       { text: 'KATEGORIE: {player} nennt ein Thema (z.B. Biersorten). Reihum nennt jeder einen Begriff. Wer stockt: {sips} Schlücke!', baseSips: 2, isGroup: true },
-      { text: 'DUELL: {player} und {player2} machen Daumenringen! Wer verliert, muss {sips} Schlücke trinken!', baseSips: 2, isGroup: true },
+      { text: 'DUELL: {player} und {player2} machen Daumenringen! Wer verliert, muss {sips} Schlücke trinken!', baseSips: 2, isGroup: true, taskForSomeone: true },
       { text: 'KATEGORIE: {player} startet mit einer Automarke. Im Uhrzeigersinn nennt jeder eine andere. Wer doppelt nennt oder stockt: {sips} Schlücke!', baseSips: 2, isGroup: true },
-      { text: 'DUELL: {player} und {player2} müssen zeitgleich eine Zahl von 1 bis 5 rufen. Rufen sie dieselbe Zahl, trinken beide {sips} Schlücke!', baseSips: 1, isBoth: true },
-      { text: 'DUELL: {player} nennt ein Wort, {player2} muss blitzschnell ein Reimwort nennen. Braucht ihr länger als 3 Sekunden, trinken beide {sips} Schlücke!', baseSips: 2, isBoth: true },
+      { text: 'DUELL: {player} und {player2} müssen zeitgleich eine Zahl von 1 bis 5 rufen. Rufen sie dieselbe Zahl, trinken beide {sips} Schlücke!', baseSips: 1, isBoth: true, taskForSomeone: true },
+      { text: 'DUELL: {player} nennt ein Wort, {player2} muss blitzschnell ein Reimwort nennen. Braucht ihr länger als 3 Sekunden, trinken beide {sips} Schlücke!', baseSips: 2, isBoth: true, taskForSomeone: true },
       { text: 'KATEGORIE: {player} gibt ein Thema vor (z.B. Automodelle, Cocktails). Reihum antworten. Wer versagt, nimmt {sips} Schlücke!', baseSips: 2, isGroup: true },
-      { text: 'DUELL: {player} und {player2} machen Armdrücken auf dem Tisch. Der Verlierer trinkt {sips} Schlücke!', baseSips: 2, isGroup: true },
+      { text: 'DUELL: {player} und {player2} machen Armdrücken auf dem Tisch. Der Verlierer trinkt {sips} Schlücke!', baseSips: 2, isGroup: true, taskForSomeone: true },
       { text: 'KATEGORIE: Filme mit Leonardo DiCaprio! {player} beginnt. Wer keinen mehr weiß, muss {sips} Schlücke trinken!', baseSips: 2, isGroup: true },
-      { text: 'DUELL: {player} summt einen bekannten Song. {player2} muss ihn erraten. Schaffen es beide nicht in 15 Sek, trinken beide {sips} Schlücke!', baseSips: 2, isBoth: true },
-      { text: 'DUELL: {player} versucht {player2} innerhalb von 20 Sekunden zum Lachen zu bringen (ohne Anfassen!). Gelingt es: {player2} trinkt {sips} Schlücke, sonst {player}!', baseSips: 2, isGroup: true }
+      { text: 'DUELL: {player} summt einen bekannten Song. {player2} muss ihn erraten. Schaffen es beide nicht in 15 Sek, trinken beide {sips} Schlücke!', baseSips: 2, isBoth: true, taskForSomeone: true },
+      { text: 'DUELL: {player} versucht {player2} innerhalb von 20 Sekunden zum Lachen zu bringen (ohne Anfassen!). Gelingt es: {player2} trinkt {sips} Schlücke, sonst {player}!', baseSips: 2, isGroup: true, taskForSomeone: true }
     ]
   },
   rules: {
@@ -1124,12 +1124,12 @@ classic: {
     name: 'Regeln',
     icon: '📜',
     cards: [
-      { text: '📜 REGEL: Ab sofort darf niemand mehr fluchen! Wer flucht, trinkt jedes Mal {sips} Schluck. (Dauer: 10 Karten)', shortText: 'Fluch-Verbot (Kein Fluchen)', baseSips: 1,  isRule: true, ruleRounds: 10},
-	  { text: '📜 REGEL: Wer ab jetzt sein Handy anfasst, muss sofort {sips} Schlucke trinken! (Dauer: 8 Karten)', shortText: 'Handy-Verbot', baseSips: 2, isRule: true, ruleRounds: 8 },
-	  { text: '📜 REGEL: Niemand darf ab sofort den Namen eines Mitspielers sagen. Wer es tut: {sips} Schluck! (Dauer: 9 Karten)', shortText: 'Keine Namen nennen', baseSips: 1, isRule: true, ruleRounds: 9 },
-	  { text: '📜 REGEL: Trinken darf man für 8 Karten ab sofort nur noch mit der nicht-dominanten Hand. Fehler = {sips} Schluck!', shortText: 'Falsche Hand', baseSips: 1, isRule: true, ruleRounds: 8 },
-	  { text: '📜 REGEL: Vor jedem Schluck muss der Spieler laut "Zum Wohl!" sagen. Vergisst man es: noch {sips} Schluck extra! (Dauer: 7 Karten)', shortText: '"Zum Wohl!" sagen', baseSips: 1, isRule: true, ruleRounds: 7 },
-	  { text: '📜 REGEL: Die gesamte Runde darf 6 Karten lang nicht mehr lachen. Wer auch nur schmunzelt, trinkt {sips} Schluck!', shortText: 'Lachverbot', baseSips: 1, isRule: true, ruleRounds: 6 },
+      { text: '📜 REGEL: Ab sofort darf niemand mehr fluchen! Wer flucht, trinkt jedes Mal {sips} Schluck. (Dauer: 10 Karten)', shortText: 'Fluch-Verbot (Kein Fluchen)', baseSips: 1,  isRule: true, ruleRounds: 11},
+	  { text: '📜 REGEL: Wer ab jetzt sein Handy anfasst, muss sofort {sips} Schlucke trinken! (Dauer: 8 Karten)', shortText: 'Handy-Verbot', baseSips: 2, isRule: true, ruleRounds: 9 },
+	  { text: '📜 REGEL: Niemand darf ab sofort den Namen eines Mitspielers sagen. Wer es tut: {sips} Schluck! (Dauer: 9 Karten)', shortText: 'Keine Namen nennen', baseSips: 1, isRule: true, ruleRounds: 10 },
+	  { text: '📜 REGEL: Trinken darf man für 8 Karten ab sofort nur noch mit der nicht-dominanten Hand. Fehler = {sips} Schluck!', shortText: 'Falsche Hand', baseSips: 1, isRule: true, ruleRounds: 9 },
+	  { text: '📜 REGEL: Vor jedem Schluck muss der Spieler laut "Zum Wohl!" sagen. Vergisst man es: noch {sips} Schluck extra! (Dauer: 7 Karten)', shortText: '"Zum Wohl!" sagen', baseSips: 1, isRule: true, ruleRounds: 8 },
+	  { text: '📜 REGEL: Die gesamte Runde darf 6 Karten lang nicht mehr lachen. Wer auch nur schmunzelt, trinkt {sips} Schluck!', shortText: 'Lachverbot', baseSips: 1, isRule: true, ruleRounds: 7 },
     ]
   },
   hot: {
@@ -1142,24 +1142,24 @@ classic: {
       { text: 'Alle Singles in der Runde trinken {sips} Schluck auf die Freiheit! 🥂', baseSips: 1, isGroup: true },
       { text: '{player}, gib {player2} einen sanften Kuss auf die Wange oder die Hand. Wenn du verweigerst: {sips} Schlücke!', baseSips: 2 },
       { text: '{player}, zeige der Runde dein sexiestes Lächeln oder deinen besten Flirt-Blick. Versagst du laut Abstimmung: {sips} Schlücke!', baseSips: 2 },
-      { text: '{player}, flüstere {player2} etwas Schmutziges oder Anzügliches ins Ohr. Wenn {player2} rot wird, trinkt {player2} {sips} Schlücke, sonst {player}!', baseSips: 3, isGroup: true },
-      { text: '{player}, lass dir von {player2} für 15 Sekunden sanft durch die Haare streicheln oder trinke {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, flüstere {player2} etwas Schmutziges oder Anzügliches ins Ohr. Wenn {player2} rot wird, trinkt {player2} {sips} Schlücke, sonst {player}!', baseSips: 3, isGroup: true, taskForSomeone: true },
+      { text: '{player}, lass dir von {player2} für 15 Sekunden sanft durch die Haare streicheln oder trinke {sips} Schlücke!', baseSips: 2, taskForSomeone: true },
       { text: '{player}, was ist deine größte optische Vorliebe beim anderen Geschlecht? Erzähle es offen oder trinke {sips} Schlücke!', baseSips: 2 },
-      { text: '{player}, mache einen kurzen, 10-sekündigen "Lapdance" vor {player2} (lustig oder sexy). Verweigerst du: {sips} Schlücke!', baseSips: 3 },
+      { text: '{player}, mache einen kurzen, 10 Sekunden "Lapdance" vor {player2} (lustig oder sexy). Verweigerst du: {sips} Schlücke!', baseSips: 3, taskForSomeone: true },
       { text: '{player}, verrate der Runde deinen intimsten oder verrücktesten Ort, an dem du je jemanden geküsst hast. Sag es oder trinke {sips} Schlücke!', baseSips: 2 },
-      { text: '{player}, streiche mit deinem Finger sanft über den Nacken von {player2}. Wenn {player2} zuckt, muss {player2} {sips} Schlücke trinken!', baseSips: 2, isGroup: true },
+      { text: '{player}, streiche mit deinem Finger sanft über den Nacken von {player2}. Wenn {player2} zuckt, muss {player2} {sips} Schlücke trinken, ansonsten du selbst!', baseSips: 2, isGroup: true },
       { text: '{player}, vergleiche die Lippen aller Mitspieler und entscheide, wer die weichsten zu haben scheint. Die gewählte Person verteilt {sips} Schlücke!', baseSips: 2, isGroup: true},
       { text: '{player}, ziehe ein Kleidungsstück deiner Wahl aus oder trinke {sips} Schlücke!', baseSips: 3 },
       { text: '{player}, bei wem aus dieser Runde würdest du am ehesten schwach werden, wenn ihr alleine auf einer Insel wärt? Antworten oder {sips} Schlücke!', baseSips: 3 },
-      { text: '{player}, beiße sanft in deine Unterlippe und schau {player2} 5 Sekunden lang intensiv an. Reagiert {player2} nervös: {sips} Schlücke für {player2}!', baseSips: 2, isGroup: true },
+      { text: '{player}, beiße sanft in deine Unterlippe und schau {player2} 5 Sekunden lang intensiv an. Reagiert {player2} nervös: {sips} Schlücke für {player2}!', baseSips: 2, isGroup: true, taskForSomeone: true },
       { text: 'Alle Personen in der Runde, die aktuell vergeben sind, trinken {sips} Schlücke auf die Liebe! ❤️', baseSips: 1, isGroup: true },
-      { text: '{player}, führe mit {player2} einen 10-sekündigen langsamen Walzer/Slow-Dance ohne Musik aus. Wenn ihr verweigert: beide {sips} Schlücke!', baseSips: 2, isBoth: true },
+      { text: '{player}, führe mit {player2} einen 10 Sekunden langsamen Walzer/Slow-Dance ohne Musik aus. Wenn ihr verweigert: beide {sips} Schlücke!', baseSips: 2, isBoth: true, taskForSomeone: true },
       { text: '{player}, erzähle von deinem bisher besten Kuss oder trinke {sips} Schlücke!', baseSips: 2 },
-      { text: '{player}, massiere die Schultern von {player2} für ganze 20 Sekunden oder trinke {sips} Schlücke!', baseSips: 2 },
+      { text: '{player}, massiere die Schultern von {player2} für ganze 20 Sekunden oder trinke {sips} Schlücke!', baseSips: 2, taskForSomeone: true },
       { text: '{player}, füttere {player2} mit einem Snack oder einem Schluck Getränk. Wenn ihr euch weigert: beide {sips} Schlücke!', baseSips: 2, isBoth: true },
       { text: '{player}, beschreibe deinen absoluten Traumtyp in 3 Adjektiven. Verweigerst du: {sips} Schlücke!', baseSips: 1 },
       { text: '{player}, tippe {player2} sanft an die Hüfte und sprich dein bestes Anmach-Sprüchlein auf. Wenn {player2} lacht, trinkt {player2} {sips} Schlücke, ansonsten du!', baseSips: 2, isGroup: true },
-      { text: '{player}, wer in der Runde hat heute das heißeste Outfit an? Die gewählte Person verteilt {sips} Schlücke!', baseSips: 2 , isGroup: true},
+      { text: '{player}, wer in der Runde hat heute das heißeste Outfit an? Die gewählte Person verteilt {sips} Schlücke!', baseSips: 2 , isGroup: true, taskForSomeone: true},
       { text: 'HOT-CHALLENGE: Alle, die schon einmal ein peinliches Dating-Foto verschickt haben, trinken sofort {sips} Schlücke!', baseSips: 2, isGroup: true }
     ]
   },
@@ -1755,8 +1755,8 @@ loadNextCard() {
     this.cardTimerInterval = null;
   }
   
-  // 1. Regel-Sperre: Prüfen & tauschen, solange die Regel aktiv ist
-  if (this.activeRule && this.deckQueue[this.currentCardIndex]?.isRule) {
+  // 1. Regel-Sperre: Prüfen & tauschen, solange eine Regel aktiv oder ausstehend ist
+  if ((this.activeRule || this.pendingRule) && this.deckQueue[this.currentCardIndex]?.isRule) {
     const nextNonRuleIdx = this.deckQueue.findIndex(
       (c, idx) => idx > this.currentCardIndex && !c.isRule
     );
@@ -1774,6 +1774,8 @@ loadNextCard() {
 
     if (this.activeRule.remainingRounds <= 0) {
       this.openRulePenaltyModal(true);
+      this.activeRule = null; // Regel nach Ablauf zurücksetzen, damit neue Regeln wieder erlaubt sind
+      this.updateRuleBannerUI();
     }
   }
 
@@ -2069,40 +2071,28 @@ toggleCardTimer() {
 }
 
 resolveCard(didDrink) {
-  if (this.isBusy) return;
-  if (!this.currentCard) return;
-
-  if (this.pendingRule) {
-    const ruleToActivate = this.pendingRule;
-    this.pendingRule = null; // Sofort leeren, damit sie nicht doppelt verarbeitet wird
-
-    setTimeout(() => {
-      this.activeRule = ruleToActivate;
-      this.updateRuleBannerUI();
-    }, 180); // 180ms Verzögerung
-  }        
-
   if (didDrink) {
     soundManager.playDrink();
 
+    const sipWord = this.currentCard.sips === 1 ? 'Schluck' : 'Schlücke';
+
     if (this.currentCard.isBoth) {
-      // Bei 'isBoth' trinken targetPlayer und player2
+      // Bei 'isBoth' trinken targetPlayer ({player}) und player2 ({player2})
       const p1 = this.currentCard.targetPlayer;
       const p2 = this.currentCard.player2;
 
       this.addSipsToPlayer(p1, this.currentCard.sips);
       if (p2 && p2 !== p1) {
         this.addSipsToPlayer(p2, this.currentCard.sips);
-        this.showToast(`${p1} & ${p2} trinken jeweils ${this.currentCard.sips} Schlücke! 🍺`);
+        this.showToast(`${p1} & ${p2} trinken jeweils ${this.currentCard.sips} ${sipWord}! 🍺`);
       } else {
-        this.showToast(`${p1} trinkt ${this.currentCard.sips} Schlücke! 🍺`);
+        this.showToast(`${p1} trinkt ${this.currentCard.sips} ${sipWord}! 🍺`);
       }
     } else {
       // Bei Einzelaufgaben trinkt der in targetPlayer definierte Spieler ({player})
       const drinker = this.currentCard.targetPlayer || this.currentCard.player1;
       this.addSipsToPlayer(drinker, this.currentCard.sips);
       
-      const sipWord = this.currentCard.sips === 1 ? 'Schluck' : 'Schlücke';
       this.showToast(`${drinker} trinkt ${this.currentCard.sips} ${sipWord}! 🍺`);
     }
   } else {
@@ -2128,16 +2118,21 @@ handleGroupDrinkClick() {
 
 confirmBothDrink() {
   const sips = this.currentCard.sips;
-  const p1 = this.currentCard.player1;
+  const p1 = this.currentCard.targetPlayer; // Geändert von player1 auf targetPlayer
   const p2 = this.currentCard.player2;
 
   soundManager.playDrink();
   this.addSipsToPlayer(p1, sips);
-  this.addSipsToPlayer(p2, sips);
 
-  //this.showToast(`${p1} & ${p2} trinken jeweils ${sips} Schluck(e)! 🍻`);
   const sipWord = sips === 1 ? 'Schluck' : 'Schlücke';
-  this.showToast(`${p1} & ${p2} trinken jeweils ${sips} ${sipWord}! 🍻`);
+
+  if (p2 && p2 !== p1) {
+    this.addSipsToPlayer(p2, sips);
+    this.showToast(`${p1} & ${p2} trinken jeweils ${sips} ${sipWord}! 🍻`);
+  } else {
+    this.showToast(`${p1} trinkt ${sips} ${sipWord}! 🍻`);
+  }
+
   this.currentCardIndex++;
   setTimeout(() => this.loadNextCard(), 280);
 }
@@ -2176,26 +2171,26 @@ confirmBothDrink() {
         this.renderGroupDrinkPlayerList();
       }
 
-      renderGroupDrinkPlayerList() {
-        const container = document.getElementById('group-drink-players-list');
-        const targetPlayers = (this.currentCard && this.currentCard.isTwoPlayers)
-          ? [this.currentCard.player1, this.currentCard.player2]
-          : this.players;
+renderGroupDrinkPlayerList() {
+  const container = document.getElementById('group-drink-players-list');
+  const targetPlayers = (this.currentCard && this.currentCard.isTwoPlayers)
+    ? [this.currentCard.targetPlayer, this.currentCard.player2]
+    : this.players;
 
-        container.innerHTML = targetPlayers.map(p => {
-          const isSelected = this.selectedGroupDrinkers.has(p);
-          return `
-            <button onclick="app.toggleGroupDranker('${p}')" class="py-3 px-3 rounded-xl border font-bold text-sm transition-all flex items-center justify-between ${
-              isSelected 
-                ? 'bg-pink-500/20 border-pink-500 text-pink-300 shadow-lg shadow-pink-500/20' 
-                : 'bg-slate-800/80 border-slate-700 text-slate-300 hover:border-slate-600'
-            }">
-              <span>👤 ${p}</span>
-              <span>${isSelected ? '✅' : '⚪'}</span>
-            </button>
-          `;
-        }).join('');
-      }
+  container.innerHTML = targetPlayers.map(p => {
+    const isSelected = this.selectedGroupDrinkers.has(p);
+    return `
+      <button onclick="app.toggleGroupDranker('${p}')" class="py-3 px-3 rounded-xl border font-bold text-sm transition-all flex items-center justify-between ${
+        isSelected 
+          ? 'bg-pink-500/20 border-pink-500 text-pink-300 shadow-lg shadow-pink-500/20' 
+          : 'bg-slate-800/80 border-slate-700 text-slate-300 hover:border-slate-600'
+      }">
+        <span>👤 ${p}</span>
+        <span>${isSelected ? '✅' : '⚪'}</span>
+      </button>
+    `;
+  }).join('');
+}
 
       confirmGroupDrink() {
         if (this.selectedGroupDrinkers.size === 0) {
