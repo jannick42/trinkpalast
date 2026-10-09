@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="icon" type="icon.ico" href="icon.ico">
-  <title>🍻 TrinkPalast v1.7 | by Jannick</title>
+  <title>🍻 TrinkPalast v1.8 | by Jannick</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="css/tailwind.css"></script>
@@ -187,7 +187,7 @@
         </div>
         <div>
           <h1 class="font-heading font-black text-xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-300 to-cyan-400">
-            TRINKPALAST v1.7 <span class="inline-block -translate-y-[4px] text-xs px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30 font-mono">by Jannick</span>
+            TRINKPALAST v1.8 <span class="inline-block -translate-y-[4px] text-xs px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30 font-mono">by Jannick</span>
 			<span id="mg-player-name" style="display: none;"></span>
           </h1>
           <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Don't drink & drive - Just sauf & lauf :)</p>
@@ -1304,6 +1304,29 @@ this.pendingExpiredRule = false;
       this.showToast('Positionen getauscht! 🔄');
     }
   }
+  
+  showMaxEasterEgg() {
+  // Verhindert doppelte Modals
+  if (document.getElementById('max-easter-egg-modal')) return;
+
+  const modalHtml = `
+    <div id="max-easter-egg-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
+      <div class="glass-panel p-6 rounded-2xl max-w-sm w-full text-center border border-purple-500/30 shadow-2xl space-y-5">
+        <div class="text-4xl">🍺</div>
+        <h3 class="text-lg font-bold text-white">
+          Oh, der Berufsalkoholiker ist auch dabei! 😂
+        </h3>
+        <button 
+          onclick="document.getElementById('max-easter-egg-modal').remove()" 
+          class="w-full py-3 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 active:scale-95 text-white font-bold transition-all shadow-lg shadow-purple-600/30">
+          Haha, war lustig. Auf geht’s😂
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
 
 init() {
     new BubbleBackground();
@@ -1335,6 +1358,13 @@ updateRuleBannerUI() {
 openRulePenaltyModal(isExpired = false) {
   if (!this.activeRule) return;
 
+  // Speichere eine Kopie der Regel für die Schluckverteilung
+  this.currentRulePenalty = {
+    title: this.activeRule.title,
+    sips: this.activeRule.sips,
+    isExpired: isExpired
+  };
+
   const modal = document.getElementById('modal-rule-penalty');
   const titleEl = document.getElementById('rule-modal-title');
   const descEl = document.getElementById('rule-modal-desc');
@@ -1343,13 +1373,13 @@ openRulePenaltyModal(isExpired = false) {
   this.pendingExpiredRule = isExpired;
 
   if (titleEl) {
-    titleEl.innerText = isExpired ? '📜 Regel abgelaufen!' : '📜 Regel-Verstoß!';
+    titleEl.innerText = isExpired ? '⌛ Regel abgelaufen!' : '📜 Regel-Verstoß!';
   }
 
   if (descEl) {
     descEl.innerHTML = isExpired 
-      ? `Die Regel ist vorbei! Letzte Chance, Strafschlücke zu verteilen:<br><b class="text-amber-300">${this.activeRule.title}</b>` 
-      : `Regel: <b class="text-amber-300">${this.activeRule.title}</b>`;
+      ? `Die Regel ist vorbei! Letzte Chance, Strafschlücke zu verteilen:<br><b class="text-amber-300">${this.currentRulePenalty.title}</b>` 
+      : `Regel: <b class="text-amber-300">${this.currentRulePenalty.title}</b>`;
   }
 
   if (listEl) {
@@ -1358,45 +1388,49 @@ openRulePenaltyModal(isExpired = false) {
         <div id="rule-bar-${idx}" class="absolute top-0 bottom-0 left-0 bg-slate-700/60 w-0 pointer-events-none z-0"></div>
         <span class="font-bold text-sm text-slate-200 z-10">👤 ${p}</span>
         <button id="rule-btn-${idx}" onclick="app.giveRulePenalty('${p}', ${idx})" class="z-10 px-3.5 py-1.5 rounded-lg bg-pink-500/20 hover:bg-pink-500/40 text-pink-300 border border-pink-500/40 font-bold text-xs transition-all active:scale-95 flex items-center gap-1">
-          +${this.activeRule.sips} 🍺
+          +${this.currentRulePenalty.sips} 🍺
         </button>
       </div>
     `).join('');
   }
 
-  if (modal) modal.classList.remove('hidden');
+  if (modal) {
+    const delay = isExpired ? 200 : 0; // Optional: Verzögerung nur bei "Regel abgelaufen", nicht bei manueller Strafe
+    setTimeout(() => {
+      modal.classList.remove('hidden');
+    }, delay);
+  }
 }
 
 giveRulePenalty(player, idx) {
-  if (!this.activeRule) return;
+  // Greife auf currentRulePenalty zu
+  if (!this.currentRulePenalty) return;
 
+  const sips = this.currentRulePenalty.sips;
   const btn = document.getElementById(`rule-btn-${idx}`);
   const bar = document.getElementById(`rule-bar-${idx}`);
 
   // Schutz vor doppelten Klicks während der Sperre
   if (btn && btn.disabled) return;
 
-  // Button/Feld sofort klicksicher sperren und ausgrauen
   if (btn) {
     btn.disabled = true;
     btn.classList.add('opacity-40', 'pointer-events-none', 'cursor-not-allowed');
   }
 
-  // Grauen Balken anzeigen und von rechts nach links (100% bis 0%) schrumpfen lassen
   if (bar) {
     bar.style.transition = 'none';
     bar.style.width = '100%';
-    void bar.offsetWidth; // Reflow erzwingen für direkten Start der Animation
+    void bar.offsetWidth;
     bar.style.transition = 'width 1.5s linear';
     bar.style.width = '0%';
   }
 
   soundManager.playDrink();
-  this.addSipsToPlayer(player, this.activeRule.sips);
-  const sipWord = this.activeRule.sips === 1 ? 'Schluck' : 'Schlücke';
-  this.showToast(`${player} erhält ${this.activeRule.sips} Straf-${sipWord}! 🍺`);
+  this.addSipsToPlayer(player, sips);
+  const sipWord = sips === 1 ? 'Schluck' : 'Schlücke';
+  this.showToast(`${player} erhält ${sips} Straf-${sipWord}! 🍺`);
 
-  // Nach 1,5 Sekunden wieder aktivieren
   setTimeout(() => {
     if (btn) {
       btn.disabled = false;
@@ -1409,18 +1443,19 @@ closeRulePenaltyModal() {
   const modal = document.getElementById('modal-rule-penalty');
   if (modal) modal.classList.add('hidden');
 
-  // Wenn die Regel abgelaufen war, wird sie beim Schließen gelöscht
   if (this.pendingExpiredRule) {
     this.activeRule = null;
     this.pendingExpiredRule = false;
     this.updateRuleBannerUI();
   }
+
+  this.currentRulePenalty = null;
 }
 
 advanceToNextCard() {
   if (this.isBusy) return;
   this.isBusy = true;
-
+  
   const cardElem = document.getElementById('card-element');
   
   // 1. Karte visuell zur Vorderseite zurückdrehen
@@ -1510,6 +1545,11 @@ addPlayer() {
       this.showToast('Name existiert bereits!');
       return;
     }
+	
+	// Easter-Egg für Max / max
+  if (name.toLowerCase() === 'max') {
+    this.showMaxEasterEgg();
+  }
 	
 	if (!name) {
       this.showToast('Bitte einen Namen eingeben!');
@@ -2401,17 +2441,22 @@ renderGroupDrinkPlayerList() {
         modal.classList.remove('hidden');
       }
 
-      confirmDistribute(giver, target, sips) {
-        soundManager.playDrink();
-        this.addSipsToPlayer(target, sips);
-		const sipWord2 = sips === 1 ? 'Schluck' : 'Schlücke';
-        this.showToast(`${target} bekommt ${sips} ${sipWord2} von ${giver}! 🍻`);
-        document.getElementById('modal-distribute').classList.add('hidden');
-        if (this.pendingDistributeCallback) {
-          this.pendingDistributeCallback();
-          this.pendingDistributeCallback = null;
-        }
-      }
+confirmDistribute(giver, target, sips) {
+  soundManager.playDrink();
+  this.addSipsToPlayer(target, sips);
+  const sipWord2 = sips === 1 ? 'Schluck' : 'Schlücke';
+  this.showToast(`${target} bekommt ${sips} ${sipWord2} von ${giver}! 🍻`);
+  document.getElementById('modal-distribute').classList.add('hidden');
+  
+  if (this.pendingDistributeCallback) {
+    const cb = this.pendingDistributeCallback;
+    this.pendingDistributeCallback = null;
+    cb();
+  } else {
+    // Falls das Modal aus einem Minispiel geöffnet wurde, jetzt zur nächsten Karte weitergehen!
+    this.advanceToNextCard();
+  }
+}
 
       updateStatsTotalBadge() {
         const total = Object.values(this.sipStats).reduce((a, b) => a + b, 0);
@@ -2651,6 +2696,13 @@ renderGroupDrinkPlayerList() {
         }, 5000);
       }
 	  
+	  closeMinigameOverlay() {
+  const modal = document.getElementById('modal-minigame');
+  if (modal) {
+    modal.classList.add('hidden');
+  }
+}
+	  
 	  
 //------------------------------------#1-Glücksrad------------------------------------
 
@@ -2802,8 +2854,11 @@ spinWheel(player) {
         if (res.action === 'drink') {
           this.showPenaltyCard(player, res.sips, `Glücksrad-Pech (${res.label})`);
         } else if (res.action === 'distribute') {
-          app.closeMinigame();
-          app.openDistributeModal(player, res.sips, res.label, () => {});
+this.closeMinigameOverlay();
+document.getElementById('modal-minigame').classList.add('hidden');
+app.openDistributeModal(player, res.sips, res.label, () => {
+  app.advanceToNextCard();
+});
         } else {
           app.showToast(`🎉 Glück gehabt! Kein Schluck für ${player}.`);
           app.closeMinigame();
@@ -2939,7 +2994,8 @@ handleReactionTap(event, player) {
         }
 
         soundManager.playSuccess();
-        app.closeMinigame();
+		this.closeMinigameOverlay();
+        //app.closeMinigame();
 		
 		const sipWord = winSips === 1 ? 'Schluck' : 'Schlücke';
 		
@@ -2947,7 +3003,7 @@ handleReactionTap(event, player) {
           player, 
           winSips, 
           `Starke Reaktion (${elapsed} ms)! Verteile ${winSips} ${sipWord}.`, 
-          () => {}
+          () => {app.advanceToNextCard();}
         );
       } else {
         // Schlucke selber trinken
@@ -3080,13 +3136,14 @@ evaluateClickSprint(player) {
       }
 
       soundManager.playSuccess();
-      app.closeMinigame();
+      //app.closeMinigame();
+	  this.closeMinigameOverlay();
 	  const sipWord = winSips === 1 ? 'Schluck' : 'Schlücke';
       app.openDistributeModal(
         player,
         winSips,
         `Klick-Marathon (${count} Klicks – Verteile ${winSips} ${sipWord})`,
-        () => {}
+        () => {app.advanceToNextCard();}
       );
     } else {
       // Selber trinken: Unter 35 Klicks
@@ -3190,13 +3247,14 @@ handleTimeGuessBtn(player) {
         }
 
         soundManager.playSuccess();
-        app.closeMinigame();
+        //app.closeMinigame();
+		this.closeMinigameOverlay();
 		const sipWord = winSips === 1 ? 'Schluck' : 'Schlücke';
         app.openDistributeModal(
           player,
           winSips,
           `Exakte Zeit! (${diffMs}ms Abweichung) – Verteile ${winSips} ${sipWord}.`,
-          () => {}
+          () => {app.advanceToNextCard();}
         );
       } else {
         // Schlucke selber trinken
@@ -3374,8 +3432,9 @@ guessCardShark(player, choice) {
       cashoutCardShark(player) {
         const maxSips = app.getMaxSipsForDifficulty();
         const sips = Math.min(maxSips, Math.max(1, this.cardStreak));
-        app.closeMinigame();
-        app.openDistributeModal(player, sips, 'Card Shark Gewinnserie', () => {});
+        //app.closeMinigame();
+		this.closeMinigameOverlay();
+        app.openDistributeModal(player, sips, 'Card Shark Gewinnserie', () => {app.advanceToNextCard();});
       }
 
 //------------------------------------#6-Kiste des Grauens------------------------------------
@@ -3527,8 +3586,9 @@ openBox(player, idx) {
 
 cashoutBoxes(player) {
   const sips = Math.max(1, this.boxSipsAccumulated);
-  app.closeMinigame();
-  app.openDistributeModal(player, sips, 'Kiste des Grauens', () => {});
+  //app.closeMinigame();
+  this.closeMinigameOverlay();
+  app.openDistributeModal(player, sips, 'Kiste des Grauens', () => {app.advanceToNextCard();});
 }
 
 getRoulettePot(survivedShots, maxSips) {
@@ -3686,8 +3746,9 @@ cashoutRoulette(player) {
 
   if (potSips > 0) {
     soundManager.playSuccess();
-    app.closeMinigame();
-    app.openDistributeModal(player, potSips, `Russisches Roulette Pott (${potSips} ${sipWordX})`, () => {});
+    //app.closeMinigame();
+	this.closeMinigameOverlay();
+    app.openDistributeModal(player, potSips, `Russisches Roulette Pott (${potSips} ${sipWordX})`, () => {app.advanceToNextCard();});
   }
 }
 
@@ -3826,13 +3887,14 @@ clickNumber(num, player) {
         soundManager.playSuccess();
         app.showToast(`🔥 In ${elapsedSeconds}s geschafft!`);
         setTimeout(() => {
-          app.closeMinigame();
+          //app.closeMinigame();
+		  this.closeMinigameOverlay();
 		  const sipWord2 = winSips === 1 ? 'Schluck' : 'Schlücke';
           app.openDistributeModal(
             player,
             winSips,
             `Zahlen-Jagd in ${elapsedSeconds}s (${winSips} ${sipWord2} verteilen)`,
-            () => {}
+            () => {app.advanceToNextCard();}
           );
         }, 800);
       } else {
@@ -4055,13 +4117,14 @@ answerShapeCounter(player, chosen, correct) {
     app.showToast(`Richtig! Es waren genau ${correct}! 🎉`);
     
     setTimeout(() => {
-      app.closeMinigame();
+      //app.closeMinigame();
+	  this.closeMinigameOverlay();
 	  const sipWord = winSips === 1 ? 'Schluck' : 'Schlücke';
       app.openDistributeModal(
         player, 
         winSips, 
         `Formen-Zähler Meister (${winSips} ${sipWord} verteilen)`, 
-        () => {}
+        () => {app.advanceToNextCard();}
       );
     }, 600);
   } else {
@@ -4270,13 +4333,14 @@ pickShuffleCard(player, pickedSlotIndex) {
   setTimeout(() => {
     if (pickedCard.type === 'win') {
       soundManager.playSuccess();
-      app.closeMinigame();
+      //app.closeMinigame();
+	  this.closeMinigameOverlay();
 	  const sipWord2 = pickedCard.sips === 1 ? 'Schluck' : 'Schlücke';
       app.openDistributeModal(
         player, 
         pickedCard.sips, 
         `Richtige Karte gezogen (${pickedCard.sips} ${sipWord2} verteilen)`, 
-        () => {}
+        () => {app.advanceToNextCard();}
       );
 
     } else if (pickedCard.type === 'lose') {
@@ -4475,9 +4539,9 @@ pickFiveCard(player, chosenIdx) {
             }
 
             soundManager.playSuccess();
-            app.closeMinigame();
+            //app.closeMinigame();
 			const sipWord = winSips === 1 ? 'Schluck' : 'Schlücke';
-            app.openDistributeModal(player, winSips, `🥇 Platz 1! Höchste Karte (${generatedCards[chosenIdx].label}) gezogen! Verteile ${winSips} ${sipWord}.`, () => {});
+            app.openDistributeModal(player, winSips, `🥇 Platz 1! Höchste Karte (${generatedCards[chosenIdx].label}) gezogen! Verteile ${winSips} ${sipWord}.`, () => {app.advanceToNextCard();});
           } else {
             // Platz 2-5: Strafen nach Tabelle
             const penalties = {
@@ -4699,12 +4763,12 @@ evaluateSlotResults(player, results) {
     setTimeout(() => {
       this.slotSpinning = false;
       if (typeof soundManager !== 'undefined' && soundManager.playSuccess) soundManager.playSuccess();
-      app.closeMinigame();
+      //app.closeMinigame();
       app.openDistributeModal(
         player,
         jackpotSips,
         `JACKPOT! 3x ${s1} (${jackpotSips} Schlücke verteilen)`,
-        () => {}
+        () => {app.advanceToNextCard();}
       );
     }, 1000);
     return;
@@ -4719,12 +4783,12 @@ evaluateSlotResults(player, results) {
     setTimeout(() => {
       this.slotSpinning = false;
       if (typeof soundManager !== 'undefined' && soundManager.playSuccess) soundManager.playSuccess();
-      app.closeMinigame();
+      //app.closeMinigame();
       app.openDistributeModal(
         player,
         winSips,
         `Dreierpasch! 3x ${s1} (${winSips} Schlücke verteilen)`,
-        () => {}
+        () => {app.advanceToNextCard();}
       );
     }, 1000);
     return;
@@ -4752,13 +4816,13 @@ evaluateSlotResults(player, results) {
         // Easy: 1-2 | Medium: 2-3 | Hard: 4-5
         const winSips = mode === 'easy' ? getRandomSips(1, 2) : mode === 'medium' ? getRandomSips(2, 3) : getRandomSips(4, 5);
         if (typeof soundManager !== 'undefined' && soundManager.playSuccess) soundManager.playSuccess();
-        app.closeMinigame();
+        //app.closeMinigame();
 		const sipWord2 = winSips === 1 ? 'Schluck' : 'Schlücke';
         app.openDistributeModal(
           player,
           winSips,
           `Zweierpaar! 2x ${pairSymbol} (${winSips} ${sipWord2} verteilen)`,
-          () => {}
+          () => {app.advanceToNextCard();}
         );
       }
     }, 1000);
